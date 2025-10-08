@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  roleId    Int
+  role      Role     @relation(fields: [roleId], references: [id])
+  quests    Quest[]
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String
+  users User[]
+}
+
+model Adventurer {
+  id             Int          @id @default(autoincrement())
+  name           String
+  specialtyId    Int
+  specialty      Specialty    @relation(fields: [specialtyId], references: [id])
+  dailyRate      Int
+  equipmentTypes      EquipmentType[]
+  consumableTypes    ConsumableType[]
+  experience         Int
+  quests             Quest[]
+}
+
+model Specialty {
+  id           Int          @id @default(autoincrement())
+  name         String
+  adventurers  Adventurer[]
+}
+
+model Equipment {
+  id              Int              @id @default(autoincrement())
+  name            String
+  equipmentTypeId Int
+  equipmentType   EquipmentType    @relation(fields: [equipmentTypeId], references: [id])
+  cost            Int
+  maxDurability   Int
+  currentDurability Int
+  stock           EquipmentStock?
+  quests          Quest[]
+}
+
+model EquipmentType {
+  id          Int          @id @default(autoincrement())
+  name        String
+  equipments  Equipment[]
+  adventurers     Adventurer[]
+}
+
+model EquipmentStock {
+  id           Int        @id @default(autoincrement())
+  equipmentId  Int        @unique
+  durability   Int
+  equipment    Equipment  @relation(fields: [equipmentId], references: [id])
+}
+
+model Consumable {
+  id                Int               @id @default(autoincrement())
+  name              String
+  consumableTypeId  Int
+  consumableType    ConsumableType    @relation(fields: [consumableTypeId], references: [id])
+  quantity          Int
+  cost              Int
+}
+
+model ConsumableType {
+  id           Int          @id @default(autoincrement())
+  name         String
+  consumables  Consumable[]
+  adventurers  Adventurer[]
+}
+
+model Quest {
+  id               Int                 @id @default(autoincrement())
+  name             String
+  description      String
+  finalDate        DateTime
+  reward           Int
+  statusId         Int
+  status           Status              @relation(fields: [statusId], references: [id])
+  estimatedDuration Int
+  recommendedXP    Int
+  adventurers      Adventurer[]
+  equipments       Equipment[]
+  UserId          Int
+  user            User                @relation(fields: [UserId], references: [id])
+}
+
+model Status {
+  id      Int     @id @default(autoincrement())
+  name    String
+  quests  Quest[]
+}
+
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  amount      Int
+  description String
+  date        DateTime
+  total       Int
+}
