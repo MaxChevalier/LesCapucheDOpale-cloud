@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from '../controllers/users.controller';
 import { UsersService } from '../services/users.service';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { RolesGuard } from '../guards/roles.guard';
+import { ExecutionContext } from '@nestjs/common';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -14,11 +17,28 @@ describe('UsersController', () => {
     remove: jest.fn(),
   };
 
+  const mockJwtAuthGuard = {
+    canActivate: (context: ExecutionContext) => {
+      const req = context.switchToHttp().getRequest();
+      req.user = { id: 1, email: 'admin@mail.com', roleId: 1 };
+      return true;
+    },
+  };
+
+  const mockRolesGuard = {
+    canActivate: () => true,
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [{ provide: UsersService, useValue: mockUsersService }],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue(mockJwtAuthGuard)
+      .overrideGuard(RolesGuard)
+      .useValue(mockRolesGuard)
+      .compile();
 
     controller = module.get<UsersController>(UsersController);
     service = module.get<UsersService>(UsersService);

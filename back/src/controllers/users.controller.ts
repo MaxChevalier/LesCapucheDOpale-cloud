@@ -1,40 +1,45 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
-
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { RolesGuard } from '../guards/roles.guard';
+import { Roles } from '../guards/roles.decorator';
 
 @Controller('users')
 export class UsersController {
-constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
+  @Post()
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
+  }
 
-@Post()
-create(@Body() createUserDto: CreateUserDto) {
-return this.usersService.create(createUserDto);
-}
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
+  findAll() {
+    return this.usersService.findAll();
+  }
 
+  @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.findOne(id);
+  }
 
-@Get()
-findAll() {
-return this.usersService.findAll();
-}
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(id, updateUserDto);
+  }
 
-
-@Get(':id')
-findOne(@Param('id', ParseIntPipe) id: number) {
-return this.usersService.findOne(id);
-}
-
-
-@Put(':id')
-update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
-return this.usersService.update(id, updateUserDto);
-}
-
-
-@Delete(':id')
-remove(@Param('id', ParseIntPipe) id: number) {
-return this.usersService.remove(id);
-}
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.remove(id);
+  }
 }

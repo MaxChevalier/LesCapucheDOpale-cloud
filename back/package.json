@@ -79,8 +79,7 @@
     "!main.ts",
     "!**/*.module.ts",
     "!**/prisma/*.ts",
-    "!**/*.config.ts",
-    "**/dto/*.ts"
+    "!**/*.config.ts"
   ],
   "coverageDirectory": "../coverage",
   "coverageReporters": ["text", "lcov", "html"],

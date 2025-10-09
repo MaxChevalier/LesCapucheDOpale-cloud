@@ -50,7 +50,7 @@ return user;
 async update(id: number, updateUserDto: UpdateUserDto) {
 
 
-const data: any = { ...updateUserDto };
+const data: UpdateUserDto  = { ...updateUserDto };
 if (updateUserDto.password) {
 data.password = await hashPassword(updateUserDto.password);
 }
