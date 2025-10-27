@@ -1,0 +1,236 @@
+openapi: 3.0.4
+info:
+  title: API "Les kips AH"
+  description: |-
+    This is the API information regarding the project "Les capuches d'Opale". 
+    
+    C'est un outil de gestion d'aventurier pour une guilde.
+    
+    Some useful links:
+    - [Les capuches d'Opale repository](https://github.com/MaxChevalier/LesCapucheDOpale)
+    - [The source API definition for Les capuches d'Opale](https://github.com/MaxChevalier/LesCapucheDOpale/openapi.yaml)
+  termsOfService: https://swagger.io/terms/
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: https://swagger.io
+servers:
+  - url: https://localhost:3000
+paths:
+  /users:
+    get:
+      tags:
+        - users
+      summary: get all users.
+      description: This can only be done by the logged in user.
+      operationId: getUsers
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/users'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/users'
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - users
+      summary: Create user with given input array.
+      description: Create user with given input array.
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/users'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/users'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/users'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /users/{id}:
+    get:
+      tags:
+        - users
+      summary: Get user by user id.
+      description: Get user detail based on id.
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          description: The id that needs to be fetched. Use 1 for testing
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/users'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/users'
+        '400':
+          description: Invalid id supplied
+        '404':
+          description: User not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      tags:
+        - users
+      summary: Update user.
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          description: name to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent user in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/users'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/users'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/users'
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: bad request
+        '404':
+          description: User not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - users
+      summary: Delete user resource.
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          description: The id that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted
+        '400':
+          description: Invalid id supplied
+        '404':
+          description: User not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    users:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          example: theUser
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: '12345'
+        role:
+          type: integer
+          description: User role
+          format: int64
+          example: 1
+      xml:
+        name: user
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+      xml:
+        name: '##default'
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+  requestBodies:
+    userArray:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/users'
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
