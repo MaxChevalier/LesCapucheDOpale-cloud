@@ -1,0 +1,19 @@
+<section>
+  <form class="formSignUp" [formGroup]="formSignUp" (ngSubmit)="onSubmit()">
+    <input type="text" placeholder="Nom d'utilisateur" name="username" required formControlName="username" />
+    <input type="text" placeholder="Email" name="mail" required formControlName="email" />
+    <input type="password" placeholder="Mot de passe" name="password" required formControlName="password" />
+    <input type="password" placeholder="Confirmation Mot de passe" name="verifPassword" required formControlName="confirmPassword">
+    <select id="roles" formControlName="role">
+      <option *ngFor="let role of roles" [value]="role">
+        {{ role }}
+      </option>
+    </select>
+    <p>
+      {{ errorMessage }}
+    </p>
+    <button type="submit" >
+      SignUp
+    </button>
+  </form>
+</section>

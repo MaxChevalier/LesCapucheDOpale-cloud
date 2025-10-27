@@ -1,14 +1,14 @@
 module.exports = function (config) {
   config.set({
-    basePath: '',
-    frameworks: ['jasmine', '@angular-devkit/build-angular'],
+    basePath: "",
+    frameworks: ["jasmine", "@angular-devkit/build-angular"],
 
     plugins: [
-      require('karma-jasmine'),
-      require('karma-chrome-launcher'),
-      require('karma-jasmine-html-reporter'),
-      require('karma-coverage'),
-      require('@angular-devkit/build-angular/plugins/karma'),
+      require("karma-jasmine"),
+      require("karma-chrome-launcher"),
+      require("karma-jasmine-html-reporter"),
+      require("karma-coverage"),
+      require("@angular-devkit/build-angular/plugins/karma"),
     ],
 
     client: {
@@ -16,15 +16,15 @@ module.exports = function (config) {
       clearContext: false,
     },
 
-    reporters: ['progress', 'kjhtml', 'coverage'],
+    reporters: ["progress", "kjhtml", "coverage"],
 
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage'),
-      subdir: '.',
+      dir: require("path").join(__dirname, "./coverage"),
+      subdir: ".",
       reporters: [
-        { type: 'html' },
-        { type: 'text-summary' },
-        { type: 'lcovonly' },
+        { type: "html" },
+        { type: "text-summary" },
+        { type: "lcovonly" },
       ],
       check: {
         global: {
@@ -38,11 +38,11 @@ module.exports = function (config) {
       includeAllSources: true,
     },
 
-    browsers: ['Chrome'],
+    browsers: ["Chrome"],
 
     customLaunchers: {
       ChromeHeadlessCI: {
-        base: 'ChromeHeadless',
+        base: "ChromeHeadless",
         flags: [
           '--no-sandbox',
           '--disable-gpu',
@@ -66,10 +66,10 @@ module.exports = function (config) {
       options: {
         codeCoverage: true,
         codeCoverageExclude: [
-          '**/environment*.ts',
-          '**/main.ts',
-          '**/polyfills.ts',
-          '**/*.spec.ts',
+          "**/environment*.ts",
+          "**/main.ts",
+          "**/polyfills.ts",
+          "**/*.spec.ts",
         ],
       },
     },
