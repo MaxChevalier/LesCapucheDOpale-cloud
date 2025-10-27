@@ -8,10 +8,10 @@ import * as path from 'path';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const swaggerDocument = YAML.load(path.join(process.cwd(), '..', 'back', 'docs', 'openapi.yaml'));
+  const swaggerDocument = YAML.load(path.join(process.cwd(), 'docs', 'openapi.yaml'));
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-  
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true,forbidNonWhitelisted: true,transform: true}));
+
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
 
   app.enableCors();
 

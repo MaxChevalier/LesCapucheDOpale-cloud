@@ -1,0 +1,35 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateStatusDto } from '../dto/create-status.dto';
+import { UpdateStatusDto } from '../dto/update-status.dto';
+
+@Injectable()
+export class StatusesService {
+  constructor(private prisma: PrismaService) {}
+
+  create(dto: CreateStatusDto) {
+    return this.prisma.status.create({ data: { name: dto.name } });
+  }
+
+  findAll() {
+    return this.prisma.status.findMany({ orderBy: { id: 'asc' } });
+  }
+
+  async update(id: number, dto: UpdateStatusDto) {
+    try {
+      return await this.prisma.status.update({ where: { id }, data: dto });
+    } catch (e: any) {
+      if (e.code === 'P2025') throw new NotFoundException('Status not found');
+      throw e;
+    }
+  }
+
+  async delete(id: number) {
+    try {
+      return await this.prisma.status.delete({ where: { id } });
+    } catch (e: any) {
+      if (e.code === 'P2025') throw new NotFoundException('Status not found');
+      throw e;
+    }
+  }
+}

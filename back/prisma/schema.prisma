@@ -8,13 +8,13 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  roleId    Int
-  role      Role     @relation(fields: [roleId], references: [id])
-  quests    Quest[]
+  id       Int     @id @default(autoincrement())
+  name     String
+  email    String  @unique
+  password String
+  roleId   Int
+  role     Role    @relation(fields: [roleId], references: [id])
+  quests   Quest[]
 }
 
 model Role {
@@ -42,69 +42,69 @@ model Speciality {
 }
 
 model Equipment {
-  id              Int              @id @default(autoincrement())
-  name            String
-  equipmentTypeId Int
-  equipmentType   EquipmentType    @relation(fields: [equipmentTypeId], references: [id])
-  cost            Int
-  maxDurability   Int
-  currentDurability Int
-  stock           EquipmentStock?
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  equipmentTypeId     Int
+  equipmentType       EquipmentType         @relation(fields: [equipmentTypeId], references: [id])
+  cost                Int
+  maxDurability       Int
+  currentDurability   Int
+  QuestStockEquipment QuestStockEquipment[]
+  stocks              EquipmentStock[]
 }
 
 model EquipmentType {
   id          Int          @id @default(autoincrement())
   name        String
   equipments  Equipment[]
-  adventurers     Adventurer[]
+  adventurers Adventurer[]
 }
 
 model EquipmentStock {
-  id           Int        @id @default(autoincrement())
-  equipmentId  Int        @unique
-  durability   Int
-  equipment    Equipment  @relation(fields: [equipmentId], references: [id])
-  quests          Quest[]
+  id                   Int                   @id @default(autoincrement())
+  equipmentId          Int
+  durability           Int
+  equipment            Equipment             @relation(fields: [equipmentId], references: [id])
+  questStockEquipments QuestStockEquipment[]
 }
 
 model Consumable {
-  id                Int               @id @default(autoincrement())
-  name              String
-  consumableTypeId  Int
-  consumableType    ConsumableType    @relation(fields: [consumableTypeId], references: [id])
-  quantity          Int
-  cost              Int
+  id               Int            @id @default(autoincrement())
+  name             String
+  consumableTypeId Int
+  consumableType   ConsumableType @relation(fields: [consumableTypeId], references: [id])
+  quantity         Int
+  cost             Int
 }
 
 model ConsumableType {
-  id           Int          @id @default(autoincrement())
-  name         String
-  consumables  Consumable[]
-  adventurers  Adventurer[]
+  id          Int          @id @default(autoincrement())
+  name        String
+  consumables Consumable[]
+  adventurers Adventurer[]
 }
 
 model Quest {
-  id               Int                 @id @default(autoincrement())
-  name             String
-  description      String
-  finalDate        DateTime
-  reward           Int
-  statusId         Int
-  status           Status              @relation(fields: [statusId], references: [id])
-  estimatedDuration Int
-  recommendedXP    Int
-  adventurers      Adventurer[]
-  equipmentStocks   EquipmentStock[]
-  UserId          Int
-  user            User                @relation(fields: [UserId], references: [id])
+  id                   Int                   @id @default(autoincrement())
+  name                 String
+  description          String
+  finalDate            DateTime
+  reward               Int
+  statusId             Int
+  status               Status                @relation(fields: [statusId], references: [id])
+  estimatedDuration    Int
+  recommendedXP        Int
+  adventurers          Adventurer[]
+  questStockEquipments QuestStockEquipment[]
+  UserId               Int
+  user                 User                  @relation(fields: [UserId], references: [id])
 }
 
 model Status {
-  id      Int     @id @default(autoincrement())
-  name    String
-  quests  Quest[]
+  id     Int     @id @default(autoincrement())
+  name   String
+  quests Quest[]
 }
-
 
 model Transaction {
   id          Int      @id @default(autoincrement())
@@ -112,4 +112,17 @@ model Transaction {
   description String
   date        DateTime
   total       Int
+}
+
+model QuestStockEquipment {
+  id               Int            @id @default(autoincrement())
+  questId          Int
+  quest            Quest          @relation(fields: [questId], references: [id])
+  equipmentStockId Int
+  equipmentStock   EquipmentStock @relation(fields: [equipmentStockId], references: [id])
+  Equipment        Equipment?     @relation(fields: [equipmentId], references: [id])
+  equipmentId      Int?
+
+  @@unique([questId, equipmentStockId])
+  @@map("quest_stock_equipment")
 }

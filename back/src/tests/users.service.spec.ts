@@ -126,13 +126,13 @@ describe('UsersService', () => {
   it('should delete a user', async () => {
     (prisma.user.delete as jest.Mock).mockResolvedValue({ id: 1 });
 
-    const result = await service.remove(1);
+    const result = await service.delete(1);
     expect(result).toEqual({ deleted: true });
   });
 
   it('should throw NotFoundException if deleting non-existent user', async () => {
     (prisma.user.delete as jest.Mock).mockRejectedValue(new Error('not found'));
-    await expect(service.remove(999)).rejects.toThrow(NotFoundException);
+    await expect(service.delete(999)).rejects.toThrow(NotFoundException);
   });
 
   // ------------------------

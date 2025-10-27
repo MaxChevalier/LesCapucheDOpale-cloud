@@ -18,17 +18,17 @@ export class ConsumableTypesController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.consumableTypesService.findOne(+id);
+    findOne(@Param('id') id: number) {
+        return this.consumableTypesService.findOne(id);
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() dto: UpdateConsumableTypeDto) {
-        return this.consumableTypesService.update(+id, dto);
+    update(@Param('id') id: number, @Body() dto: UpdateConsumableTypeDto) {
+        return this.consumableTypesService.update(id, dto);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.consumableTypesService.remove(+id);
+    delete(@Param('id') id: number) {
+        return this.consumableTypesService.delete(id);
     }
 }

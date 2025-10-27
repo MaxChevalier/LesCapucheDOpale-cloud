@@ -18,17 +18,17 @@ export class EquipmentTypesController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.equipmentTypesService.findOne(+id);
+    findOne(@Param('id') id: number) {
+        return this.equipmentTypesService.findOne(id);
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() dto: UpdateEquipmentTypeDto) {
-        return this.equipmentTypesService.update(+id, dto);
+    update(@Param('id') id: number, @Body() dto: UpdateEquipmentTypeDto) {
+        return this.equipmentTypesService.update(id, dto);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.equipmentTypesService.remove(+id);
+    delete(@Param('id') id: number) {
+        return this.equipmentTypesService.delete(id);
     }
 }

@@ -18,17 +18,17 @@ export class SpecialitiesController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.specialitiesService.findOne(+id);
+    findOne(@Param('id') id: number) {
+        return this.specialitiesService.findOne(id);
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() dto: UpdateSpecialityDto) {
-        return this.specialitiesService.update(+id, dto);
+    update(@Param('id') id: number, @Body() dto: UpdateSpecialityDto) {
+        return this.specialitiesService.update(id, dto);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.specialitiesService.remove(+id);
+    remove(@Param('id') id: number) {
+        return this.specialitiesService.delete(id);
     }
 }

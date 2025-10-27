@@ -14,7 +14,7 @@ describe('UsersController', () => {
     findAll: jest.fn(),
     findOne: jest.fn(),
     update: jest.fn(),
-    remove: jest.fn(),
+    delete: jest.fn(),
   };
 
   const mockJwtAuthGuard = {
@@ -86,13 +86,13 @@ describe('UsersController', () => {
     expect(result).toEqual(updated);
   });
 
-  it('should call service.remove()', async () => {
+  it('should call service.delete()', async () => {
     const deleted = { id: 1 };
-    mockUsersService.remove.mockResolvedValue(deleted);
+    mockUsersService.delete.mockResolvedValue(deleted);
 
-    const result = await controller.remove(1);
+    const result = await controller.delete(1);
 
-    expect(service.remove).toHaveBeenCalledWith(1);
+    expect(service.delete).toHaveBeenCalledWith(1);
     expect(result).toEqual(deleted);
   });
 });

@@ -78,7 +78,7 @@ throw new NotFoundException('User not found');
 }
 
 
-async remove(id: number) {
+async delete(id: number) {
 try {
 await this.prisma.user.delete({ where: { id } });
 return { deleted: true };

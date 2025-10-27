@@ -49,9 +49,7 @@ describe('AdventurersController', () => {
     it('should call service.create()', async () => {
         const dto = {
             name: 'Aragorn',
-            speciality: {
-                name: 'Warrior'
-            },
+            specialityId: 1,
             dailyRate: 100,
             experience: 5,
             equipmentTypes: [

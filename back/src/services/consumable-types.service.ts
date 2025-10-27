@@ -32,7 +32,7 @@ export class ConsumableTypesService {
         return consumableType;
     }
 
-    async remove(id: number) {
+    async delete(id: number) {
         try {
             return await this.prisma.consumableType.delete({ where: { id } });
         } catch (e: any) {

@@ -13,8 +13,8 @@ export class AdventurersController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.adventurersService.findOne(+id);
+    findOne(@Param('id') id: number) {
+        return this.adventurersService.findOne(id);
     }
 
     @Post()

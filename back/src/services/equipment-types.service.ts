@@ -32,7 +32,7 @@ export class EquipmentTypesService {
         return equipmentType;
     }
 
-    async remove(id: number) {
+    async delete(id: number) {
         try {
             return await this.prisma.equipmentType.delete({ where: { id } });
         } catch (e: any) {

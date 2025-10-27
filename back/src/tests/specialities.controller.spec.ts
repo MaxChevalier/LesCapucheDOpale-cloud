@@ -14,7 +14,7 @@ describe('SpecialitiesController', () => {
         findAll: jest.fn(),
         findOne: jest.fn(),
         update: jest.fn(),
-        remove: jest.fn(),
+        delete: jest.fn(),
     };
 
     const mockJwtAuthGuard = {
@@ -88,11 +88,11 @@ describe('SpecialitiesController', () => {
 
     it('should call service.remove()', async () => {
         const deleted = { id: 1 };
-        mockSpecialitiesService.remove.mockResolvedValue(deleted);
+        mockSpecialitiesService.delete.mockResolvedValue(deleted);
 
         const result = await controller.remove(1);
 
-        expect(service.remove).toHaveBeenCalledWith(1);
+        expect(service.delete).toHaveBeenCalledWith(1);
         expect(result).toEqual(deleted);
     });
 });

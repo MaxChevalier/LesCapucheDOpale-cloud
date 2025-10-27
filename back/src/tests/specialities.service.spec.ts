@@ -97,12 +97,12 @@ describe('SpecialitiesService', () => {
     it('should delete a speciality', async () => {
         (prisma.speciality.delete as jest.Mock).mockResolvedValue({ id: 1 });
 
-        const result = await service.remove(1);
+        const result = await service.delete(1);
         expect(result).toEqual({ id: 1 });
     });
 
     it('should throw NotFoundException if deleting non-existent speciality', async () => {
         (prisma.speciality.delete as jest.Mock).mockRejectedValue({ code: 'P2025' });
-        await expect(service.remove(999)).rejects.toThrow(NotFoundException);
+        await expect(service.delete(999)).rejects.toThrow(NotFoundException);
     });
 });
