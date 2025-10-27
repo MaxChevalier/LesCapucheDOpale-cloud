@@ -8,6 +8,16 @@ import { Prisma } from "@prisma/client";
 export class AdventurersService {
     constructor(private prisma: PrismaService) {}
 
+    async findAll() {
+        return this.prisma.adventurer.findMany();
+    }
+
+    async findOne(id: number) {
+        const adventurer = await this.prisma.adventurer.findUnique({ where: { id } });
+        if (!adventurer) throw new NotFoundException('Adventurer not found');
+        return adventurer;
+    }
+
     async create(createAdventurerDto: CreateAdventurerDto) {
         const {
             name,

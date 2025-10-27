@@ -12,6 +12,8 @@ describe('AdventurersService', () => {
                 findFirst: jest.fn(),
                 create: jest.fn(),
                 update: jest.fn(),
+                findMany: jest.fn(),
+                findUnique: jest.fn(),
             },
             speciality: {
                 findFirst: jest.fn(),
@@ -34,6 +36,51 @@ describe('AdventurersService', () => {
     });
 
     afterEach(() => jest.clearAllMocks());
+
+    // ------------------------
+    // FIND ALL
+    // ------------------------
+    it('should return an array of adventurers', async () => {
+        const adventurersList = [
+            { id: 1, name: 'Aragorn' },
+            { id: 2, name: 'Legolas' },
+        ];
+        (prisma.adventurer.findMany as jest.Mock).mockResolvedValue(adventurersList);
+
+        const result = await service.findAll();
+
+        expect(result).toEqual(adventurersList);
+        expect(prisma.adventurer.findMany).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return an empty array when no adventurers are found', async () => {
+        (prisma.adventurer.findMany as jest.Mock).mockResolvedValue([]);
+
+        const result = await service.findAll();
+
+        expect(result).toEqual([]);
+        expect(prisma.adventurer.findMany).toHaveBeenCalledTimes(1);
+    });
+
+    // ------------------------
+    // FIND ONE
+    // ------------------------
+    it('should return a single adventurer', async () => {
+        const adventurer = { id: 1, name: 'Aragorn' };
+        (prisma.adventurer.findUnique as jest.Mock).mockResolvedValue(adventurer);
+
+        const result = await service.findOne(1);
+
+        expect(result).toEqual(adventurer);
+        expect(prisma.adventurer.findUnique).toHaveBeenCalledWith({ where: { id: 1 } });
+    });
+
+    it('should throw NotFoundException if adventurer is not found', async () => {
+        (prisma.adventurer.findUnique as jest.Mock).mockResolvedValue(null);
+
+        await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
+        expect(prisma.adventurer.findUnique).toHaveBeenCalledWith({ where: { id: 999 } });
+    });
 
     // ------------------------
     // CREATE
