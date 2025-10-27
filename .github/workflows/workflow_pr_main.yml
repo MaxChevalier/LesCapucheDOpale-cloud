@@ -1,0 +1,44 @@
+name: CI Main
+
+# Trigger
+on:
+    pull_request:
+        branches: ["main"]
+        types: [opened, synchronize]
+
+# JOBS
+jobs:
+    test-front:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                node-version: '18'
+            - name: Front - Install and Test
+              run: |
+                cd front
+                npm run testCi
+    test-back:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                node-version: '18'
+
+            - name: Back - Install dependencies
+              run: npm ci
+              working-directory: ./back
+
+            - name: Back - Lint
+              run: npm run lint
+              working-directory: ./back
+
+            - name: Back - Build
+              run: npm run build
+              working-directory: ./back
+
+            - name: Back - Test
+              run: npm run test
+              working-directory: ./back
