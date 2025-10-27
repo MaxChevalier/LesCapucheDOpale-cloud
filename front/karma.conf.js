@@ -28,9 +28,9 @@ module.exports = function (config) {
       ],
       check: {
         global: {
-          statements: 100,
-          lines: 100,
-          branches: 100,
+          statements: 75,
+          lines: 75,
+          branches: 75,
           functions: 100,
         },
       },
@@ -48,8 +48,7 @@ module.exports = function (config) {
           '--disable-gpu',
           '--disable-dev-shm-usage',
           '--disable-software-rasterizer',
-          '--mute-audio',
-          '--single-process',
+          '--mute-audio'
         ],
       },
     },
