@@ -1,236 +1,804 @@
-openapi: 3.0.4
+openapi: 3.0.0
+paths:
+  /auth/login:
+    post:
+      operationId: AuthController_login
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - Auth
+  /users:
+    post:
+      operationId: UsersController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - Users
+    get:
+      operationId: UsersController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Users
+  /users/{id}:
+    get:
+      operationId: UsersController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Users
+    patch:
+      operationId: UsersController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Users
+    delete:
+      operationId: UsersController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Users
+  /quests:
+    get:
+      operationId: QuestsController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Quests
+    post:
+      operationId: QuestsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuestDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - Quests
+  /quests/{id}:
+    get:
+      operationId: QuestsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Quests
+    patch:
+      operationId: QuestsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQuestDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Quests
+  /quests/{id}/status:
+    patch:
+      operationId: QuestsController_updateStatus
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStatusDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Quests
+  /quests/{id}/adventurers/attach:
+    patch:
+      operationId: QuestsController_attachAdventurers
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdsDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Quests
+  /quests/{id}/adventurers/detach:
+    patch:
+      operationId: QuestsController_detachAdventurers
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdsDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Quests
+  /quests/{id}/adventurers/set:
+    patch:
+      operationId: QuestsController_setAdventurers
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdsDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Quests
+  /quests/{id}/equipment-stocks/attach:
+    patch:
+      operationId: QuestsController_attachEquipment
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdsDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Quests
+  /quests/{id}/equipment-stocks/detach:
+    patch:
+      operationId: QuestsController_detachEquipment
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdsDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Quests
+  /quests/{id}/equipment-stocks/set:
+    patch:
+      operationId: QuestsController_setEquipment
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdsDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Quests
+  /adventurers:
+    get:
+      operationId: AdventurersController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Adventurers
+    post:
+      operationId: AdventurersController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdventurerDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - Adventurers
+  /adventurers/{id}:
+    get:
+      operationId: AdventurersController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Adventurers
+    patch:
+      operationId: AdventurersController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAdventurerDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Adventurers
+  /specialities:
+    post:
+      operationId: SpecialitiesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSpecialityDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - Specialities
+    get:
+      operationId: SpecialitiesController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Specialities
+  /specialities/{id}:
+    get:
+      operationId: SpecialitiesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Specialities
+    patch:
+      operationId: SpecialitiesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSpecialityDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Specialities
+    delete:
+      operationId: SpecialitiesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Specialities
+  /equipment-types:
+    post:
+      operationId: EquipmentTypesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEquipmentTypeDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - EquipmentTypes
+    get:
+      operationId: EquipmentTypesController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - EquipmentTypes
+  /equipment-types/{id}:
+    get:
+      operationId: EquipmentTypesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - EquipmentTypes
+    patch:
+      operationId: EquipmentTypesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEquipmentTypeDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - EquipmentTypes
+    delete:
+      operationId: EquipmentTypesController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - EquipmentTypes
+  /consumable-types:
+    post:
+      operationId: ConsumableTypesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConsumableTypeDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - ConsumableTypes
+    get:
+      operationId: ConsumableTypesController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - ConsumableTypes
+  /consumable-types/{id}:
+    get:
+      operationId: ConsumableTypesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - ConsumableTypes
+    patch:
+      operationId: ConsumableTypesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConsumableTypeDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - ConsumableTypes
+    delete:
+      operationId: ConsumableTypesController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - ConsumableTypes
+  /equipment:
+    get:
+      operationId: EquipmentController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Equipment
+    post:
+      operationId: EquipmentController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEquipmentDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - Equipment
+  /equipment/{id}:
+    get:
+      operationId: EquipmentController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Equipment
+    patch:
+      operationId: EquipmentController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEquipmentDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Equipment
+    delete:
+      operationId: EquipmentController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Equipment
+  /equipment-stocks:
+    get:
+      operationId: EquipmentStocksController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - EquipmentStocks
+    post:
+      operationId: EquipmentStocksController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEquipmentStockDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - EquipmentStocks
+  /equipment-stocks/{id}:
+    get:
+      operationId: EquipmentStocksController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - EquipmentStocks
+    patch:
+      operationId: EquipmentStocksController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEquipmentStockDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - EquipmentStocks
+    delete:
+      operationId: EquipmentStocksController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - EquipmentStocks
+  /quest-stock-equipment:
+    get:
+      operationId: QuestStockEquipmentController_list
+      parameters:
+        - name: questId
+          required: true
+          in: query
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - QuestStockEquipment
+    post:
+      operationId: QuestStockEquipmentController_attach
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuestStockEquipmentDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - QuestStockEquipment
+  /quest-stock-equipment/{id}:
+    delete:
+      operationId: QuestStockEquipmentController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - QuestStockEquipment
+  /statuses:
+    get:
+      operationId: StatusesController_list
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Statuses
+    post:
+      operationId: StatusesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStatusDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - Statuses
+  /statuses/{id}:
+    patch:
+      operationId: StatusesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStatusDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Statuses
+    delete:
+      operationId: StatusesController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Statuses
+  /:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - App
 info:
   title: API "Les kips AH"
   description: |-
-    This is the API information regarding the project "Les capuches d'Opale". 
-    
+    This is the API information regarding the project "Les capuches d'Opale".
+
     C'est un outil de gestion d'aventurier pour une guilde.
-    
-    Some useful links:
-    - [Les capuches d'Opale repository](https://github.com/MaxChevalier/LesCapucheDOpale)
-    - [The source API definition for Les capuches d'Opale](https://github.com/MaxChevalier/LesCapucheDOpale/openapi.yaml)
+  version: 1.0.0
+  contact: {}
   termsOfService: https://swagger.io/terms/
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
-externalDocs:
-  description: Find out more about Swagger
-  url: https://swagger.io
-servers:
-  - url: https://localhost:3000
-paths:
-  /users:
-    get:
-      tags:
-        - users
-      summary: get all users.
-      description: This can only be done by the logged in user.
-      operationId: getUsers
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/users'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/users'
-
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    post:
-      tags:
-        - users
-      summary: Create user with given input array.
-      description: Create user with given input array.
-      operationId: createUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-                $ref: '#/components/schemas/users'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/users'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/users'
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /users/{id}:
-    get:
-      tags:
-        - users
-      summary: Get user by user id.
-      description: Get user detail based on id.
-      operationId: getUserById
-      parameters:
-        - name: id
-          in: path
-          description: The id that needs to be fetched. Use 1 for testing
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/users'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/users'
-        '400':
-          description: Invalid id supplied
-        '404':
-          description: User not found
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    patch:
-      tags:
-        - users
-      summary: Update user.
-      description: This can only be done by the logged in user.
-      operationId: updateUser
-      parameters:
-        - name: id
-          in: path
-          description: name to update
-          required: true
-          schema:
-            type: string
-      requestBody:
-        description: Update an existent user in the store
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/users'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/users'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/users'
-      responses:
-        '200':
-          description: successful operation
-        '400':
-          description: bad request
-        '404':
-          description: User not found
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    delete:
-      tags:
-        - users
-      summary: Delete user resource.
-      description: This can only be done by the logged in user.
-      operationId: deleteUser
-      parameters:
-        - name: id
-          in: path
-          description: The id that needs to be deleted
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: User deleted
-        '400':
-          description: Invalid id supplied
-        '404':
-          description: User not found
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+tags: []
+servers: []
 components:
-  schemas:
-    users:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 10
-        name:
-          type: string
-          example: theUser
-        email:
-          type: string
-          example: john@email.com
-        password:
-          type: string
-          example: '12345'
-        role:
-          type: integer
-          description: User role
-          format: int64
-          example: 1
-      xml:
-        name: user
-    ApiResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-          format: int32
-        type:
-          type: string
-        message:
-          type: string
-      xml:
-        name: '##default'
-    Error:
-      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-      required:
-        - code
-        - message
-  requestBodies:
-    userArray:
-      description: List of user object
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/users'
   securitySchemes:
-    api_key:
-      type: apiKey
-      name: api_key
-      in: header
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
