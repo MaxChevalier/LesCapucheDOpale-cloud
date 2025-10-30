@@ -20,6 +20,8 @@ export class QuestStockEquipmentController {
   constructor(private readonly service: QuestStockEquipmentService) {}
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
   list(@Query('questId') questId?: number) {
     return this.service.findAll(questId);
   }

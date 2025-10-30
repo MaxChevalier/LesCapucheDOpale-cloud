@@ -21,6 +21,8 @@ export class StatusesController {
   constructor(private readonly service: StatusesService) {}
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
   list() {
     return this.service.findAll();
   }

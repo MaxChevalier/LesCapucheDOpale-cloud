@@ -21,11 +21,15 @@ export class EquipmentController {
   constructor(private readonly service: EquipmentService) {}
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
   findAll() {
     return this.service.findAll();
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id);
   }

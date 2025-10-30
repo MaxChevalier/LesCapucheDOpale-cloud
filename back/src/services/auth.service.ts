@@ -38,6 +38,6 @@ export class AuthService {
       });
     }
 
-    return { access_token: token , user: user };
+    return { access_token: token, user: user };
   }
 }
