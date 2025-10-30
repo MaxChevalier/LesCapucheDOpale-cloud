@@ -10,8 +10,11 @@ describe('ItemAdventurer', () => {
     id: 1,
     name: 'Aragorn',
     speciality: { id: 1, name: 'Guerrier' },
+    specialityId: 1,
     equipmentType: [],
+    equipmentTypeIds: [],
     consumableType: [],
+    consumableTypeIds: [],
     dailyRate: 123,
     experience: 0
   };

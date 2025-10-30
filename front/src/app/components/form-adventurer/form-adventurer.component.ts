@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AdventurerFormData, ConsumableType, EquipmentType, Speciality } from '../../models/models';
 
@@ -14,15 +14,15 @@ import { FormMoney } from '../form-money/form-money';
     templateUrl: './form-adventurer.component.html',
     styleUrl: './form-adventurer.component.scss'
 })
-export class FormAdventurerComponent implements OnInit {
+export class FormAdventurerComponent implements OnInit, OnChanges {
   @Output() formSubmitted = new EventEmitter<AdventurerFormData>();
   @Input() initialData: AdventurerFormData | null = null;
 
   protected adventurerForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
-    speciality: new FormControl(0, [Validators.required]),
-    equipmentType: new FormControl([] as number[], []),
-    consumableType: new FormControl([] as number[], []),
+    specialityId: new FormControl(0, [Validators.required]),
+    equipmentTypeIds: new FormControl([] as number[], []),
+    consumableTypeIds: new FormControl([] as number[], []),
     dailyRate: new FormControl(0, [Validators.required, Validators.min(0)]),
   });
 
@@ -47,13 +47,15 @@ export class FormAdventurerComponent implements OnInit {
       this.equipmentTypes = equipment;
       this.consumableTypes = consumables;
     });
+  }
 
-    if (this.initialData) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['initialData'] && this.initialData) {
       this.adventurerForm.patchValue({
         name: this.initialData.name,
-        speciality: this.initialData.speciality,
-        equipmentType: this.initialData.equipmentType,
-        consumableType: this.initialData.consumableType,
+        specialityId: this.initialData.specialityId,
+        equipmentTypeIds: this.initialData.equipmentTypeIds,
+        consumableTypeIds: this.initialData.consumableTypeIds,
         dailyRate: this.initialData.dailyRate,
       });
     }
@@ -65,7 +67,13 @@ export class FormAdventurerComponent implements OnInit {
       return;
     }
     this.formSubmitted.emit(
-      this.adventurerForm.value as AdventurerFormData
+      {
+        name: this.adventurerForm.get('name')?.value ?? "",
+        specialityId: +(this.adventurerForm.get('specialityId')?.value ?? 0),
+        equipmentTypeIds: (this.adventurerForm.get('equipmentTypeIds')?.value ?? []).map((id: any) => +id),
+        consumableTypeIds: (this.adventurerForm.get('consumableTypeIds')?.value ?? []).map((id: any) => +id),
+        dailyRate: this.getMoney(),
+      }
     );
   }
 

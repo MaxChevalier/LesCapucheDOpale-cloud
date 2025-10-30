@@ -12,8 +12,11 @@ class MockAdventurerService {
     id: 1,
     name: 'Lara',
     speciality: { id: 2, name: 'Rogue' },
+    specialityId: 2,
     equipmentType: [{ id: 3, name: 'Dagger' }],
+    equipmentTypeIds: [3],
     consumableType: [{ id: 4, name: 'Potion' }],
+    consumableTypeIds: [4],
     dailyRate: 200
   }));
 
@@ -21,8 +24,11 @@ class MockAdventurerService {
     id: 1,
     name: 'Updated Lara',
     speciality: { id: 2, name: 'Rogue' },
+    specialityId: 2,
     equipmentType: [{ id: 3, name: 'Dagger' }],
+    equipmentTypeIds: [3],
     consumableType: [{ id: 4, name: 'Potion' }],
+    consumableTypeIds: [4],
     dailyRate: 250
   }));
 }
@@ -64,9 +70,9 @@ describe('UpdateAdventurer', () => {
     expect(adventurerService.getAdventurerById).toHaveBeenCalledWith(1);
     expect(component.adventurer).toEqual({
       name: 'Lara',
-      speciality: 2,
-      equipmentType: [3],
-      consumableType: [4],
+      specialityId: 2,
+      equipmentTypeIds: [3],
+      consumableTypeIds: [4],
       dailyRate: 200
     });
   });
@@ -74,9 +80,9 @@ describe('UpdateAdventurer', () => {
   it('should call updateAdventurer when form is submitted', () => {
     const mockFormData: AdventurerFormData = {
       name: 'Updated Lara',
-      speciality: 2,
-      equipmentType: [3],
-      consumableType: [4],
+      specialityId: 2,
+      equipmentTypeIds: [3],
+      consumableTypeIds: [4],
       dailyRate: 250
     };
 
@@ -95,9 +101,9 @@ describe('UpdateAdventurer', () => {
   it('should handle error when updateAdventurer fails', () => {
     const mockFormData: AdventurerFormData = {
       name: 'Error Lara',
-      speciality: 2,
-      equipmentType: [3],
-      consumableType: [4],
+      specialityId: 2,
+      equipmentTypeIds: [3],
+      consumableTypeIds: [4],
       dailyRate: 200
     };
 

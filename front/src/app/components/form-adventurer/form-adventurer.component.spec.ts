@@ -55,19 +55,22 @@ describe('FormAdventurerComponent', () => {
   it('should patch form with initialData', () => {
     component.initialData = {
       name: 'Aragorn',
-      speciality: 1,
-      equipmentType: [10],
-      consumableType: [20],
+      specialityId: 1,
+      equipmentTypeIds: [10],
+      consumableTypeIds: [20],
       dailyRate: 345,
     };
 
     fixture.detectChanges();
+    (component as any).ngOnChanges({
+      initialData: { currentValue: component.initialData, previousValue: null, firstChange: true, isFirstChange: () => true }
+    });
 
     const form = (component as any).adventurerForm.value;
     expect(form.name).toBe('Aragorn');
-    expect(form.speciality).toBe(1);
-    expect(form.equipmentType).toEqual([10]);
-    expect(form.consumableType).toEqual([20]);
+    expect(form.specialityId).toBe(1);
+    expect(form.equipmentTypeIds).toEqual([10]);
+    expect(form.consumableTypeIds).toEqual([20]);
     expect(form.dailyRate).toBe(345);
   });
 
@@ -88,9 +91,9 @@ describe('FormAdventurerComponent', () => {
 
     (component as any).adventurerForm.setValue({
       name: 'Gandalf',
-      speciality: 1,
-      equipmentType: [10],
-      consumableType: [20],
+      specialityId: 1,
+      equipmentTypeIds: [10],
+      consumableTypeIds: [20],
       dailyRate: 123,
     });
 
@@ -98,9 +101,9 @@ describe('FormAdventurerComponent', () => {
 
     expect(emitSpy).toHaveBeenCalledWith({
       name: 'Gandalf',
-      speciality: 1,
-      equipmentType: [10],
-      consumableType: [20],
+      specialityId: 1,
+      equipmentTypeIds: [10],
+      consumableTypeIds: [20],
       dailyRate: 123,
     });
   });

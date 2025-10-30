@@ -16,8 +16,11 @@ describe('ListAdventurer', () => {
       id: 1,
       name: 'Aragorn',
       speciality: { id: 1, name: 'Guerrier' },
+      specialityId: 1,
       equipmentType: [],
+      equipmentTypeIds: [],
       consumableType: [],
+      consumableTypeIds: [],
       dailyRate: 500,
       experience: 100
     },
@@ -25,8 +28,11 @@ describe('ListAdventurer', () => {
       id: 2,
       name: 'Legolas',
       speciality: { id: 2, name: 'Archer' },
+      specialityId: 2,
       equipmentType: [],
+      equipmentTypeIds: [],
       consumableType: [],
+      consumableTypeIds: [],
       dailyRate: 600,
       experience: 200
     }

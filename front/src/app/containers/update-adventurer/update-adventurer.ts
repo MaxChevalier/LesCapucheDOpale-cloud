@@ -33,9 +33,9 @@ export class UpdateAdventurer implements OnInit {
     this.adventurerService.getAdventurerById(this.id).subscribe(adventurer => {
       this.adventurer = {
         name: adventurer.name,
-        speciality: adventurer.speciality.id,
-        equipmentType: adventurer.equipmentType.map(e => e.id),
-        consumableType: adventurer.consumableType.map(c => c.id),
+        specialityId: adventurer.specialityId,
+        equipmentTypeIds: adventurer.equipmentTypeIds,
+        consumableTypeIds: adventurer.consumableTypeIds,
         dailyRate: adventurer.dailyRate
       };
     });

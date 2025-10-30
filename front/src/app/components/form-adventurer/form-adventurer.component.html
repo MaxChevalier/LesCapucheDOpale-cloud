@@ -11,12 +11,12 @@
 
   <div class="form-group">
     <label for="speciality">Spécialité:</label>
-    <select id="speciality" formControlName="speciality">
+    <select id="speciality" formControlName="specialityId">
       @for (spe of specialities; track spe) {
       <option [value]="spe.id">{{ spe.name }}</option>
       }
     </select>
-    @if ((adventurerForm.get('speciality')?.touched || hasSubmitted) && adventurerForm.get('speciality')?.invalid) {
+    @if ((adventurerForm.get('specialityId')?.touched || hasSubmitted) && adventurerForm.get('specialityId')?.invalid) {
     <p class="error">
       La spécialité est requise.
     </p>
@@ -25,12 +25,12 @@
 
   <div class="form-group">
     <label for="equipmentType">Type d'équipement:</label>
-    <select id="equipmentType" formControlName="equipmentType" multiple>
+    <select id="equipmentType" formControlName="equipmentTypeIds" multiple>
       @for (type of equipmentTypes; track type) {
       <option [value]="type.id">{{ type.name }}</option>
       }
     </select>
-    @if ((adventurerForm.get('equipmentType')?.touched || hasSubmitted) && adventurerForm.get('equipmentType')?.invalid)
+    @if ((adventurerForm.get('equipmentTypeIds')?.touched || hasSubmitted) && adventurerForm.get('equipmentTypeIds')?.invalid)
     {
     <p class="error">
       Le type d'équipement est requis.
@@ -40,13 +40,13 @@
 
   <div class="form-group">
     <label for="consumableType">Type de consommable:</label>
-    <select id="consumableType" formControlName="consumableType" multiple>
+    <select id="consumableType" formControlName="consumableTypeIds" multiple>
       @for (type of consumableTypes; track type) {
       <option [value]="type.id">{{ type.name }}</option>
       }
     </select>
-    @if ((adventurerForm.get('consumableType')?.touched || hasSubmitted) &&
-    adventurerForm.get('consumableType')?.invalid) {
+    @if ((adventurerForm.get('consumableTypeIds')?.touched || hasSubmitted) &&
+    adventurerForm.get('consumableTypeIds')?.invalid) {
     <p class="error">
       Le type de consommable est requis.
     </p>

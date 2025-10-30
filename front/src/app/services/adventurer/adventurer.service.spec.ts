@@ -28,9 +28,9 @@ describe('AdventurerService', () => {
   it('should create a new adventurer via POST', () => {
     const formData: AdventurerFormData = {
       name: 'Aragorn',
-      speciality: 1,
-      equipmentType: [1, 2],
-      consumableType: [3],
+      specialityId: 1,
+      equipmentTypeIds: [1, 2],
+      consumableTypeIds: [3],
       dailyRate: 500
     };
 
@@ -38,13 +38,16 @@ describe('AdventurerService', () => {
       id: 1,
       name: 'Aragorn',
       speciality: { id: 1, name: 'Warrior' },
+      specialityId: 1,
       equipmentType: [
         { id: 1, name: 'Sword' },
         { id: 2, name: 'Shield' }
       ],
+      equipmentTypeIds: [1, 2],
       consumableType: [
         { id: 3, name: 'Health Potion' }
       ],
+      consumableTypeIds: [3],
       dailyRate: 500,
       experience: 0
     };
@@ -63,8 +66,25 @@ describe('AdventurerService', () => {
 
   it('should retrieve all adventurers via GET', () => {
     const mockAdventurers: Adventurer[] = [
-      { id: 1, name: 'Aragorn', speciality: { id: 1, name: 'Warrior' }, equipmentType: [], consumableType: [], dailyRate: 500, experience: 100 },
-      { id: 2, name: 'Legolas', speciality: { id: 2, name: 'Archer' }, equipmentType: [], consumableType: [], dailyRate: 600, experience: 150 }
+      {
+        id: 1,
+        name: 'Aragorn', speciality: { id: 1, name: 'Warrior' }, equipmentType: [], consumableType: [], dailyRate: 500, experience: 100,
+        specialityId: 1,
+        equipmentTypeIds: [],
+        consumableTypeIds: []
+      },
+      {
+        id: 2,
+        name: 'Legolas',
+        specialityId: 2,
+        speciality: { id: 2, name: 'Archer' },
+        equipmentType: [],
+        consumableType: [],
+        equipmentTypeIds: [],
+        consumableTypeIds: [],
+        dailyRate: 600,
+        experience: 150
+      }
     ];
 
     service.getAll().subscribe((adventurers) => {
@@ -82,7 +102,10 @@ describe('AdventurerService', () => {
       id: 1,
       name: 'Gimli',
       speciality: { id: 3, name: 'Dwarf Warrior' },
+      specialityId: 3,
       equipmentType: [],
+      equipmentTypeIds: [],
+      consumableTypeIds: [],
       consumableType: [],
       dailyRate: 400,
       experience: 200
@@ -101,9 +124,9 @@ describe('AdventurerService', () => {
   it('should update an adventurer via PUT', () => {
     const updateData: AdventurerFormData = {
       name: 'Gimli the Brave',
-      speciality: 3,
-      equipmentType: [2],
-      consumableType: [3],
+      specialityId: 3,
+      equipmentTypeIds: [2],
+      consumableTypeIds: [3],
       dailyRate: 450
     };
 
@@ -111,8 +134,11 @@ describe('AdventurerService', () => {
       id: 1,
       name: 'Gimli the Brave',
       speciality: { id: 3, name: 'Dwarf Warrior' },
+      specialityId: 3,
       equipmentType: [{ id: 2, name: 'Axe' }],
+      equipmentTypeIds: [2],
       consumableType: [{ id: 3, name: 'Beer' }],
+      consumableTypeIds: [3],
       dailyRate: 450,
       experience: 250
     };

@@ -43,15 +43,18 @@ describe('NewAdventurerComponent', () => {
     // Arrange
     const mockFormData: AdventurerFormData = {
       name: 'Aragorn',
-      speciality: 1,
-      equipmentType: [],
-      consumableType: [],
+      specialityId: 1,
+      equipmentTypeIds: [],
+      consumableTypeIds: [],
       dailyRate: 123,
     };
 
     const mockResponse: Adventurer = {
       name: 'Aragorn',
       speciality: { id: 1, name: 'Guerrier' },
+      specialityId: 1,
+      equipmentTypeIds: [],
+      consumableTypeIds: [],
       equipmentType: [],
       consumableType: [],
       dailyRate: 123,
@@ -74,9 +77,9 @@ describe('NewAdventurerComponent', () => {
     // Arrange
     const mockFormData: AdventurerFormData = {
       name: 'Legolas',
-      speciality: 2,
-      equipmentType: [],
-      consumableType: [],
+      specialityId: 2,
+      equipmentTypeIds: [],
+      consumableTypeIds: [],
       dailyRate: 150,
     };
 
