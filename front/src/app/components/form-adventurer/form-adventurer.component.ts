@@ -6,10 +6,11 @@ import { forkJoin } from 'rxjs';
 import { SpecialityService } from '../../services/speciality/speciality.service';
 import { EquipmentService } from '../../services/equipment/equipment.service';
 import { ConsumableService } from '../../services/consumable/consumable.service';
+import { FormMoney } from '../form-money/form-money';
 
 @Component({
     selector: 'app-form-adventurer',
-    imports: [ReactiveFormsModule],
+    imports: [ReactiveFormsModule, FormMoney],
     templateUrl: './form-adventurer.component.html',
     styleUrl: './form-adventurer.component.scss'
 })
@@ -22,9 +23,7 @@ export class FormAdventurerComponent implements OnInit {
     speciality: new FormControl(0, [Validators.required]),
     equipmentType: new FormControl([] as number[], []),
     consumableType: new FormControl([] as number[], []),
-    dailyRatePo: new FormControl(0, [Validators.required, Validators.min(0)]),
-    dailyRatePa: new FormControl(0, [Validators.required, Validators.min(0)]),
-    dailyRatePc: new FormControl(0, [Validators.required, Validators.min(0)]),
+    dailyRate: new FormControl(0, [Validators.required, Validators.min(0)]),
   });
 
   protected specialities: Speciality[] = [];
@@ -55,21 +54,9 @@ export class FormAdventurerComponent implements OnInit {
         speciality: this.initialData.speciality,
         equipmentType: this.initialData.equipmentType,
         consumableType: this.initialData.consumableType,
-        dailyRatePo: Math.floor((this.initialData.dailyRate || 0) / 100),
-        dailyRatePa: Math.floor((this.initialData.dailyRate || 0) / 10) % 10,
-        dailyRatePc: Math.floor(this.initialData.dailyRate || 0) % 10,
+        dailyRate: this.initialData.dailyRate,
       });
     }
-  }
-
-  protected onDailyRateChange(): void {
-    const po = this.adventurerForm.get('dailyRatePo')?.value ?? 0;
-    const pa = this.adventurerForm.get('dailyRatePa')?.value ?? 0;
-    const pc = this.adventurerForm.get('dailyRatePc')?.value ?? 0;
-    const totalDailyRate = po * 100 + pa * 10 + pc;
-    this.adventurerForm.get('dailyRatePc')?.setValue(totalDailyRate % 10, { emitEvent: false });
-    this.adventurerForm.get('dailyRatePa')?.setValue(Math.floor((totalDailyRate / 10) % 10), { emitEvent: false });
-    this.adventurerForm.get('dailyRatePo')?.setValue(Math.floor(totalDailyRate / 100), { emitEvent: false });
   }
 
   protected onSubmit(): void {
@@ -78,15 +65,15 @@ export class FormAdventurerComponent implements OnInit {
       return;
     }
     this.formSubmitted.emit(
-      {
-        name: this.adventurerForm.get('name')?.value ?? '',
-        speciality: +(this.adventurerForm.get('speciality')?.value ?? 0),
-        equipmentType: this.adventurerForm.get('equipmentType')?.value ?? [],
-        consumableType: this.adventurerForm.get('consumableType')?.value ?? [],
-        dailyRate: (this.adventurerForm.get('dailyRatePo')?.value ?? 0) * 100 +
-                   (this.adventurerForm.get('dailyRatePa')?.value ?? 0) * 10 +
-                   (this.adventurerForm.get('dailyRatePc')?.value ?? 0),
-      }
+      this.adventurerForm.value as AdventurerFormData
     );
+  }
+
+  protected getMoney(): number {
+    return this.adventurerForm.get('dailyRate')?.value ?? 0;
+  }
+
+  protected setMoney(value: number): void {
+    this.adventurerForm.get('dailyRate')?.setValue(value);
   }
 }

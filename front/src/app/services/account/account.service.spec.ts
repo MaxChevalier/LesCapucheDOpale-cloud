@@ -28,7 +28,7 @@ describe('AccountService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should send a POST request when calling signUp', () => {
+  it('should send a POST quest when calling signUp', () => {
     const mockUser = {
       name: 'John',
       email: 'john@example.com',
@@ -59,13 +59,13 @@ describe('AccountService', () => {
       roleId: 2,
     };
 
-    const mockError = { status: 400, statusText: 'Bad Request' };
+    const mockError = { status: 400, statusText: 'Bad Quest' };
 
     service.signUp(mockUser).subscribe({
       next: () => fail('Expected an error, but got a success response'),
       error: (error) => {
         expect(error.status).toBe(400);
-        expect(error.statusText).toBe('Bad Request');
+        expect(error.statusText).toBe('Bad Quest');
       },
     });
 

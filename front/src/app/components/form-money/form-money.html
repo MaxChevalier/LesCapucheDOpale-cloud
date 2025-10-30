@@ -1,0 +1,15 @@
+<form [formGroup]="form" class="form-group">
+    <span>{{ label }}</span>
+    <span>
+      <label for="po">PO</label>
+      <input id="po" type="number" (change)="onChange()" formControlName="po" min="0" />
+    </span>
+    <span>
+      <label for="pa">PA</label>
+      <input id="pa" type="number" (change)="onChange()" formControlName="pa" min="0" />
+    </span>
+    <span>
+      <label for="pc">PC</label>
+      <input id="pc" type="number" (change)="onChange()" formControlName="pc" min="0" />
+    </span>
+</form>

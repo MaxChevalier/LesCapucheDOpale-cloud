@@ -1,0 +1,29 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { QuestForm, Quest } from '../../models/models';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class QuestService {
+  private readonly baseUrl = `/api/quests`;
+
+  constructor(private readonly http: HttpClient) { }
+
+  getAllQuests(): Observable<Quest[]> {
+    return this.http.get<Quest[]>(this.baseUrl);
+  }
+
+  getQuestById(id: number): Observable<Quest> {
+    return this.http.get<Quest>(`${this.baseUrl}/${id}`);
+  }
+
+  createQuest(quest: QuestForm): Observable<Quest> {
+    return this.http.post<Quest>(this.baseUrl, quest);
+  }
+
+  updateQuest(id: number, quest: QuestForm): Observable<Quest> {
+    return this.http.put<Quest>(`${this.baseUrl}/${id}`, quest);
+  }
+}

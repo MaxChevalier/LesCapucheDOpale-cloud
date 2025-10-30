@@ -1,0 +1,18 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label for="title">Titre:</label>
+    <input id="title" formControlName="name" type="text" />
+
+    <label for="description">Description:</label>
+    <textarea id="description" formControlName="description"></textarea>
+
+    <label for="finalDate">Date limite:</label>
+    <input id="finalDate" formControlName="finalDate" type="date"/>
+
+    <label for="estimatedDuration">Durée:</label>
+    <input id="estimatedDuration" formControlName="estimatedDuration" type="number" min="1"/>
+    <label for="estimatedDuration">Journées</label>
+
+    <app-form-money label="Prime : " [money]="getMoney()" (moneyChange)="setMoney($event)"></app-form-money>
+
+    <button type="submit">Soumettre la Requête</button>
+</form>

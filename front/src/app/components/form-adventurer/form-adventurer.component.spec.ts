@@ -65,26 +65,20 @@ describe('FormAdventurerComponent', () => {
 
     const form = (component as any).adventurerForm.value;
     expect(form.name).toBe('Aragorn');
-    expect(form.dailyRatePo).toBe(3);
-    expect(form.dailyRatePa).toBe(4);
-    expect(form.dailyRatePc).toBe(5);
+    expect(form.speciality).toBe(1);
+    expect(form.equipmentType).toEqual([10]);
+    expect(form.consumableType).toEqual([20]);
+    expect(form.dailyRate).toBe(345);
   });
 
-  it('should patch form with initialData with no dailyRate', () => {
-    component.initialData = {
-      name: 'Aragorn',
-      speciality: 1,
-      equipmentType: [10],
-      consumableType: [20],
-    } as any;
+  it('should set dailyRate to 0 if not provided', () => {
+    (component as any).adventurerForm = {
+      get: (field: string) => null
+    }
 
-    fixture.detectChanges();
+    const res = (component as any).getMoney();
 
-    const form = (component as any).adventurerForm.value;
-    expect(form.name).toBe('Aragorn');
-    expect(form.dailyRatePo).toBe(0);
-    expect(form.dailyRatePa).toBe(0);
-    expect(form.dailyRatePc).toBe(0);
+    expect(res).toBe(0);
   });
 
   it('should emit formSubmitted with correct data when form is valid', () => {
@@ -97,9 +91,7 @@ describe('FormAdventurerComponent', () => {
       speciality: 1,
       equipmentType: [10],
       consumableType: [20],
-      dailyRatePo: 1,
-      dailyRatePa: 2,
-      dailyRatePc: 3,
+      dailyRate: 123,
     });
 
     (component as any).onSubmit();
@@ -123,61 +115,10 @@ describe('FormAdventurerComponent', () => {
     expect(emitSpy).not.toHaveBeenCalled();
   });
 
-  it('should recalculate daily rate correctly in onDailyRateChange', () => {
+  it('should set and get money correctly', () => {
     fixture.detectChanges();
 
-    const form = (component as any).adventurerForm;
-    form.patchValue({
-      dailyRatePo: 2,
-      dailyRatePa: 5,
-      dailyRatePc: 8,
-    });
-
-    (component as any).onDailyRateChange();
-
-    const po = form.get('dailyRatePo')?.value;
-    const pa = form.get('dailyRatePa')?.value;
-    const pc = form.get('dailyRatePc')?.value;
-    const total = po * 100 + pa * 10 + pc;
-
-    expect(total).toBe(258);
-  });
-
-  it('should handle edge cases in onDailyRateChange with undefined values', () => {
-    fixture.detectChanges();
-
-    const form = (component as any).adventurerForm;
-    form.patchValue({
-      dailyRatePo: undefined,
-      dailyRatePa: undefined,
-      dailyRatePc: undefined,
-    });
-
-    (component as any).onDailyRateChange();
-
-    const total = (form.get('dailyRatePo')?.value ?? 0) * 100 +
-                  (form.get('dailyRatePa')?.value ?? 0) * 10 +
-                  (form.get('dailyRatePc')?.value ?? 0);
-
-    expect(total).toBe(0); // valeurs par défaut sécurisées
-  });
-
-  it('should submit form with default data when no initialData is provided', () => {
-    fixture.detectChanges();
-    const emitSpy = spyOn(component.formSubmitted, 'emit');
-    (component as any).adventurerForm = {
-      invalid: false,
-      get: (field: string) => null,
-    };
-
-    (component as any).onSubmit();
-
-    expect(emitSpy).toHaveBeenCalledWith({
-      name: '',
-      speciality: 0,
-      equipmentType: [],
-      consumableType: [],
-      dailyRate: 0,
-    });
+    (component as any).setMoney(250);
+    expect((component as any).getMoney()).toBe(250);
   });
 });
