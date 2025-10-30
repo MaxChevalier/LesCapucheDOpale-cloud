@@ -38,7 +38,7 @@ module.exports = function (config) {
       includeAllSources: true,
     },
 
-    browsers: ["Chrome"],
+    browsers: [],
 
     customLaunchers: {
       ChromeHeadlessCI: {

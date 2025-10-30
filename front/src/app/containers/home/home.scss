@@ -1,0 +1,108 @@
+.home-container{
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  position: relative;
+}
+
+.content{
+  flex: 1;
+  max-width: 900px;
+}
+
+/* ...existing code... */
+.side-banner{
+  position: fixed;
+  top: 90px;
+  right: 1rem;
+  width: 300px;
+  background: linear-gradient(180deg,#fffdf6,#fff6e6);
+  border-left: 4px solid #e0b400;
+  padding: 0.9rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  border-radius: 8px;
+  color: #222;
+  z-index: 1100;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+.banner-heading{
+  margin: 0 0 0.6rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0b5a7c;
+}
+
+/* Card pour chaque annonce */
+.ad-card{
+  background: rgba(255,255,255,0.7);
+  border-radius: 6px;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+/* Badge pill */
+.ad-badge{
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(90deg,#ff8a00,#e04b00);
+  box-shadow: 0 2px 6px rgba(224,75,0,0.18);
+  text-transform: uppercase;
+}
+
+/* Titles and description */
+.ad-title{
+  margin: 0;
+  font-size: 0.95rem;
+  color: #0b3e52;
+}
+
+.ad-desc{
+  margin: 0;
+  font-size: 0.88rem;
+  color: #374151;
+  line-height: 1.25;
+}
+
+/* Separator */
+.ad-sep{
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.06), transparent);
+  margin: 0.6rem 0;
+}
+
+/* CTA link styled as button */
+.ad-cta{
+  display: inline-block;
+  align-self: start;
+  margin-top: 0.25rem;
+  padding: 0.42rem 0.7rem;
+  background: #0b5a7c;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.15s ease, transform 0.08s ease;
+}
+
+.ad-cta:hover{ background: #094b66; transform: translateY(-1px); }
+
+/* Variantes (couleur selon type) */
+.ad-card.promo .ad-badge{ background: linear-gradient(90deg,#ffb347,#ff7b00); }
+.ad-card.recruit .ad-badge{ background: linear-gradient(90deg,#6ee7b7,#10b981); }
+
+/* Masquer sur petits écrans */
+@media (max-width: 900px){
+  .side-banner{ display: none; }
+}
