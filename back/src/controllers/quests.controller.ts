@@ -18,6 +18,7 @@ import { Roles } from '../guards/roles.decorator';
 import { UpdateStatusDto } from '../dto/update-quest-status.dto';
 import { IdsDto } from '../dto/quest_id.dto';
 import { UserDto } from 'src/dto/user.dto';
+import { ValidateQuestDto } from '../dto/validate-quest.dto';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -332,5 +333,123 @@ export class QuestsController {
   })
   setEquipment(@Param('id', ParseIntPipe) id: number, @Body() body: IdsDto) {
     return this.questsService.setEquipmentStocks(id, body.ids);
+  }
+
+  @Patch(':id/validate')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
+  @ApiParam({ name: 'id', example: 42, description: 'Quest ID' })
+  @ApiBody({
+    description: "Valider la quête et définir l'XP recommandée",
+    required: true,
+    schema: {
+      type: 'object',
+      additionalProperties: true,
+      example: { xp: 150 },
+    },
+  })
+  @ApiOkResponse({
+    description: 'Quête validée',
+    schema: {
+      type: 'object',
+      additionalProperties: true,
+      example: {
+        id: 42,
+        recommendedXP: 150,
+        statusId: 2,
+        updatedAt: '2025-10-30T13:15:00.000Z',
+      },
+    },
+  })
+  validate(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ValidateQuestDto,
+  ) {
+    return this.questsService.validateQuest(id, dto.xp);
+  }
+
+  @Patch(':id/invalidate')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
+  @ApiParam({ name: 'id', example: 42, description: 'Quest ID' })
+  @ApiOkResponse({
+    description:
+      'Quête dévalidée (retour en attente, XP remise à 0, aventuriers/équipements/consommables vidés)',
+    schema: {
+      type: 'object',
+      additionalProperties: true,
+      example: {
+        id: 42,
+        recommendedXP: 0,
+        statusId: 1,
+        adventurerIds: [],
+        equipmentStockIds: [],
+        updatedAt: '2025-10-30T13:20:00.000Z',
+      },
+    },
+  })
+  invalidate(@Param('id', ParseIntPipe) id: number) {
+    return this.questsService.invalidateQuest(id);
+  }
+
+  @Patch(':id/start')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
+  @ApiParam({ name: 'id', example: 42, description: 'Quest ID' })
+  @ApiOkResponse({
+    description:
+      'Quête démarrée (désélection impossible après démarrage)',
+    schema: {
+      type: 'object',
+      additionalProperties: true,
+      example: {
+        id: 42,
+        statusId: 3,
+        updatedAt: '2025-10-30T13:25:00.000Z',
+      },
+    },
+  })
+  start(@Param('id', ParseIntPipe) id: number) {
+    return this.questsService.startQuest(id);
+  }
+
+  @Patch(':id/refuse')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
+  @ApiParam({ name: 'id', example: 42, description: 'Quest ID' })
+  @ApiOkResponse({
+    description: 'Quête refusée',
+    schema: {
+      type: 'object',
+      additionalProperties: true,
+      example: {
+        id: 42,
+        status: { name: 'refusée' },
+        updatedAt: '2025-10-30T13:30:00.000Z',
+      },
+    },
+  })
+  refuse(@Param('id', ParseIntPipe) id: number) {
+    return this.questsService.refuseQuest(id);
+  }
+
+  @Patch(':id/abandon')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(1, 2)
+  @ApiParam({ name: 'id', example: 42, description: 'Quest ID' })
+  @ApiOkResponse({
+    description: 'Quête abandonnée (peut être abandonnée uniquement si elle n\'est pas validée ou commencée, typiquement en statut \'en attente\')',
+    schema: {
+      type: 'object',
+      additionalProperties: true,
+      example: {
+        id: 42,
+        status: { name: 'abandonnée' },
+        updatedAt: '2025-10-30T13:35:00.000Z',
+      },
+    },
+  })
+  abandon(@Param('id', ParseIntPipe) id: number) {
+    return this.questsService.abandonQuest(id);
   }
 }

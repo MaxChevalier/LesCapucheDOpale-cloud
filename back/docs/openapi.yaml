@@ -645,6 +645,161 @@ paths:
         - bearer: []
       tags:
         - Quests
+  /quests/{id}/validate:
+    patch:
+      operationId: QuestsController_validate
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Quest ID
+          schema:
+            example: 42
+            type: number
+      requestBody:
+        required: true
+        description: Valider la quête et définir l'XP recommandée
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              example:
+                xp: 150
+      responses:
+        '200':
+          description: Quête validée
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                example:
+                  id: 42
+                  recommendedXP: 150
+                  statusId: 2
+                  updatedAt: '2025-10-30T13:15:00.000Z'
+      security:
+        - bearer: []
+      tags:
+        - Quests
+  /quests/{id}/invalidate:
+    patch:
+      operationId: QuestsController_invalidate
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Quest ID
+          schema:
+            example: 42
+            type: number
+      responses:
+        '200':
+          description: >-
+            Quête dévalidée (retour en attente, XP remise à 0,
+            aventuriers/équipements/consommables vidés)
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                example:
+                  id: 42
+                  recommendedXP: 0
+                  statusId: 1
+                  adventurerIds: []
+                  equipmentStockIds: []
+                  updatedAt: '2025-10-30T13:20:00.000Z'
+      security:
+        - bearer: []
+      tags:
+        - Quests
+  /quests/{id}/start:
+    patch:
+      operationId: QuestsController_start
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Quest ID
+          schema:
+            example: 42
+            type: number
+      responses:
+        '200':
+          description: Quête démarrée (désélection impossible après démarrage)
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                example:
+                  id: 42
+                  statusId: 3
+                  updatedAt: '2025-10-30T13:25:00.000Z'
+      security:
+        - bearer: []
+      tags:
+        - Quests
+  /quests/{id}/refuse:
+    patch:
+      operationId: QuestsController_refuse
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Quest ID
+          schema:
+            example: 42
+            type: number
+      responses:
+        '200':
+          description: Quête refusée
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                example:
+                  id: 42
+                  status:
+                    name: refusée
+                  updatedAt: '2025-10-30T13:30:00.000Z'
+      security:
+        - bearer: []
+      tags:
+        - Quests
+  /quests/{id}/abandon:
+    patch:
+      operationId: QuestsController_abandon
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Quest ID
+          schema:
+            example: 42
+            type: number
+      responses:
+        '200':
+          description: >-
+            Quête abandonnée (peut être abandonnée uniquement si elle n'est pas
+            validée ou commencée, typiquement en statut 'en attente')
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                example:
+                  id: 42
+                  status:
+                    name: abandonnée
+                  updatedAt: '2025-10-30T13:35:00.000Z'
+      security:
+        - bearer: []
+      tags:
+        - Quests
   /adventurers:
     get:
       operationId: AdventurersController_findAll
