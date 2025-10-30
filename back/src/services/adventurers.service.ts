@@ -8,13 +8,24 @@ import { Prisma } from '@prisma/client';
 export class AdventurersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.adventurer.findMany();
+    async findAll() {
+    return this.prisma.adventurer.findMany({
+      include: {
+        speciality: true,
+        equipmentTypes: true,
+        consumableTypes: true,
+      },
+    });
   }
 
   async findOne(id: number) {
     const adventurer = await this.prisma.adventurer.findUnique({
       where: { id },
+      include: {
+        speciality: true,
+        equipmentTypes: true,
+        consumableTypes: true,
+      },
     });
     if (!adventurer) throw new NotFoundException('Adventurer not found');
     return adventurer;

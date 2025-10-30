@@ -1,4 +1,4 @@
-import {  NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { AdventurersService } from '../services/adventurers.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
@@ -46,9 +46,7 @@ describe('AdventurersService', () => {
       { id: 1, name: 'Aragorn' },
       { id: 2, name: 'Legolas' },
     ];
-    (prisma.adventurer.findMany as jest.Mock).mockResolvedValue(
-      adventurersList,
-    );
+    (prisma.adventurer.findMany as jest.Mock).mockResolvedValue(adventurersList);
 
     const result = await service.findAll();
 
@@ -65,6 +63,19 @@ describe('AdventurersService', () => {
     expect(prisma.adventurer.findMany).toHaveBeenCalledTimes(1);
   });
 
+  it('should call findAll with relations included', async () => {
+    (prisma.adventurer.findMany as jest.Mock).mockResolvedValue([]);
+    await service.findAll();
+
+    expect(prisma.adventurer.findMany).toHaveBeenCalledWith({
+      include: {
+        speciality: true,
+        equipmentTypes: true,
+        consumableTypes: true,
+      },
+    });
+  });
+
   // ------------------------
   // FIND ONE
   // ------------------------
@@ -75,30 +86,41 @@ describe('AdventurersService', () => {
     const result = await service.findOne(1);
 
     expect(result).toEqual(adventurer);
-    expect(prisma.adventurer.findUnique).toHaveBeenCalledWith({
-      where: { id: 1 },
-    });
+    expect(prisma.adventurer.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 1 },
+        include: {
+          speciality: true,
+          equipmentTypes: true,
+          consumableTypes: true,
+        },
+      }),
+    );
   });
 
   it('should throw NotFoundException if adventurer is not found', async () => {
     (prisma.adventurer.findUnique as jest.Mock).mockResolvedValue(null);
 
     await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
-    expect(prisma.adventurer.findUnique).toHaveBeenCalledWith({
-      where: { id: 999 },
-    });
+    expect(prisma.adventurer.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 999 },
+        include: {
+          speciality: true,
+          equipmentTypes: true,
+          consumableTypes: true,
+        },
+      }),
+    );
   });
 
   // ------------------------
   // CREATE
   // ------------------------
   it('should create a new adventurer', async () => {
-    (prisma.adventurer.findFirst as jest.Mock).mockResolvedValue(null);
     (prisma.speciality.findUnique as jest.Mock).mockResolvedValue({ id: 1 });
     (prisma.equipmentType.findMany as jest.Mock).mockResolvedValue([{ id: 1 }]);
-    (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([
-      { id: 1 },
-    ]);
+    (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([{ id: 1 }]);
     (prisma.adventurer.create as jest.Mock).mockResolvedValue({
       id: 1,
       name: 'Aragorn',
@@ -122,10 +144,27 @@ describe('AdventurersService', () => {
       equipmentTypes: [{ id: 1, name: 'Sword' }],
       consumableTypes: [{ id: 1, name: 'Potion' }],
     });
+
+    expect(prisma.adventurer.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          name: 'Aragorn',
+          specialityId: 1,
+          dailyRate: 100,
+          experience: 0,
+          equipmentTypes: { connect: [{ id: 1 }] },
+          consumableTypes: { connect: [{ id: 1 }] },
+        }),
+        include: {
+          speciality: true,
+          equipmentTypes: true,
+          consumableTypes: true,
+        },
+      }),
+    );
   });
 
   it('should create without relations when arrays are empty', async () => {
-    (prisma.adventurer.findFirst as jest.Mock).mockResolvedValue(null);
     (prisma.speciality.findUnique as jest.Mock).mockResolvedValue({ id: 2 });
     (prisma.adventurer.create as jest.Mock).mockResolvedValue({
       id: 2,
@@ -148,6 +187,8 @@ describe('AdventurersService', () => {
         data: expect.objectContaining({
           name: 'Gandalf',
           specialityId: 2,
+          dailyRate: 200,
+          experience: 0,
           equipmentTypes: undefined,
           consumableTypes: undefined,
         }),
@@ -156,9 +197,27 @@ describe('AdventurersService', () => {
     );
   });
 
+  it('should set default experience to 0 on create', async () => {
+    (prisma.speciality.findUnique as jest.Mock).mockResolvedValue({ id: 10 });
+    (prisma.adventurer.create as jest.Mock).mockResolvedValue({ id: 123 });
+
+    await service.create({
+      name: 'Frodo',
+      specialityId: 10,
+      dailyRate: 50,
+      equipmentTypeIds: [],
+      consumableTypeIds: [],
+    });
+
+    expect(prisma.adventurer.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ experience: 0 }),
+      }),
+    );
+  });
+
   it('should throw NotFoundException if speciality not found', async () => {
-    (prisma.adventurer.findFirst as jest.Mock).mockResolvedValue(null);
-    (prisma.speciality.findFirst as jest.Mock).mockResolvedValue(null);
+    (prisma.speciality.findUnique as jest.Mock).mockResolvedValue(null);
 
     await expect(
       service.create({
@@ -172,7 +231,6 @@ describe('AdventurersService', () => {
   });
 
   it('should throw NotFoundException if some equipment types are not found', async () => {
-    (prisma.adventurer.findFirst as jest.Mock).mockResolvedValue(null);
     (prisma.speciality.findUnique as jest.Mock).mockResolvedValue({ id: 1 });
     (prisma.equipmentType.findMany as jest.Mock).mockResolvedValue([{ id: 1 }]);
     (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([]);
@@ -189,12 +247,9 @@ describe('AdventurersService', () => {
   });
 
   it('should throw NotFoundException if some consumable types are not found', async () => {
-    (prisma.adventurer.findFirst as jest.Mock).mockResolvedValue(null);
     (prisma.speciality.findUnique as jest.Mock).mockResolvedValue({ id: 1 });
     (prisma.equipmentType.findMany as jest.Mock).mockResolvedValue([]);
-    (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([
-      { id: 1 },
-    ]);
+    (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([{ id: 1 }]);
 
     await expect(
       service.create({
@@ -208,7 +263,6 @@ describe('AdventurersService', () => {
   });
 
   it('should create with equipment types only', async () => {
-    (prisma.adventurer.findFirst as jest.Mock).mockResolvedValue(null);
     (prisma.speciality.findUnique as jest.Mock).mockResolvedValue({ id: 1 });
     (prisma.equipmentType.findMany as jest.Mock).mockResolvedValue([{ id: 1 }]);
     (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([]);
@@ -222,16 +276,20 @@ describe('AdventurersService', () => {
       consumableTypeIds: [],
     });
 
-    expect(prisma.adventurer.create).toHaveBeenCalled();
+    expect(prisma.adventurer.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          equipmentTypes: { connect: [{ id: 1 }] },
+          consumableTypes: undefined,
+        }),
+      }),
+    );
   });
 
   it('should create with consumable types only', async () => {
-    (prisma.adventurer.findFirst as jest.Mock).mockResolvedValue(null);
     (prisma.speciality.findUnique as jest.Mock).mockResolvedValue({ id: 1 });
     (prisma.equipmentType.findMany as jest.Mock).mockResolvedValue([]);
-    (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([
-      { id: 1 },
-    ]);
+    (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([{ id: 1 }]);
     (prisma.adventurer.create as jest.Mock).mockResolvedValue({ id: 1 });
 
     await service.create({
@@ -242,7 +300,38 @@ describe('AdventurersService', () => {
       consumableTypeIds: [1],
     });
 
-    expect(prisma.adventurer.create).toHaveBeenCalled();
+    expect(prisma.adventurer.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          equipmentTypes: undefined,
+          consumableTypes: { connect: [{ id: 1 }] },
+        }),
+      }),
+    );
+  });
+
+  it('should create and connect multiple relations', async () => {
+    (prisma.speciality.findUnique as jest.Mock).mockResolvedValue({ id: 3 });
+    (prisma.equipmentType.findMany as jest.Mock).mockResolvedValue([{ id: 1 }, { id: 2 }]);
+    (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([{ id: 3 }]);
+    (prisma.adventurer.create as jest.Mock).mockResolvedValue({ id: 42 });
+
+    await service.create({
+      name: 'Sam',
+      specialityId: 3,
+      dailyRate: 70,
+      equipmentTypeIds: [1, 2],
+      consumableTypeIds: [3],
+    });
+
+    expect(prisma.adventurer.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          equipmentTypes: { connect: [{ id: 1 }, { id: 2 }] },
+          consumableTypes: { connect: [{ id: 3 }] },
+        }),
+      }),
+    );
   });
 
   // ------------------------
@@ -251,9 +340,7 @@ describe('AdventurersService', () => {
   it('should update an adventurer', async () => {
     (prisma.speciality.findUnique as jest.Mock).mockResolvedValue({ id: 1 });
     (prisma.equipmentType.findMany as jest.Mock).mockResolvedValue([{ id: 1 }]);
-    (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([
-      { id: 1 },
-    ]);
+    (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([{ id: 1 }]);
     const updated = { id: 1, name: 'Updated' };
     (prisma.adventurer.update as jest.Mock).mockResolvedValue(updated);
 
@@ -264,18 +351,14 @@ describe('AdventurersService', () => {
   it('should throw NotFoundException if speciality not found on update', async () => {
     (prisma.speciality.findUnique as jest.Mock).mockResolvedValue(null);
 
-    await expect(service.update(1, { specialityId: 999 })).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(service.update(1, { specialityId: 999 })).rejects.toThrow(NotFoundException);
   });
 
   it('should throw NotFoundException if an equipment type is not found on update', async () => {
     (prisma.speciality.findUnique as jest.Mock).mockResolvedValue({ id: 1 });
     (prisma.equipmentType.findMany as jest.Mock).mockResolvedValue([]);
 
-    await expect(
-      service.update(1, { equipmentTypeIds: [999] }),
-    ).rejects.toThrow(NotFoundException);
+    await expect(service.update(1, { equipmentTypeIds: [999] })).rejects.toThrow(NotFoundException);
   });
 
   it('should throw NotFoundException if a consumable type is not found on update', async () => {
@@ -283,21 +366,14 @@ describe('AdventurersService', () => {
     (prisma.equipmentType.findMany as jest.Mock).mockResolvedValue([{ id: 1 }]);
     (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([]);
 
-    await expect(
-      service.update(1, { consumableTypeIds: [999] }),
-    ).rejects.toThrow(NotFoundException);
+    await expect(service.update(1, { consumableTypeIds: [999] })).rejects.toThrow(NotFoundException);
   });
 
-it('should throw NotFoundException if updating non-existent adventurer', async () => {
-  (prisma.adventurer.update as jest.Mock).mockRejectedValue(
-    new NotFoundException('Record not found'),
-  );
+  it('should throw NotFoundException if updating non-existent adventurer', async () => {
+    (prisma.adventurer.update as jest.Mock).mockRejectedValue(new NotFoundException('Record not found'));
 
-  await expect(service.update(999, { name: 'Ghost' })).rejects.toThrow(
-    NotFoundException,
-  );
-});
-
+    await expect(service.update(999, { name: 'Ghost' })).rejects.toThrow(NotFoundException);
+  });
 
   it('should update speciality only', async () => {
     (prisma.speciality.findUnique as jest.Mock).mockResolvedValue({ id: 2 });
@@ -308,6 +384,11 @@ it('should throw NotFoundException if updating non-existent adventurer', async (
     expect(prisma.adventurer.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ specialityId: 2 }),
+        include: {
+          speciality: true,
+          equipmentTypes: true,
+          consumableTypes: true,
+        },
       }),
     );
   });
@@ -323,14 +404,17 @@ it('should throw NotFoundException if updating non-existent adventurer', async (
         data: expect.objectContaining({
           equipmentTypes: { set: [{ id: 2 }] },
         }),
+        include: {
+          speciality: true,
+          equipmentTypes: true,
+          consumableTypes: true,
+        },
       }),
     );
   });
 
   it('should update consumable types only', async () => {
-    (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([
-      { id: 2 },
-    ]);
+    (prisma.consumableType.findMany as jest.Mock).mockResolvedValue([{ id: 2 }]);
     (prisma.adventurer.update as jest.Mock).mockResolvedValue({ id: 1 });
 
     await service.update(1, { consumableTypeIds: [2] });
@@ -340,6 +424,52 @@ it('should throw NotFoundException if updating non-existent adventurer', async (
         data: expect.objectContaining({
           consumableTypes: { set: [{ id: 2 }] },
         }),
+        include: {
+          speciality: true,
+          equipmentTypes: true,
+          consumableTypes: true,
+        },
+      }),
+    );
+  });
+
+  it('should update only scalar fields and include relations in response', async () => {
+    (prisma.adventurer.update as jest.Mock).mockResolvedValue({ id: 5, name: 'Boromir', dailyRate: 150 });
+
+    await service.update(5, { name: 'Boromir', dailyRate: 150 });
+
+    expect(prisma.adventurer.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 5 },
+        data: expect.objectContaining({ name: 'Boromir', dailyRate: 150 }),
+        include: {
+          speciality: true,
+          equipmentTypes: true,
+          consumableTypes: true,
+        },
+      }),
+    );
+  });
+
+  it('should clear relations when updating with empty arrays', async () => {
+    (prisma.adventurer.update as jest.Mock).mockResolvedValue({ id: 10 });
+
+    await service.update(10, { equipmentTypeIds: [], consumableTypeIds: [] });
+
+    expect(prisma.equipmentType.findMany).not.toHaveBeenCalled();
+    expect(prisma.consumableType.findMany).not.toHaveBeenCalled();
+
+    expect(prisma.adventurer.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          equipmentTypes: { set: [] },
+          consumableTypes: { set: [] },
+        }),
+        include: {
+          speciality: true,
+          equipmentTypes: true,
+          consumableTypes: true,
+        },
       }),
     );
   });
