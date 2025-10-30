@@ -55,8 +55,8 @@ describe('NewAdventurerComponent', () => {
       specialityId: 1,
       equipmentTypeIds: [],
       consumableTypeIds: [],
-      equipmentType: [],
-      consumableType: [],
+      equipmentTypes: [],
+      consumableTypes: [],
       dailyRate: 123,
       id: 1,
       experience: 0

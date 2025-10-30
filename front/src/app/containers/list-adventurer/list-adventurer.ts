@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Adventurer } from '../../models/adventurer';
 import { AdventurerService } from '../../services/adventurer/adventurer.service';
 import { ItemAdventurer } from '../../components/item-adventurer/item-adventurer';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-list-adventurer',
-  imports: [ItemAdventurer],
+  imports: [ItemAdventurer, RouterLink],
   templateUrl: './list-adventurer.html',
   styleUrl: './list-adventurer.scss'
 })

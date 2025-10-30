@@ -1,1 +1,24 @@
-<app-form-quest (formSubmitted)="onFormSubmitted($event)" [initialData]="quest"></app-form-quest>
+<app-form-quest 
+  (formSubmitted)="onFormSubmitted($event)" 
+  [initialData]="quest">
+</app-form-quest>
+
+@if (isAssistant()) {
+  <form [formGroup]="form">
+    <label for="recommendedXP">Expérience recommandée :</label>
+    <input 
+      id="recommendedXP" 
+      formControlName="recommendedXP" 
+      type="number" />
+
+    @if (quest.statusId === 1) {
+      <button type="button" (click)="onValidate()">Valider la Requête</button>
+      <button type="button" (click)="onRefuse()">Refuser la Requête</button>
+    }
+    @end
+  </form>
+}
+@else if (isClient()) {
+  <button type="button" (click)="onAbandon()">Abandonner la Requête</button>
+}
+@end

@@ -1,3 +1,4 @@
+<a routerLink="/quest/new" routerLinkActive="active">Nouvelles Quêtes</a>
 <div class="container">
     @for (quest of quests; track quest.id) {
         <app-item-quest [quest]="quest" (click)="onQuestClick(quest.id)"></app-item-quest>

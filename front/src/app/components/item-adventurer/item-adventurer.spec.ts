@@ -11,9 +11,9 @@ describe('ItemAdventurer', () => {
     name: 'Aragorn',
     speciality: { id: 1, name: 'Guerrier' },
     specialityId: 1,
-    equipmentType: [],
+    equipmentTypes: [],
     equipmentTypeIds: [],
-    consumableType: [],
+    consumableTypes: [],
     consumableTypeIds: [],
     dailyRate: 123,
     experience: 0
@@ -35,7 +35,7 @@ describe('ItemAdventurer', () => {
   });
 
   describe('getEquipmentNames', () => {
-    it('should return "Aucun" when equipmentType is empty', () => {
+    it('should return "Aucun" when equipmentTypes is empty', () => {
       const result = component.getEquipmentNames(mockAdventurer);
       expect(result).toBe('Aucun');
     });
@@ -43,7 +43,7 @@ describe('ItemAdventurer', () => {
     it('should return a comma-separated list of equipment names', () => {
       const adventurerWithEquipments: Adventurer = {
         ...mockAdventurer,
-        equipmentType: [
+        equipmentTypes: [
           { id: 1, name: 'Épée' },
           { id: 2, name: 'Bouclier' }
         ]
@@ -53,15 +53,15 @@ describe('ItemAdventurer', () => {
       expect(result).toBe('Épée, Bouclier');
     });
 
-    it('should handle undefined equipmentType gracefully', () => {
-      const adventurerWithoutEquipments = { ...mockAdventurer, equipmentType: undefined as any };
+    it('should handle undefined equipmentTypes gracefully', () => {
+      const adventurerWithoutEquipments = { ...mockAdventurer, equipmentTypes: undefined as any };
       const result = component.getEquipmentNames(adventurerWithoutEquipments);
       expect(result).toBe('Aucun');
     });
   });
 
   describe('getConsumableNames', () => {
-    it('should return "Aucun" when consumableType is empty', () => {
+    it('should return "Aucun" when consumableTypes is empty', () => {
       const result = component.getConsumableNames(mockAdventurer);
       expect(result).toBe('Aucun');
     });
@@ -69,7 +69,7 @@ describe('ItemAdventurer', () => {
     it('should return a comma-separated list of consumable names', () => {
       const adventurerWithConsumables: Adventurer = {
         ...mockAdventurer,
-        consumableType: [
+        consumableTypes: [
           { id: 1, name: 'Potion de soin' },
           { id: 2, name: 'Ration de voyage' }
         ]
@@ -79,8 +79,8 @@ describe('ItemAdventurer', () => {
       expect(result).toBe('Potion de soin, Ration de voyage');
     });
 
-    it('should handle undefined consumableType gracefully', () => {
-      const adventurerWithoutConsumables = { ...mockAdventurer, consumableType: undefined as any };
+    it('should handle undefined consumableTypes gracefully', () => {
+      const adventurerWithoutConsumables = { ...mockAdventurer, consumableTypes: undefined as any };
       const result = component.getConsumableNames(adventurerWithoutConsumables);
       expect(result).toBe('Aucun');
     });

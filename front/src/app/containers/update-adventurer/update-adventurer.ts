@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AdventurerFormData } from '../../models/adventurer';
 import { AdventurerService } from '../../services/adventurer/adventurer.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormAdventurerComponent } from '../../components/form-adventurer/form-adventurer.component';
 
 @Component({
@@ -16,11 +16,12 @@ export class UpdateAdventurer implements OnInit {
 
   constructor(
     private readonly adventurerService: AdventurerService,
-    private readonly route: ActivatedRoute
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router
   ) {}
 
   ngOnInit() {
-    const idStr = this.route.snapshot.paramMap.get('id');
+    const idStr = this.activatedRoute.snapshot.paramMap.get('id');
     this.id = idStr ? Number(idStr) : -1;
 
     if (!idStr || !/^\d+$/.test(idStr) || this.id < 0 || isNaN(this.id)) {
@@ -42,7 +43,7 @@ export class UpdateAdventurer implements OnInit {
   protected onFormSubmitted(data: AdventurerFormData): void {
     this.adventurerService.updateAdventurer(this.id, data).subscribe({
       next: (adventurer) => {
-        console.log('Adventurer updated successfully:', adventurer);
+        this.router.navigate(['/adventurers']);
       },
       error: (error) => {
         console.error('Error updating adventurer:', error);

@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ListAdventurer } from './list-adventurer';
 import { AdventurerService } from '../../services/adventurer/adventurer.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
-import { Router } from '@angular/router';
 import { Adventurer } from '../../models/adventurer';
 
 describe('ListAdventurer', () => {
@@ -17,9 +17,9 @@ describe('ListAdventurer', () => {
       name: 'Aragorn',
       speciality: { id: 1, name: 'Guerrier' },
       specialityId: 1,
-      equipmentType: [],
+      equipmentTypes: [],
       equipmentTypeIds: [],
-      consumableType: [],
+      consumableTypes: [],
       consumableTypeIds: [],
       dailyRate: 500,
       experience: 100
@@ -29,9 +29,9 @@ describe('ListAdventurer', () => {
       name: 'Legolas',
       speciality: { id: 2, name: 'Archer' },
       specialityId: 2,
-      equipmentType: [],
+      equipmentTypes: [],
       equipmentTypeIds: [],
-      consumableType: [],
+      consumableTypes: [],
       consumableTypeIds: [],
       dailyRate: 600,
       experience: 200
@@ -39,7 +39,6 @@ describe('ListAdventurer', () => {
   ];
 
   beforeEach(async () => {
-    // Création des spies
     adventurerServiceSpy = jasmine.createSpyObj('AdventurerService', ['getAll']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -47,7 +46,8 @@ describe('ListAdventurer', () => {
       imports: [ListAdventurer],
       providers: [
         { provide: AdventurerService, useValue: adventurerServiceSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: ActivatedRoute, useValue: {} }
       ]
     }).compileComponents();
 
@@ -55,7 +55,7 @@ describe('ListAdventurer', () => {
     component = fixture.componentInstance;
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
@@ -68,11 +68,10 @@ describe('ListAdventurer', () => {
 
     // Assert
     expect(adventurerServiceSpy.getAll).toHaveBeenCalled();
-    expect(component.adventurers.length).toBe(2);
     expect(component.adventurers).toEqual(mockAdventurers);
   });
 
-  it('should navigate to adventurer detail on click', () => {
+  it('should navigate to the correct adventurer detail page on click', () => {
     // Act
     component.onAdventurerClick(1);
 

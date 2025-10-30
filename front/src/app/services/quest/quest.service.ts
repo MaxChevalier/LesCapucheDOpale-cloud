@@ -26,4 +26,16 @@ export class QuestService {
   updateQuest(id: number, quest: QuestForm): Observable<Quest> {
     return this.http.patch<Quest>(`${this.baseUrl}/${id}`, quest);
   }
+
+  validateQuest(id: number, recommendedXP: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/validate`, { recommendedXP });
+  }
+
+  refuseQuest(id: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/refuse`, {});
+  }
+
+  abandonQuest(id: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/abandon`, {});
+  }
 }

@@ -21,7 +21,6 @@ export class NewQuest {
         this.router.navigate(['/quests']);
       },
       error: (err) => {
-        console.error('Erreur lors de la création de la quête :', err);
         alert('Une erreur est survenue lors de la création de la quête.');
       }
     });

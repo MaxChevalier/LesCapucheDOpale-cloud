@@ -11,11 +11,11 @@ export class ItemAdventurer {
   @Input() adventurer!: Adventurer;
 
   getEquipmentNames(adventurer: Adventurer): string {
-    return adventurer.equipmentType?.map(e => e.name).join(', ') || 'Aucun';
+    return adventurer.equipmentTypes?.map(e => e.name).join(', ') || 'Aucun';
   }
 
   getConsumableNames(adventurer: Adventurer): string {
-    return adventurer.consumableType?.map(c => c.name).join(', ') || 'Aucun';
+    return adventurer.consumableTypes?.map(c => c.name).join(', ') || 'Aucun';
   }
 
 }

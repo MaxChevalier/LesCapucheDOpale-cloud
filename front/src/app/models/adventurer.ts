@@ -5,9 +5,9 @@ export interface Adventurer {
   name: string;
   speciality: Speciality;
   specialityId: number;
-  equipmentType: EquipmentType[];
+  equipmentTypes: EquipmentType[];
   equipmentTypeIds: number[];
-  consumableType: ConsumableType[];
+  consumableTypes: ConsumableType[];
   consumableTypeIds: number[];
   dailyRate: number; // in copper pieces
   experience: number;

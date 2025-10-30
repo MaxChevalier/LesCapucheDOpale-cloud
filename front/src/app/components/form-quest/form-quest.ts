@@ -19,7 +19,7 @@ export class FormQuest implements OnChanges {
     description: new FormControl('', [Validators.required]),
     finalDate: new FormControl('', [Validators.required]),
     estimatedDuration: new FormControl(1, [Validators.required, Validators.min(1)]),
-    reward: new FormControl(0, [Validators.required, Validators.min(0)])
+    reward: new FormControl(0, [Validators.required, Validators.min(0)]),
   });
 
   ngOnChanges(): void {

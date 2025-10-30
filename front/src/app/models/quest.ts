@@ -19,4 +19,5 @@ export interface QuestForm {
     finalDate: string;
     estimatedDuration: number;
     reward: number;
+    recommendedXP?: number;
 }

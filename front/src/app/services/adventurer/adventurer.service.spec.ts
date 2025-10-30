@@ -39,12 +39,12 @@ describe('AdventurerService', () => {
       name: 'Aragorn',
       speciality: { id: 1, name: 'Warrior' },
       specialityId: 1,
-      equipmentType: [
+      equipmentTypes: [
         { id: 1, name: 'Sword' },
         { id: 2, name: 'Shield' }
       ],
       equipmentTypeIds: [1, 2],
-      consumableType: [
+      consumableTypes: [
         { id: 3, name: 'Health Potion' }
       ],
       consumableTypeIds: [3],
@@ -68,7 +68,7 @@ describe('AdventurerService', () => {
     const mockAdventurers: Adventurer[] = [
       {
         id: 1,
-        name: 'Aragorn', speciality: { id: 1, name: 'Warrior' }, equipmentType: [], consumableType: [], dailyRate: 500, experience: 100,
+        name: 'Aragorn', speciality: { id: 1, name: 'Warrior' }, equipmentTypes: [], consumableTypes: [], dailyRate: 500, experience: 100,
         specialityId: 1,
         equipmentTypeIds: [],
         consumableTypeIds: []
@@ -78,8 +78,8 @@ describe('AdventurerService', () => {
         name: 'Legolas',
         specialityId: 2,
         speciality: { id: 2, name: 'Archer' },
-        equipmentType: [],
-        consumableType: [],
+        equipmentTypes: [],
+        consumableTypes: [],
         equipmentTypeIds: [],
         consumableTypeIds: [],
         dailyRate: 600,
@@ -103,10 +103,10 @@ describe('AdventurerService', () => {
       name: 'Gimli',
       speciality: { id: 3, name: 'Dwarf Warrior' },
       specialityId: 3,
-      equipmentType: [],
+      equipmentTypes: [],
       equipmentTypeIds: [],
       consumableTypeIds: [],
-      consumableType: [],
+      consumableTypes: [],
       dailyRate: 400,
       experience: 200
     };
@@ -135,9 +135,9 @@ describe('AdventurerService', () => {
       name: 'Gimli the Brave',
       speciality: { id: 3, name: 'Dwarf Warrior' },
       specialityId: 3,
-      equipmentType: [{ id: 2, name: 'Axe' }],
+      equipmentTypes: [{ id: 2, name: 'Axe' }],
       equipmentTypeIds: [2],
-      consumableType: [{ id: 3, name: 'Beer' }],
+      consumableTypes: [{ id: 3, name: 'Beer' }],
       consumableTypeIds: [3],
       dailyRate: 450,
       experience: 250

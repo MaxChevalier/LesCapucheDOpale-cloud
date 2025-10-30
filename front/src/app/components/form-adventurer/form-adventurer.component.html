@@ -24,8 +24,8 @@
   </div>
 
   <div class="form-group">
-    <label for="equipmentType">Type d'équipement:</label>
-    <select id="equipmentType" formControlName="equipmentTypeIds" multiple>
+    <label for="equipmentTypes">Type d'équipement:</label>
+    <select id="equipmentTypes" formControlName="equipmentTypeIds" multiple>
       @for (type of equipmentTypes; track type) {
       <option [value]="type.id">{{ type.name }}</option>
       }
@@ -39,8 +39,8 @@
   </div>
 
   <div class="form-group">
-    <label for="consumableType">Type de consommable:</label>
-    <select id="consumableType" formControlName="consumableTypeIds" multiple>
+    <label for="consumableTypes">Type de consommable:</label>
+    <select id="consumableTypes" formControlName="consumableTypeIds" multiple>
       @for (type of consumableTypes; track type) {
       <option [value]="type.id">{{ type.name }}</option>
       }

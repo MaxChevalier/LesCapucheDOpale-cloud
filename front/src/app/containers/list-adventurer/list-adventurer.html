@@ -1,3 +1,4 @@
+<a routerLink="/adventurer/new" routerLinkActive="active">Nouveaux Aventuriers</a>
 <div class="container">
     @for (adventurer of adventurers; track adventurer.id) {
         <app-item-adventurer [adventurer]="adventurer" (click)="onAdventurerClick(adventurer.id)"></app-item-adventurer>

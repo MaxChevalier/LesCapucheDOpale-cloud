@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UpdateAdventurer } from './update-adventurer';
 import { AdventurerService } from '../../services/adventurer/adventurer.service';
 import { AdventurerFormData } from '../../models/adventurer';
@@ -13,9 +13,9 @@ class MockAdventurerService {
     name: 'Lara',
     speciality: { id: 2, name: 'Rogue' },
     specialityId: 2,
-    equipmentType: [{ id: 3, name: 'Dagger' }],
+    equipmentTypes: [{ id: 3, name: 'Dagger' }],
     equipmentTypeIds: [3],
-    consumableType: [{ id: 4, name: 'Potion' }],
+    consumableTypes: [{ id: 4, name: 'Potion' }],
     consumableTypeIds: [4],
     dailyRate: 200
   }));
@@ -25,9 +25,9 @@ class MockAdventurerService {
     name: 'Updated Lara',
     speciality: { id: 2, name: 'Rogue' },
     specialityId: 2,
-    equipmentType: [{ id: 3, name: 'Dagger' }],
+    equipmentTypes: [{ id: 3, name: 'Dagger' }],
     equipmentTypeIds: [3],
-    consumableType: [{ id: 4, name: 'Potion' }],
+    consumableTypes: [{ id: 4, name: 'Potion' }],
     consumableTypeIds: [4],
     dailyRate: 250
   }));
@@ -38,18 +38,20 @@ describe('UpdateAdventurer', () => {
   let fixture: ComponentFixture<UpdateAdventurer>;
   let adventurerService: MockAdventurerService;
   let route: ActivatedRoute;
+  let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+
     await TestBed.configureTestingModule({
       imports: [UpdateAdventurer],
       providers: [
         { provide: AdventurerService, useClass: MockAdventurerService },
         {
           provide: ActivatedRoute,
-          useValue: {
-            snapshot: { paramMap: new Map([['id', '1']]) }
-          }
+          useValue: { snapshot: { paramMap: new Map([['id', '1']]) } }
         },
+        { provide: Router, useValue: routerSpy },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting()
       ]
@@ -77,7 +79,7 @@ describe('UpdateAdventurer', () => {
     });
   });
 
-  it('should call updateAdventurer when form is submitted', () => {
+  it('should call updateAdventurer and navigate on success', () => {
     const mockFormData: AdventurerFormData = {
       name: 'Updated Lara',
       specialityId: 2,
@@ -86,16 +88,11 @@ describe('UpdateAdventurer', () => {
       dailyRate: 250
     };
 
-    const consoleSpy = spyOn(console, 'log');
     component.id = 1;
-
     (component as any).onFormSubmitted(mockFormData);
 
     expect(adventurerService.updateAdventurer).toHaveBeenCalledWith(1, mockFormData);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Adventurer updated successfully:',
-      jasmine.objectContaining({ name: 'Updated Lara' })
-    );
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/adventurers']);
   });
 
   it('should handle error when updateAdventurer fails', () => {
@@ -114,10 +111,7 @@ describe('UpdateAdventurer', () => {
     (component as any).onFormSubmitted(mockFormData);
 
     expect(adventurerService.updateAdventurer).toHaveBeenCalledWith(1, mockFormData);
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error updating adventurer:',
-      jasmine.any(Error)
-    );
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error updating adventurer:', jasmine.any(Error));
   });
 
   describe('invalid ID scenarios', () => {

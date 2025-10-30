@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 import { Quest } from '../../models/models';
 import { QuestService } from '../../services/quest/quest.service';
-import { Router } from '@angular/router';
 import { ItemQuest } from '../../components/item-quest/item-quest';
 
 @Component({
   selector: 'app-list-quest',
-  imports: [ItemQuest],
+  standalone: true,
+  imports: [CommonModule, ItemQuest, RouterLink],
   templateUrl: './list-quest.html',
-  styleUrl: './list-quest.scss'
+  styleUrls: ['./list-quest.scss']
 })
 export class ListQuest implements OnInit {
   quests: Quest[] = [];
@@ -16,15 +18,16 @@ export class ListQuest implements OnInit {
   constructor(
     private readonly questService: QuestService,
     private readonly router: Router
-  ) { }
+  ) {}
 
-  ngOnInit() {
-    this.questService.getAllQuests().subscribe(quests => {
-      this.quests = quests;
+  ngOnInit(): void {
+    this.questService.getAllQuests().subscribe({
+      next: (quests) => (this.quests = quests),
+      error: (err) => console.error('Erreur lors du chargement des quêtes', err),
     });
   }
 
-  onQuestClick(questId: number) {
+  onQuestClick(questId: number): void {
     this.router.navigate(['/quest', questId]);
   }
 }

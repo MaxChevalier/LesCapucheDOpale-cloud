@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { QuestService } from './quest.service';
 import { Quest, QuestForm } from '../../models/models';
 import { provideHttpClient } from '@angular/common/http';
@@ -13,7 +13,7 @@ describe('QuestService', () => {
     { id: 2, name: 'Defend the Village', description: 'Protect the villagers from goblin attacks.', finalDate: '2023-12-31', estimatedDuration: 5, reward: 1000, statusId: 1, recommendedXP: 500, UserId: 1, status: { id: 1, name: 'Open' } },
   ];
 
-  const mockQuest: Quest = { id: 1, name: 'Retrieve the Artifact', description: 'Find the lost relic in the ruins.', finalDate: '2023-12-31', estimatedDuration: 5, reward: 1000, statusId: 1, recommendedXP: 500, UserId: 1, status: { id: 1, name: 'Open' } };
+  const mockQuest: Quest = mockQuests[0];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -25,7 +25,7 @@ describe('QuestService', () => {
   });
 
   afterEach(() => {
-    httpMock.verify(); // Vérifie qu'aucune requête HTTP n’est restée en attente
+    httpMock.verify();
   });
 
   it('should be created', () => {
@@ -88,5 +88,39 @@ describe('QuestService', () => {
     expect(req.request.method).toBe('PATCH');
     expect(req.request.body).toEqual(updatedQuest);
     req.flush({ id, ...updatedQuest });
+  });
+
+  it('should validate a quest', () => {
+    const id = 1;
+    const recommendedXP = 500;
+
+    service.validateQuest(id, recommendedXP).subscribe();
+
+    const req = httpMock.expectOne(`/api/quests/${id}/validate`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ recommendedXP });
+    req.flush({});
+  });
+
+  it('should refuse a quest', () => {
+    const id = 2;
+
+    service.refuseQuest(id).subscribe();
+
+    const req = httpMock.expectOne(`/api/quests/${id}/refuse`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({});
+    req.flush({});
+  });
+
+  it('should abandon a quest', () => {
+    const id = 3;
+
+    service.abandonQuest(id).subscribe();
+
+    const req = httpMock.expectOne(`/api/quests/${id}/abandon`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({});
+    req.flush({});
   });
 });

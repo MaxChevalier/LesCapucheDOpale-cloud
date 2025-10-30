@@ -19,12 +19,11 @@ export const routes: Routes = [
     { path: 'adventurer/:id', component: UpdateAdventurer, canActivate: [authGuard]},
 
     // User routes
-    { path: 'user/new', component: NewUserComponent },
+    { path: 'user/new', component: NewUserComponent, canActivate: [authGuard] },
     { path: 'login', component: Login },
 
     // Quest routes
-    { path: 'quest/new', component: NewQuest, canActivate: [authGuard]},
-    { path: 'quests', component: ListQuest, canActivate: [authGuard]},
-    { path: 'quest/:id', component: UpdateQuest, canActivate: [authGuard]},
-
+    { path: 'quest/new', component: NewQuest, canActivate: [authGuard] },
+    { path: 'quests', component: ListQuest, canActivate: [authGuard] },
+    { path: 'quest/:id', component: UpdateQuest, canActivate: [authGuard] },
 ];
