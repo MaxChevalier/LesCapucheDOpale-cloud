@@ -54,6 +54,17 @@ npx prisma migrate status
 npx prisma migrate reset
 ```
 
+#### Initialisation avec données de test
+
+Pour initialiser la base de données avec des données de test (utilisateurs, aventuriers, quêtes, etc.), consultez la documentation détaillée :
+
+📖 **[Documentation d'initialisation de la base de données](./prisma/README.md)**
+
+Commande rapide :
+```bash
+npm run db:init
+```
+
 ## Développement
 
 ### Démarrer le serveur de développement
