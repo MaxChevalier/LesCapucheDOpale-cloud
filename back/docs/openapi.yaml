@@ -1418,6 +1418,95 @@ paths:
         - bearer: []
       tags:
         - Equipment Types
+  /consumables:
+    post:
+      operationId: ConsumablesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConsumableDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - Consumables
+    get:
+      operationId: ConsumablesController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Consumables
+  /consumables/{id}:
+    get:
+      operationId: ConsumablesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Consumables
+    patch:
+      operationId: ConsumablesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConsumableDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Consumables
+    delete:
+      operationId: ConsumablesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Consumables
+  /consumables/{id}/purchase:
+    post:
+      operationId: ConsumablesController_purchase
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseConsumableDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - Consumables
   /consumable-types:
     post:
       operationId: ConsumableTypesController_create
