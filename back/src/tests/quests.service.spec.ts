@@ -6,11 +6,10 @@ import { UpdateQuestDto } from '../dto/update-quest.dto';
 import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 import { Prisma } from '@prisma/client';
 
-// CORRECTION MAJEURE : On utilise 'any' pour éviter les conflits de types stricts de Jest
 type JestMock = any;
 
 type MockedPrismaService = Partial<{
-  status: { findFirst: JestMock; create: JestMock };
+  status: { findFirst: JestMock };
   adventurer: { findMany: JestMock };
   equipmentStock: { findMany: JestMock };
   questStockEquipment: { findMany: JestMock; createMany: JestMock; deleteMany: JestMock };
@@ -22,7 +21,7 @@ describe('QuestsService', () => {
   let service: QuestsService;
 
   const mockPrisma: MockedPrismaService = {
-    status: { findFirst: jest.fn(), create: jest.fn() },
+    status: { findFirst: jest.fn() },
     adventurer: { findMany: jest.fn() },
     equipmentStock: { findMany: jest.fn() },
     questStockEquipment: { findMany: jest.fn(), createMany: jest.fn(), deleteMany: jest.fn() },
@@ -37,23 +36,20 @@ describe('QuestsService', () => {
 
   // ------------------------ CREATE ------------------------
   describe('create', () => {
-    it('should create a quest when status exists (getOrCreateStatusId found path)', async () => {
+    it('should create a quest with STATUS_ID_WAITING', async () => {
       const dto: CreateQuestDto = {
         name: 'Q1', description: 'desc', finalDate: new Date(), reward: 100, estimatedDuration: 3,
         adventurerIds: [1, 2], equipmentStockIds: [10, 11],
       };
-      mockPrisma.status!.findFirst.mockResolvedValue({ id: 7 });
       mockPrisma.adventurer!.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }]);
       mockPrisma.equipmentStock!.findMany.mockResolvedValue([{ id: 10 }, { id: 11 }]);
       mockPrisma.quest!.create.mockResolvedValue({ id: 99, ...dto });
 
       const res = await service.create(42, dto);
       expect(res).toEqual(expect.objectContaining({ id: 99 }));
-      expect(mockPrisma.status!.create).not.toHaveBeenCalled();
     });
 
-    it('should create a quest when status does not exist (getOrCreateStatusId create path)', async () => {
-      // CORRECTION DTO : Ajout des champs requis pour éviter l'erreur TS
+    it('should create a quest without adventurers and equipment', async () => {
       const dto: CreateQuestDto = { 
         name: 'Q2', 
         reward: 50, 
@@ -62,18 +58,14 @@ describe('QuestsService', () => {
         finalDate: new Date()
       };
       
-      mockPrisma.status!.findFirst.mockResolvedValue(null);
-      mockPrisma.status!.create.mockResolvedValue({ id: 999 });
       mockPrisma.quest!.create.mockResolvedValue({ id: 100 });
 
-      await service.create(42, dto);
-      
-      expect(mockPrisma.status!.create).toHaveBeenCalled();
+      const res = await service.create(42, dto);
+      expect(res).toEqual(expect.objectContaining({ id: 100 }));
     });
 
     it('should throw NotFoundException if adventurer id missing', async () => {
       const dto: Partial<CreateQuestDto> = { name: 'Q3', adventurerIds: [1, 2] };
-      mockPrisma.status!.findFirst.mockResolvedValue({ id: 1 });
       mockPrisma.adventurer!.findMany.mockResolvedValue([{ id: 1 }]);
       await expect(service.create(1, dto as CreateQuestDto)).rejects.toThrow(NotFoundException);
       await expect(service.create(1, dto as CreateQuestDto)).rejects.toThrow(/Adventurer id\(s\) not found/);
@@ -81,7 +73,6 @@ describe('QuestsService', () => {
 
     it('should throw NotFoundException if equipmentStock id missing', async () => {
       const dto: Partial<CreateQuestDto> = { name: 'Q4', equipmentStockIds: [10, 11] };
-      mockPrisma.status!.findFirst.mockResolvedValue({ id: 1 });
       mockPrisma.equipmentStock!.findMany.mockResolvedValue([{ id: 10 }]);
       
       await expect(service.create(1, dto as CreateQuestDto)).rejects.toThrow(NotFoundException);
@@ -91,12 +82,11 @@ describe('QuestsService', () => {
   // ------------------------ UPDATE ------------------------
   describe('update', () => {
     beforeEach(() => {
-      mockPrisma.quest!.findUnique.mockResolvedValue({ status: { name: 'attendre pour la validation' } });
+      mockPrisma.quest!.findUnique.mockResolvedValue({ statusId: 1 }); // STATUS_ID_WAITING = 1
     });
 
     it('should update quest and set adventurers and questStockEquipments when arrays provided', async () => {
       const dto: Partial<UpdateQuestDto> = { name: 'Updated', adventurerIds: [3, 4], equipmentStockIds: [20] };
-      mockPrisma.status!.findFirst.mockResolvedValue({ id: 2 });
       mockPrisma.adventurer!.findMany.mockResolvedValue([{ id: 3 }, { id: 4 }]);
       mockPrisma.equipmentStock!.findMany.mockResolvedValue([{ id: 20 }]);
       mockPrisma.quest!.update.mockResolvedValue({ id: 7 });
@@ -202,7 +192,7 @@ describe('QuestsService', () => {
     beforeEach(() => {
       mockPrisma.quest!.update.mockResolvedValue({ id: 1 });
       mockPrisma.adventurer!.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }]);
-      mockPrisma.quest!.findUnique.mockResolvedValue({ status: { name: 'attendre pour la validation' } });
+      mockPrisma.quest!.findUnique.mockResolvedValue({ statusId: 1 }); // STATUS_ID_WAITING = 1
     });
 
     it('should attach adventurers', async () => {
@@ -244,7 +234,7 @@ describe('QuestsService', () => {
       mockPrisma.questStockEquipment!.createMany.mockResolvedValue({});
       mockPrisma.questStockEquipment!.deleteMany.mockResolvedValue({});
       mockPrisma.$transaction.mockResolvedValue({});
-      mockPrisma.quest!.findUnique.mockResolvedValue({ id: 1, status: { name: 'attendre pour la validation' } });
+      mockPrisma.quest!.findUnique.mockResolvedValue({ id: 1, statusId: 1 }); // STATUS_ID_WAITING = 1
       mockPrisma.equipmentStock!.findMany.mockResolvedValue([{ id: 10 }]);
     });
 
@@ -268,8 +258,7 @@ describe('QuestsService', () => {
   describe('business actions: refuse/abandon', () => {
     describe('refuseQuest', () => {
       it('should set status "refusée" when current status is waiting', async () => {
-        mockPrisma.quest!.findUnique.mockResolvedValueOnce({ status: { name: 'attendre pour la validation' } });
-        mockPrisma.status!.findFirst.mockResolvedValueOnce({ id: 21 });
+        mockPrisma.quest!.findUnique.mockResolvedValueOnce({ statusId: 1 }); // STATUS_ID_WAITING = 1
         mockPrisma.quest!.update.mockResolvedValueOnce({ id: 1, status: { name: 'refusée' } });
 
         const res = await service.refuseQuest(1);
@@ -277,7 +266,7 @@ describe('QuestsService', () => {
       });
 
       it('should fail with BadRequestException when current status is "validée"', async () => {
-        mockPrisma.quest!.findUnique.mockResolvedValueOnce({ status: { name: 'validée' } });
+        mockPrisma.quest!.findUnique.mockResolvedValueOnce({ statusId: 2 }); // STATUS_ID_VALIDATED = 2
         await expect(service.refuseQuest(1)).rejects.toThrow(BadRequestException);
       });
 
@@ -289,8 +278,7 @@ describe('QuestsService', () => {
 
     describe('abandonQuest', () => {
       it('should set status "abandonnée" when current status is waiting', async () => {
-        mockPrisma.quest!.findUnique.mockResolvedValueOnce({ status: { name: 'attendre pour la validation' } });
-        mockPrisma.status!.findFirst.mockResolvedValueOnce({ id: 22 });
+        mockPrisma.quest!.findUnique.mockResolvedValueOnce({ statusId: 1 }); // STATUS_ID_WAITING = 1
         mockPrisma.quest!.update.mockResolvedValueOnce({ id: 1, status: { name: 'abandonnée' } });
 
         const res = await service.abandonQuest(1);
@@ -298,7 +286,7 @@ describe('QuestsService', () => {
       });
 
       it('should fail with BadRequestException when current status is "validée"', async () => {
-        mockPrisma.quest!.findUnique.mockResolvedValueOnce({ status: { name: 'validée' } });
+        mockPrisma.quest!.findUnique.mockResolvedValueOnce({ statusId: 2 }); // STATUS_ID_VALIDATED = 2
         await expect(service.abandonQuest(1)).rejects.toThrow(BadRequestException);
       });
 
@@ -326,7 +314,6 @@ describe('QuestsService', () => {
         clientVersion: '1.0',
       } as any);
       
-      mockPrisma.status!.findFirst.mockResolvedValue({ id: 5 });
       mockPrisma.quest!.update.mockRejectedValue(prismaError);
 
       await expect(service.validateQuest(999, 100)).rejects.toThrow(NotFoundException);
@@ -334,19 +321,17 @@ describe('QuestsService', () => {
 
     it('validateQuest should re-throw generic errors', async () => {
       const error = new Error('Generic');
-      mockPrisma.status!.findFirst.mockResolvedValue({ id: 5 });
       mockPrisma.quest!.update.mockRejectedValue(error);
       await expect(service.validateQuest(1, 100)).rejects.toThrow(error);
     });
 
     it('startQuest should fail if not validated', async () => {
-      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ status: { name: 'attendre pour la validation' } });
+      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ statusId: 1 }); // STATUS_ID_WAITING = 1
       await expect(service.startQuest(1)).rejects.toThrow(BadRequestException);
     });
 
     it('startQuest should set status "commencée" when validated', async () => {
-      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ status: { name: 'validée' } });
-      mockPrisma.status!.findFirst.mockResolvedValueOnce({ id: 9 });
+      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ statusId: 2 }); // STATUS_ID_VALIDATED = 2
       mockPrisma.quest!.update.mockResolvedValueOnce({ id: 1, status: { name: 'commencée' } });
 
       const res = await service.startQuest(1);
@@ -359,7 +344,7 @@ describe('QuestsService', () => {
     });
 
     it('invalidateQuest should fail if quest is started', async () => {
-      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ status: { name: 'commencée' } });
+      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ statusId: 3 }); // STATUS_ID_STARTED = 3
       await expect(service.invalidateQuest(1)).rejects.toThrow(BadRequestException);
     });
 
@@ -369,8 +354,7 @@ describe('QuestsService', () => {
     });
     
     it('invalidateQuest should reset XP and status when not started', async () => {
-      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ status: { name: 'validée' } });
-      mockPrisma.status!.findFirst.mockResolvedValueOnce({ id: 1 });
+      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ statusId: 2 }); // STATUS_ID_VALIDATED = 2
       mockPrisma.$transaction.mockResolvedValueOnce({});
       mockPrisma.quest!.update.mockResolvedValueOnce({ id: 1, status: { name: 'attendre pour la validation' } });
 
@@ -464,7 +448,7 @@ describe('QuestsService', () => {
 
   describe('more branches: update/attachments', () => {
     it('should throw when updating started quest with adventurerIds', async () => {
-      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ status: { name: 'commencée' } });
+      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ statusId: 3 }); // STATUS_ID_STARTED = 3
       await expect(service.update(1, { adventurerIds: [1] } as any)).rejects.toThrow();
     });
 
@@ -472,14 +456,14 @@ describe('QuestsService', () => {
       mockPrisma.equipmentStock!.findMany.mockResolvedValue([{ id: 10 }]);
       
       mockPrisma.questStockEquipment!.findMany.mockResolvedValueOnce([{ equipmentStockId: 10 }]);
-      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ id: 1, status: { name: 'attendre pour la validation' } });
+      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ id: 1, statusId: 1 }); // STATUS_ID_WAITING = 1
       mockPrisma.quest!.findUnique.mockResolvedValueOnce({ id: 1 });
       const res = await service.attachEquipmentStocks(1, [10]);
       expect(res).toEqual(expect.objectContaining({ id: 1 }));
     });
 
     it('setEquipmentStocks should work when given empty array', async () => {
-      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ id: 1, status: { name: 'attendre pour la validation' } });
+      mockPrisma.quest!.findUnique.mockResolvedValueOnce({ id: 1, statusId: 1 }); // STATUS_ID_WAITING = 1
       mockPrisma.$transaction.mockResolvedValueOnce({});
       mockPrisma.quest!.findUnique.mockResolvedValueOnce({ id: 1 });
       const res = await service.setEquipmentStocks(1, []);

@@ -26,30 +26,20 @@ export type FindQuestsOptions = {
 export class QuestsService {
   constructor(private prisma: PrismaService) {}
 
-  private readonly STATUS_WAITING = 'attendre pour la validation';
-  private readonly STATUS_VALIDATED = 'validée';
-  private readonly STATUS_STARTED = 'commencée';
-  private readonly STATUS_REFUSED = 'refusée';
-  private readonly STATUS_ABANDONED = 'abandonnée';
-
-  private async getOrCreateStatusId(name: string): Promise<number> {
-    const found = await this.prisma.status.findFirst({ where: { name } });
-    if (found) return found.id;
-    const created = await this.prisma.status.create({ data: { name } });
-    return created.id;
-  }
-
-  private async getPendingStatusId(): Promise<number> {
-    return this.getOrCreateStatusId(this.STATUS_WAITING);
-  }
+  // Status IDs (must match database values)
+  private readonly STATUS_ID_WAITING = 1;
+  private readonly STATUS_ID_VALIDATED = 2;
+  private readonly STATUS_ID_STARTED = 3;
+  private readonly STATUS_ID_REFUSED = 4;
+  private readonly STATUS_ID_ABANDONED = 5;
 
   private async isStarted(questId: number): Promise<boolean> {
     const q = await this.prisma.quest.findUnique({
       where: { id: questId },
-      select: { status: { select: { name: true } } },
+      select: { statusId: true },
     });
     if (!q) throw new NotFoundException('Quest not found');
-    return q.status?.name?.toLowerCase() === this.STATUS_STARTED.toLowerCase();
+    return q.statusId === this.STATUS_ID_STARTED;
   }
 
   async findAll(options: FindQuestsOptions = {}) {
@@ -202,8 +192,6 @@ export class QuestsService {
   }
 
   async create(userId: number, dto: CreateQuestDto) {
-    const pendingStatusId = await this.getPendingStatusId();
-
     if (dto.adventurerIds?.length) {
       await this.findAdventurersExist(dto.adventurerIds);
     }
@@ -220,7 +208,7 @@ export class QuestsService {
         reward: dto.reward,
         estimatedDuration: dto.estimatedDuration,
         recommendedXP: 0,
-        statusId: pendingStatusId,
+        statusId: this.STATUS_ID_WAITING,
         UserId: userId,
         adventurers: dto.adventurerIds?.length
           ? { connect: dto.adventurerIds.map((id) => ({ id })) }
@@ -250,9 +238,7 @@ export class QuestsService {
       );
     }
 
-    const pendingStatusId = isStarted
-      ? undefined
-      : await this.getPendingStatusId();
+    const pendingStatusId = isStarted ? undefined : this.STATUS_ID_WAITING;
 
     if (dto.adventurerIds?.length) {
       await this.findAdventurersExist(dto.adventurerIds);
@@ -452,12 +438,11 @@ export class QuestsService {
   }
 
   async validateQuest(questId: number, xp: number) {
-    const statusId = await this.getOrCreateStatusId(this.STATUS_VALIDATED);
     try {
       return await this.prisma.quest.update({
         where: { id: questId },
         data: {
-          status: { connect: { id: statusId } },
+          status: { connect: { id: this.STATUS_ID_VALIDATED } },
           recommendedXP: xp,
         },
         include: {
@@ -483,13 +468,11 @@ export class QuestsService {
       throw new BadRequestException('Quest is started: cannot invalidate');
     }
 
-    const waitingId = await this.getOrCreateStatusId(this.STATUS_WAITING);
-
     await this.prisma.$transaction([
       this.prisma.quest.update({
         where: { id: questId },
         data: {
-          status: { connect: { id: waitingId } },
+          status: { connect: { id: this.STATUS_ID_WAITING } },
           recommendedXP: 0,
           adventurers: { set: [] },
         },
@@ -503,22 +486,19 @@ export class QuestsService {
   async startQuest(questId: number) {
     const quest = await this.prisma.quest.findUnique({
       where: { id: questId },
-      include: { status: true },
+      select: { statusId: true },
     });
     if (!quest) throw new NotFoundException('Quest not found');
 
-    if (
-      quest.status?.name?.toLowerCase() !== this.STATUS_VALIDATED.toLowerCase()
-    ) {
+    if (quest.statusId !== this.STATUS_ID_VALIDATED) {
       throw new BadRequestException(
         'Quest must be validated before it can be started',
       );
     }
 
-    const startedId = await this.getOrCreateStatusId(this.STATUS_STARTED);
     return this.prisma.quest.update({
       where: { id: questId },
-      data: { status: { connect: { id: startedId } } },
+      data: { status: { connect: { id: this.STATUS_ID_STARTED } } },
       include: {
         status: true,
         adventurers: true,
@@ -531,21 +511,22 @@ export class QuestsService {
   async refuseQuest(questId: number) {
     const quest = await this.prisma.quest.findUnique({
       where: { id: questId },
-      include: { status: true },
+      select: { statusId: true },
     });
     if (!quest) throw new NotFoundException('Quest not found');
 
-    const current = quest.status?.name?.toLowerCase();
-    if (current === this.STATUS_VALIDATED || current === this.STATUS_STARTED) {
+    if (
+      quest.statusId === this.STATUS_ID_VALIDATED ||
+      quest.statusId === this.STATUS_ID_STARTED
+    ) {
       throw new BadRequestException(
         'Quest cannot be refused when accepted or started',
       );
     }
 
-    const refusedId = await this.getOrCreateStatusId(this.STATUS_REFUSED);
     return await this.prisma.quest.update({
       where: { id: questId },
-      data: { status: { connect: { id: refusedId } } },
+      data: { status: { connect: { id: this.STATUS_ID_REFUSED } } },
       include: {
         status: true,
         adventurers: true,
@@ -558,21 +539,22 @@ export class QuestsService {
   async abandonQuest(questId: number) {
     const quest = await this.prisma.quest.findUnique({
       where: { id: questId },
-      include: { status: true },
+      select: { statusId: true },
     });
     if (!quest) throw new NotFoundException('Quest not found');
 
-    const current = quest.status?.name?.toLowerCase();
-    if (current === this.STATUS_VALIDATED || current === this.STATUS_STARTED) {
+    if (
+      quest.statusId === this.STATUS_ID_VALIDATED ||
+      quest.statusId === this.STATUS_ID_STARTED
+    ) {
       throw new BadRequestException(
         'Quest cannot be abandoned when accepted or started',
       );
     }
 
-    const abandonedId = await this.getOrCreateStatusId(this.STATUS_ABANDONED);
     return this.prisma.quest.update({
       where: { id: questId },
-      data: { status: { connect: { id: abandonedId } } },
+      data: { status: { connect: { id: this.STATUS_ID_ABANDONED } } },
       include: {
         status: true,
         adventurers: true,
