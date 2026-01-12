@@ -31,7 +31,7 @@ describe('EquipmentService', () => {
       { id: 2, name: 'MRI' },
     ];
 
-    service.getEquipment().subscribe((equipment) => {
+    service.getEquipmentType().subscribe((equipment) => {
       expect(equipment).toEqual(mockEquipment);
       expect(equipment.length).toBe(2);
       expect(equipment[0].name).toBe('ECG');

@@ -1,0 +1,9 @@
+<div>
+    <h4>{{ equipment.equipment.name }}</h4>
+    @if (isSelected) {
+        <span class="selected-badge">Sélectionné</span>
+    }
+    <p>Type: {{ equipment.equipment.equipmentType.name }}</p>
+    <p>Durabilité: {{ equipment.durability }} / {{ equipment.equipment.maxDurability }}</p>
+    <p>Prix: {{ equipment.equipment.cost }}</p>
+</div>

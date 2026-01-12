@@ -1,0 +1,9 @@
+<div>
+    <h3>Equipement en stock</h3>
+    <a routerLink="/equipments" routerLinkActive="active">Ajouter du nouveau stock</a>
+     <div>
+        @for (equipment of stockEquipments; track equipment.id) {
+            <app-item-stock-equipment [equipment]="equipment"></app-item-stock-equipment>
+        }
+     </div>
+</div>

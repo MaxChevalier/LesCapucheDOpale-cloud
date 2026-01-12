@@ -61,11 +61,22 @@
         <label for="succes">Chances de réussite de la mission :</label>
         <span id="succes">{{ successRate }}%</span>
     </div>
-    @for (adventurer of adventurers; track adventurer.id) {
-    <app-item-adventurer (click)="onToggleAdventurer(adventurer)" [adventurer]="adventurer"
-        [isSelected]="this.selectedAdventurerIds.has(adventurer.id)">
-    </app-item-adventurer>
-    } @empty {
-    <p>Aucun aventurier trouvé</p>
-    }
+    <div assign-container>
+        @for (adventurer of adventurers; track adventurer.id) {
+        <app-item-adventurer (click)="onToggleAdventurer(adventurer)" [adventurer]="adventurer"
+            [isSelected]="selectedAdventurerIds.has(adventurer.id)">
+        </app-item-adventurer>
+        } @empty {
+        <p>Aucun aventurier trouvé</p>
+        }
+    </div>
+    <div assign-container>
+        @for (equipment of equipments; track equipment.id) {
+        <app-item-stock-equipment (click)="onToggleEquipment(equipment)" [equipment]="equipment"
+            [isSelected]="selectedEquipmentIds.has(equipment.id)">
+        </app-item-stock-equipment>
+        } @empty {
+        <p>Aucun equipment trouvé</p>
+        }
+    </div>
 </div>

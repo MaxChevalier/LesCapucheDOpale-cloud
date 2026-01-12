@@ -3,6 +3,7 @@ import { AssignQuest } from './assign-quest';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuestService } from '../../services/quest/quest.service';
 import { AdventurerService } from '../../services/adventurer/adventurer.service';
+import { EquipmentService } from '../../services/equipment/equipment.service';
 import { of } from 'rxjs';
 import { Quest, Adventurer } from '../../models/models';
 
@@ -12,6 +13,7 @@ describe('AssignQuest', () => {
 
   let mockQuestService: jasmine.SpyObj<QuestService>;
   let mockAdventurerService: jasmine.SpyObj<AdventurerService>;
+  let mockEquipmentService: jasmine.SpyObj<EquipmentService>;
   let mockRouter: jasmine.SpyObj<Router>;
 
   const mockQuest: Quest = {
@@ -20,14 +22,15 @@ describe('AssignQuest', () => {
     reward: 250,
     recommendedXP: 100,
     estimatedDuration: 2,
-    statusId: 3,
+    statusId: 2,
     adventurers: [
       { id: 1, name: 'A1', experience: 80, dailyRate: 10, speciality: { id: 1, name: 'Warrior' }, specialityId: 1, equipmentTypes: [], equipmentTypeIds: [], consumableTypes: [], consumableTypeIds: [] }
     ],
+    questStockEquipments: [],
     description: 'A sample quest',
     finalDate: '2023-12-31',
     UserId: 1,
-    status: { id: 3, name: 'Ready for Assignment' }
+    status: { id: 3, name: 'Ready' }
   };
 
   const mockAdventurers: Adventurer[] = [
@@ -42,13 +45,21 @@ describe('AssignQuest', () => {
     mockAdventurerService = jasmine.createSpyObj('AdventurerService', [
       'getAll'
     ]);
+    mockEquipmentService = jasmine.createSpyObj('EquipmentService', [
+      'getStockEquipments', 'assignEquipment', 'unassignEquipment'
+    ]);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+
+    mockQuestService.getQuestById.and.returnValue(of(mockQuest));
+    mockAdventurerService.getAll.and.returnValue(of(mockAdventurers));
+    mockEquipmentService.getStockEquipments.and.returnValue(of([]));
 
     await TestBed.configureTestingModule({
       imports: [AssignQuest],
       providers: [
         { provide: QuestService, useValue: mockQuestService },
         { provide: AdventurerService, useValue: mockAdventurerService },
+        { provide: EquipmentService, useValue: mockEquipmentService },
         {
           provide: ActivatedRoute,
           useValue: {
@@ -59,37 +70,28 @@ describe('AssignQuest', () => {
       ]
     }).compileComponents();
 
-    mockQuestService.getQuestById.and.returnValue(of(mockQuest));
-    mockAdventurerService.getAll.and.returnValue(of(mockAdventurers));
-
     fixture = TestBed.createComponent(AssignQuest);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  // ---------------------------------------------
-  //              BASIC CREATION
-  // ---------------------------------------------
+  // -----------------------------------------------------
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // ---------------------------------------------
-  //              INIT LOGIC
-  // ---------------------------------------------
-  it('should load quest and adventurers on init', () => {
+  // -----------------------------------------------------
+  it('should load quest, adventurers and equipment on init', () => {
     expect(component.quest).toEqual(mockQuest);
     expect(component.adventurers.length).toBe(2);
     expect(component.selectedAdventurerIds.has(1)).toBeTrue();
-    expect(component.cost).toBe(20); // dailyRate 10 * 2 days
+    expect(component.cost).toBe(20); // 10 * 2 days
   });
 
-  // ---------------------------------------------
-  //        Redirect if quest.statusId !== 3
-  // ---------------------------------------------
-  it('should redirect if quest not assignable', () => {
+  // -----------------------------------------------------
+  it('should redirect if quest not assignable (statusId !== 2)', () => {
     mockQuestService.getQuestById.and.returnValue(
-      of({ ...mockQuest, statusId: 2 })
+      of({ ...mockQuest, statusId: 3 })
     );
 
     TestBed.resetTestingModule();
@@ -98,6 +100,7 @@ describe('AssignQuest', () => {
       providers: [
         { provide: QuestService, useValue: mockQuestService },
         { provide: AdventurerService, useValue: mockAdventurerService },
+        { provide: EquipmentService, useValue: mockEquipmentService },
         {
           provide: ActivatedRoute,
           useValue: { snapshot: { paramMap: { get: () => '1' } } }
@@ -112,11 +115,9 @@ describe('AssignQuest', () => {
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/quest/', 1]);
   });
 
-  // ---------------------------------------------
-  //        TOGGLE ADD ADVENTURER
-  // ---------------------------------------------
+  // -----------------------------------------------------
   it('should assign an adventurer when toggled and not selected', () => {
-    const newAdv = mockAdventurers[1]; // id = 2
+    const newAdv = mockAdventurers[1];
     mockQuestService.assignAdventurer.and.returnValue(of({} as any));
 
     component.onToggleAdventurer(newAdv);
@@ -124,17 +125,15 @@ describe('AssignQuest', () => {
     expect(mockQuestService.assignAdventurer)
       .toHaveBeenCalledWith(1, 2);
     expect(component.selectedAdventurerIds.has(2)).toBeTrue();
-    expect(component.cost).toBe(20 + newAdv.dailyRate * mockQuest.estimatedDuration); // 20 + 40
+    expect(component.cost).toBe(20 + 40);
     expect(component.successRateForAdventurer[2]).toBe(1);
   });
 
-  // ---------------------------------------------
-  //        TOGGLE REMOVE ADVENTURER
-  // ---------------------------------------------
+  // -----------------------------------------------------
   it('should unassign an adventurer when toggled and selected', () => {
+    const existingAdv = mockAdventurers[0];
     mockQuestService.unassignAdventurer.and.returnValue(of({} as any));
 
-    const existingAdv = mockAdventurers[0]; // id = 1
     component.onToggleAdventurer(existingAdv);
 
     expect(mockQuestService.unassignAdventurer)
@@ -144,28 +143,20 @@ describe('AssignQuest', () => {
     expect(component.successRateForAdventurer[1]).toBeUndefined();
   });
 
-  // ---------------------------------------------
-  //         COST BREAKDOWN
-  // ---------------------------------------------
+  // -----------------------------------------------------
   it('should compute costBreakdown correctly', () => {
-    component.cost = 123; // 1po / 2pa / 3pc
+    component.cost = 123;
     expect(component.costBreakdown).toEqual({ po: 1, pa: 2, pc: 3 });
   });
 
-  // ---------------------------------------------
-  //         REWARD BREAKDOWN
-  // ---------------------------------------------
+  // -----------------------------------------------------
   it('should compute rewardBreakdown correctly', () => {
     expect(component.rewardBreakdown).toEqual({ po: 2, pa: 5, pc: 0 });
   });
 
-  // ---------------------------------------------
-  //         SUCCESS RATE
-  // ---------------------------------------------
+  // -----------------------------------------------------
   it('should calculate successRate correctly', () => {
-    // A1: 80/100 = 0.8
-    expect(component.successRate).toBe(
-      Math.round((0.8 * 80) * 100) / 100
-    );
+    expect(component.successRate).toBe(64);
   });
+
 });

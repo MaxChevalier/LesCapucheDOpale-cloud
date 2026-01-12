@@ -40,7 +40,7 @@ export class FormAdventurerComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     forkJoin({
       specialities: this.specialityService.getSpecialities(),
-      equipment: this.equipmentService.getEquipment(),
+      equipment: this.equipmentService.getEquipmentType(),
       consumables: this.consumableService.getConsumables()
     }).subscribe(({ specialities, equipment, consumables }) => {
       this.specialities = specialities;

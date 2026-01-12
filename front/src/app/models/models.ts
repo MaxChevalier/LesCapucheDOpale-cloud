@@ -4,3 +4,5 @@ export { ConsumableType } from './consumable-type';
 export { Adventurer, AdventurerFormData } from './adventurer';
 export { Quest, QuestForm } from './quest';
 export { Status } from './status';
+export { Equipment, EquipmentFormData } from './equipment';
+export { StockEquipment } from './stock-equipment';

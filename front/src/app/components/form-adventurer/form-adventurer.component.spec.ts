@@ -15,11 +15,11 @@ describe('FormAdventurerComponent', () => {
 
   beforeEach(async () => {
     specialityServiceSpy = jasmine.createSpyObj('SpecialityService', ['getSpecialities']);
-    equipmentServiceSpy = jasmine.createSpyObj('EquipmentService', ['getEquipment']);
+    equipmentServiceSpy = jasmine.createSpyObj('EquipmentService', ['getEquipmentType']);
     consumableServiceSpy = jasmine.createSpyObj('ConsumableService', ['getConsumables']);
 
     specialityServiceSpy.getSpecialities.and.returnValue(of([{ id: 1, name: 'Guerrier' }]));
-    equipmentServiceSpy.getEquipment.and.returnValue(of([{ id: 10, name: 'Épée' }]));
+    equipmentServiceSpy.getEquipmentType.and.returnValue(of([{ id: 10, name: 'Épée' }]));
     consumableServiceSpy.getConsumables.and.returnValue(of([{ id: 20, name: 'Potion' }]));
 
     await TestBed.configureTestingModule({
@@ -44,7 +44,7 @@ describe('FormAdventurerComponent', () => {
     fixture.detectChanges();
 
     expect(specialityServiceSpy.getSpecialities).toHaveBeenCalled();
-    expect(equipmentServiceSpy.getEquipment).toHaveBeenCalled();
+    expect(equipmentServiceSpy.getEquipmentType).toHaveBeenCalled();
     expect(consumableServiceSpy.getConsumables).toHaveBeenCalled();
 
     expect((component as any).specialities).toEqual([{ id: 1, name: 'Guerrier' }]);

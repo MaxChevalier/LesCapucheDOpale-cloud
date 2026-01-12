@@ -37,7 +37,7 @@ export class UpdateQuest implements OnInit {
 
     this.questService.getQuestById(this.id).subscribe((quest) => {
       this.quest = quest;
-      if (this.quest.statusId === 3) {
+      if (this.quest.statusId === 2) {
         this.router.navigate(['/quest', this.id, 'assign']);
       }
     });

@@ -1,5 +1,6 @@
 import { Adventurer } from './adventurer';
 import { Status } from './status';
+import { StockEquipment } from './stock-equipment';
 
 export interface Quest {
     id: number;
@@ -13,6 +14,7 @@ export interface Quest {
     UserId: number;
     status: Status;
     adventurers: Adventurer[];
+    questStockEquipments: StockEquipment[];
 }
 
 export interface QuestForm {

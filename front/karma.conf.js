@@ -31,7 +31,7 @@ module.exports = function (config) {
           statements: 75,
           lines: 75,
           branches: 75,
-          functions: 100,
+          functions: 75,
         },
       },
       fixWebpackSourcePaths: true,

@@ -1,0 +1,9 @@
+<div class="equipment-item">
+    <h3>{{ equipment.name }}</h3>
+    <p>Type: {{ equipment.equipmentType.name }}</p>
+    <p>Coût: {{ equipment.cost }} Pc</p>
+    <p>Durabilité maximale: {{ equipment.maxDurability }}</p>
+    <button (click)="onUpdate()">Modifier</button>
+    <label for="quantity">Quantité à ajouter au stock:</label>
+    <input id="quantity" type="number" (change)="onQuantityChange($event)" min="0" />
+</div>

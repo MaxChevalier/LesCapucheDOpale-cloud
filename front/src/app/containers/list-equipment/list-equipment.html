@@ -1,0 +1,9 @@
+<a routerLink="/equipment/new" routerLinkActive="active">Nouvel Équipement</a>
+<div class="container">
+    @for (equipment of equipments; track equipment.id) {
+        <app-item-equipment [equipment]="equipment" (quantityChange)="onQuantityChange(equipment.id, $event)"></app-item-equipment>
+    } @empty {
+        <p>Aucun élément</p>
+    }
+</div>
+<button (click)="onPurchase()">Ajouter au stock</button>

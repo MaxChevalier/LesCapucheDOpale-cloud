@@ -9,8 +9,8 @@ describe('QuestService', () => {
   let httpMock: HttpTestingController;
 
   const mockQuests: Quest[] = [
-    { id: 1, name: 'Retrieve the Artifact', description: 'Find the lost relic in the ruins.', finalDate: '2023-12-31', estimatedDuration: 5, reward: 1000, statusId: 1, recommendedXP: 500, UserId: 1, status: { id: 1, name: 'Open' }, adventurers: [] },
-    { id: 2, name: 'Defend the Village', description: 'Protect the villagers from goblin attacks.', finalDate: '2023-12-31', estimatedDuration: 5, reward: 1000, statusId: 1, recommendedXP: 500, UserId: 1, status: { id: 1, name: 'Open' }, adventurers: [] },
+    { id: 1, name: 'Retrieve the Artifact', description: 'Find the lost relic in the ruins.', finalDate: '2023-12-31', estimatedDuration: 5, reward: 1000, statusId: 1, recommendedXP: 500, UserId: 1, status: { id: 1, name: 'Open' }, adventurers: [], questStockEquipments: [] },
+    { id: 2, name: 'Defend the Village', description: 'Protect the villagers from goblin attacks.', finalDate: '2023-12-31', estimatedDuration: 5, reward: 1000, statusId: 1, recommendedXP: 500, UserId: 1, status: { id: 1, name: 'Open' }, adventurers: [], questStockEquipments: [] },
   ];
 
   const mockQuest: Quest = mockQuests[0];

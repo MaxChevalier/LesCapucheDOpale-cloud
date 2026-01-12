@@ -1,0 +1,71 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="equipmentForm" novalidate>
+  <label for="name">Nom de l'équipement:</label>
+  <input id="name" formControlName="name" />
+  @if (name.invalid && (name.dirty || name.touched)) {
+  @if (name.errors?.['required']) {
+  <div class="error"><small>Le nom est requis.</small></div>
+  }
+  @if (name.errors?.['minlength']) {
+  <div class="error"><small>Le nom doit contenir au moins 3 caractères.</small></div>
+  }
+  }
+
+  <label for="type">Type d'équipement:</label>
+  <select id="type" formControlName="equipmentTypeId">
+    <option value="" disabled>Choisissez un type</option>
+    @for (type of equipmentTypes; track type.id) {
+    <option [value]="type.id">{{ type.name }}</option>
+    }
+  </select>
+  <button type="button" class="add-type-btn" (click)="showTypePopup = true">
+    Ajouter un type d'équipement
+  </button>
+
+  @if (showTypePopup) {
+  <div class="popup-backdrop">
+    <div class="popup">
+      <h3>Nouveau type d'équipement</h3>
+
+      <input type="text" formControlName="newTypeName" placeholder="Nom du type" />
+
+      <div class="popup-actions">
+        <button type="button" (click)="addNewEquipmentType()">Ajouter</button>
+        <button type="button" (click)="cancelPopup()">Annuler</button>
+      </div>
+
+      @if(newTypeError) {
+      <p class="error">{{ newTypeError }}</p>
+      }
+    </div>
+  </div>
+  }
+  @if (equipmentTypeId.invalid && (equipmentTypeId.dirty || equipmentTypeId.touched)) {
+  @if (equipmentTypeId.errors?.['required']) {
+  <div class="error"><small>Le type d'équipement est requis.</small></div>
+  }
+  }
+
+  <app-form-money label="Coût de l'équipement : " [money]="getMoney()"
+    (moneyChange)="setMoney($event)"></app-form-money>
+  @if (cost.invalid && (cost.dirty || cost.touched)) {
+  @if (cost.errors?.['required']) {
+  <div class="error"><small>Le coût est requis.</small></div>
+  }
+  @if (cost.errors?.['min']) {
+  <div class="error"><small>Le coût doit être supérieur ou égal à 0.</small></div>
+  }
+  }
+
+  <label for="maxDurability">Durabilité maximale:</label>
+  <input id="maxDurability" type="number" formControlName="maxDurability" />
+  @if (maxDurability.invalid && (maxDurability.dirty || maxDurability.touched)) {
+  @if (maxDurability.errors?.['required']) {
+  <div class="error"><small>La durabilité est requise.</small></div>
+  }
+  @if (maxDurability.errors?.['min']) {
+  <div class="error"><small>La durabilité doit être au moins 1.</small></div>
+  }
+  }
+
+  <button type="submit" [disabled]="equipmentForm.invalid">Submit</button>
+</form>

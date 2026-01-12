@@ -10,6 +10,10 @@ import { UpdateQuest } from './containers/update-quest/update-quest';
 import { Login } from './containers/login/login';
 import { authGuard } from './guard/auth-guard';
 import { AssignQuest } from './containers/assign-quest/assign-quest';
+import { NewEquipment } from './containers/new-equipment/new-equipment';
+import { ListEquipment } from './containers/list-equipment/list-equipment';
+import { UpdateEquipment } from './containers/update-equipment/update-equipment';
+import { Stock } from './containers/stock/stock';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -22,6 +26,14 @@ export const routes: Routes = [
     // User routes
     { path: 'user/new', component: NewUserComponent, canActivate: [authGuard] },
     { path: 'login', component: Login },
+
+    // Stock routes
+    { path: 'stock', component: Stock, canActivate: [authGuard] },
+
+    // Equipment routes
+    { path: 'equipment/new', component: NewEquipment, canActivate: [authGuard] },
+    { path: 'equipments', component: ListEquipment, canActivate: [authGuard]},
+    { path: 'equipment/:id', component: UpdateEquipment, canActivate: [authGuard] },
 
     // Quest routes
     { path: 'quest/new', component: NewQuest, canActivate: [authGuard] },

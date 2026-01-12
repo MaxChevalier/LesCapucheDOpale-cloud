@@ -1,14 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { Adventurer, Quest } from '../../models/models';
+import { Adventurer, Quest, StockEquipment } from '../../models/models';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuestService } from '../../services/quest/quest.service';
 import { AdventurerService } from '../../services/adventurer/adventurer.service';
 import { ItemAdventurer } from '../../components/item-adventurer/item-adventurer';
 import { DatePipe } from '@angular/common';
+import { ItemStockEquipment } from '../../components/item-stock-equipment/item-stock-equipment';
+import { EquipmentService } from '../../services/equipment/equipment.service';
 
 @Component({
   selector: 'app-assign-quest',
-  imports: [ItemAdventurer, DatePipe],
+  imports: [
+    ItemAdventurer,
+    ItemStockEquipment,
+    DatePipe
+  ],
   templateUrl: './assign-quest.html',
   styleUrl: './assign-quest.scss'
 })
@@ -17,6 +23,7 @@ export class AssignQuest implements OnInit {
   constructor(
     private readonly questService: QuestService,
     private readonly adventurerService: AdventurerService,
+    private readonly equipmentService: EquipmentService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly router: Router
   ) { }
@@ -25,6 +32,8 @@ export class AssignQuest implements OnInit {
   id!: number;
   adventurers: Adventurer[] = [];
   selectedAdventurerIds: Set<number> = new Set<number>();
+  equipments: StockEquipment[] = [];
+  selectedEquipmentIds: Set<number> = new Set<number>();
   cost: number = 0;
   successRateForAdventurer: { [adventurerId: number]: number } = {};
 
@@ -40,7 +49,7 @@ export class AssignQuest implements OnInit {
 
     this.questService.getQuestById(this.id).subscribe((quest) => {
       this.quest = quest;
-      if (quest.statusId !== 3) {
+      if (quest.statusId !== 2) {
         this.router.navigate(['/quest/', this.id]);
         return;
       }
@@ -49,6 +58,7 @@ export class AssignQuest implements OnInit {
         (sum, a) => sum + a.dailyRate * quest.estimatedDuration,
         0
       );
+      this.selectedEquipmentIds = new Set<number>(quest.questStockEquipments.map(e => e.id));
       for (const adventurer of quest.adventurers) {
         this.successRateForAdventurer[adventurer.id] = Math.min(
           this.quest.recommendedXP,
@@ -59,6 +69,10 @@ export class AssignQuest implements OnInit {
 
     this.adventurerService.getAll().subscribe((adventurers) => {
       this.adventurers = adventurers;
+    });
+
+    this.equipmentService.getStockEquipments().subscribe((equipments) => {
+      this.equipments = equipments;
     });
   }
 
@@ -80,6 +94,22 @@ export class AssignQuest implements OnInit {
             this.quest.recommendedXP,
             adventurer.experience
           ) / this.quest.recommendedXP;
+        }
+      });
+    }
+  }
+
+  onToggleEquipment(equipment: any) {
+    if (this.selectedEquipmentIds.has(equipment.id)) {
+      this.equipmentService.unassignEquipment(this.id, equipment.id).subscribe({
+        next: () => {
+          this.selectedEquipmentIds.delete(equipment.id);
+        }
+      });
+    } else {
+      this.equipmentService.assignEquipment(this.id, equipment.id).subscribe({
+        next: () => {
+          this.selectedEquipmentIds.add(equipment.id);
         }
       });
     }
