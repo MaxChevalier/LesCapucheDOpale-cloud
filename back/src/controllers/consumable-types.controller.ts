@@ -24,6 +24,7 @@ import {
 } from '@nestjs/swagger';
 
 @ApiTags('Consumable Types')
+@ApiBearerAuth()
 @Controller('consumable-types')
 export class ConsumableTypesController {
   constructor(
@@ -33,7 +34,6 @@ export class ConsumableTypesController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(1, 2)
-  @ApiBearerAuth()
   @ApiBody({
     description: 'New consumable type payload',
     required: true,
@@ -97,7 +97,6 @@ export class ConsumableTypesController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(1, 2)
-  @ApiBearerAuth()
   @ApiParam({ name: 'id', example: 5, description: 'Consumable type ID' })
   @ApiBody({
     description: 'Fields to update (partial)',
@@ -126,7 +125,6 @@ export class ConsumableTypesController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(1, 2)
-  @ApiBearerAuth()
   @ApiParam({ name: 'id', example: 5, description: 'Consumable type ID' })
   @ApiOkResponse({
     description: 'Delete result',

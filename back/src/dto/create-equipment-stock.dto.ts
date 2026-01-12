@@ -1,10 +1,11 @@
-import { IsInt, Min } from 'class-validator';
+import { IsInt, IsOptional, Min } from 'class-validator';
 
 export class CreateEquipmentStockDto {
   @IsInt()
   equipmentId: number;
 
   @IsInt()
-  @Min(0)
-  durability: number;
+  @Min(1)
+  @IsOptional()
+  quantity?: number;
 }

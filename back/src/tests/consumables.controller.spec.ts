@@ -69,7 +69,7 @@ describe('ConsumablesController', () => {
     it('should call service.findOne()', async () => {
         mockConsumablesService.findOne.mockResolvedValue({ id: 1 });
 
-        const result = await controller.findOne('1');
+        const result = await controller.findOne(1);
 
         expect(service.findOne).toHaveBeenCalledWith(1);
         expect(result).toEqual({ id: 1 });
@@ -78,7 +78,7 @@ describe('ConsumablesController', () => {
     it('should call service.update()', async () => {
         mockConsumablesService.update.mockResolvedValue({ id: 1, name: 'Pain' });
 
-        const result = await controller.update('1', { name: 'Pain' } as any);
+        const result = await controller.update(1, { name: 'Pain' } as any);
 
         expect(service.update).toHaveBeenCalledWith(1, { name: 'Pain' });
         expect(result).toEqual({ id: 1, name: 'Pain' });
@@ -87,7 +87,7 @@ describe('ConsumablesController', () => {
     it('should call service.remove()', async () => {
         mockConsumablesService.remove.mockResolvedValue({ id: 1 });
 
-        const result = await controller.remove('1');
+        const result = await controller.remove(1);
 
         expect(service.remove).toHaveBeenCalledWith(1);
         expect(result).toEqual({ id: 1 });
@@ -96,7 +96,7 @@ describe('ConsumablesController', () => {
     it('should call service.purchase()', async () => {
         mockConsumablesService.purchase.mockResolvedValue({ id: 1, purchasedQuantity: 3 });
 
-        const result = await controller.purchase('1', { quantity: 3 } as any);
+        const result = await controller.purchase(1, { quantity: 3 } as any);
 
         expect(service.purchase).toHaveBeenCalledWith(1, 3);
         expect(result).toEqual({ id: 1, purchasedQuantity: 3 });

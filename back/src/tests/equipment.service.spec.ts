@@ -4,7 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateEquipmentDto } from '../dto/create-equipment.dto';
 import { UpdateEquipmentDto } from '../dto/update-equipment.dto';
 import { Equipment, EquipmentType, Prisma } from '@prisma/client';
-import { equipmentInclude } from '../dto/equipment.dto';
+import { equipmentInclude } from '../dbo/equipment.dbo';
 
 describe('EquipmentService', () => {
   let service: EquipmentService;

@@ -49,7 +49,6 @@ export class QuestStockEquipmentController {
           id: { type: 'number', example: 101 },
           questId: { type: 'number', example: 12 },
           equipmentStockId: { type: 'number', example: 3 },
-          quantity: { type: 'number', example: 2 },
           createdAt: {
             type: 'string',
             format: 'date-time',
@@ -79,9 +78,8 @@ export class QuestStockEquipmentController {
       properties: {
         questId: { type: 'number', example: 12 },
         equipmentStockId: { type: 'number', example: 3 },
-        quantity: { type: 'number', example: 2 },
       },
-      required: ['questId', 'equipmentStockId', 'quantity'],
+      required: ['questId', 'equipmentStockId'],
       additionalProperties: false,
     },
   })
@@ -93,7 +91,6 @@ export class QuestStockEquipmentController {
         id: { type: 'number', example: 101 },
         questId: { type: 'number', example: 12 },
         equipmentStockId: { type: 'number', example: 3 },
-        quantity: { type: 'number', example: 2 },
         createdAt: {
           type: 'string',
           format: 'date-time',

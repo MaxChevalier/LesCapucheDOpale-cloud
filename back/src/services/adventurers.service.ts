@@ -2,14 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAdventurerDto } from '../dto/create-adventurer.dto';
 import { UpdateAdventurerDto } from '../dto/update-adventurer.dto';
+import { FindAdventurersQueryDto } from '../dto/find-adventurers-query.dto';
 import { Prisma } from '@prisma/client';
-import { FindAdventurersOptions } from 'src/controllers/adventurers.controller';
 
 @Injectable()
 export class AdventurersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(options: FindAdventurersOptions = {}) {
+  async findAll(options: FindAdventurersQueryDto = {}) {
     const { name, specialityId, experienceMin, experienceMax, dailyRateOrder } =
       options;
 

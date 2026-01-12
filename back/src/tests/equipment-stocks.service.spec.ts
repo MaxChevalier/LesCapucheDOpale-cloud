@@ -3,7 +3,7 @@ import { EquipmentStocksService } from '../services/equipment-stocks.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEquipmentStockDto } from '../dto/create-equipment-stock.dto';
 import { UpdateEquipmentStockDto } from '../dto/update-equipment-stock.dto';
-import { equipmentStockInclude } from '../dto/equipment-stock.dto';
+import { equipmentStockInclude } from '../dbo/equipment-stock.dbo';
 import { Prisma } from '@prisma/client'; // Important pour simuler l'erreur
 
 describe('EquipmentStocksService', () => {
@@ -32,14 +32,15 @@ describe('EquipmentStocksService', () => {
 
   // --- CREATE ---
   describe('create', () => {
-    it('should create an equipment stock', async () => {
-      const dto: CreateEquipmentStockDto = { equipmentId: 1, durability: 100 };
-      mockPrisma.equipment.findUnique.mockResolvedValue({ id: 1 });
+    it('should create an equipment stock with auto durability from maxDurability', async () => {
+      const dto: CreateEquipmentStockDto = { equipmentId: 1, quantity: 5 };
+      mockPrisma.equipment.findUnique.mockResolvedValue({ id: 1, maxDurability: 100 });
       mockPrisma.equipmentStock.create.mockResolvedValue({
         id: 1,
         equipmentId: 1,
         durability: 100,
-        equipment: { id: 1 },
+        quantity: 5,
+        equipment: { id: 1, maxDurability: 100 },
       });
 
       const res = await service.create(dto);
@@ -48,14 +49,34 @@ describe('EquipmentStocksService', () => {
         where: { id: dto.equipmentId },
       });
       expect(mockPrisma.equipmentStock.create).toHaveBeenCalledWith({
-        data: { equipmentId: dto.equipmentId, durability: dto.durability },
+        data: { equipmentId: dto.equipmentId, durability: 100, quantity: 5 },
         include: equipmentStockInclude,
       });
-      expect(res).toEqual(expect.objectContaining({ id: 1, equipmentId: 1 }));
+      expect(res).toEqual(expect.objectContaining({ id: 1, equipmentId: 1, quantity: 5 }));
+    });
+
+    it('should create an equipment stock with default quantity 1', async () => {
+      const dto: CreateEquipmentStockDto = { equipmentId: 1 };
+      mockPrisma.equipment.findUnique.mockResolvedValue({ id: 1, maxDurability: 50 });
+      mockPrisma.equipmentStock.create.mockResolvedValue({
+        id: 1,
+        equipmentId: 1,
+        durability: 50,
+        quantity: 1,
+        equipment: { id: 1, maxDurability: 50 },
+      });
+
+      const res = await service.create(dto);
+
+      expect(mockPrisma.equipmentStock.create).toHaveBeenCalledWith({
+        data: { equipmentId: dto.equipmentId, durability: 50, quantity: 1 },
+        include: equipmentStockInclude,
+      });
+      expect(res).toEqual(expect.objectContaining({ id: 1, quantity: 1 }));
     });
 
     it('should throw NotFoundException if equipment does not exist', async () => {
-      const dto: CreateEquipmentStockDto = { equipmentId: 999, durability: 50 };
+      const dto: CreateEquipmentStockDto = { equipmentId: 999 };
       mockPrisma.equipment.findUnique.mockResolvedValue(null);
 
       await expect(service.create(dto)).rejects.toThrow(NotFoundException);
@@ -105,8 +126,8 @@ describe('EquipmentStocksService', () => {
   // --- UPDATE ---
   describe('update', () => {
     it('should update and return the updated row', async () => {
-      const dto: UpdateEquipmentStockDto = { durability: 80 };
-      const updated = { id: 1, equipmentId: 1, durability: 80 };
+      const dto: UpdateEquipmentStockDto = { quantity: 10 };
+      const updated = { id: 1, equipmentId: 1, durability: 80, quantity: 10 };
       mockPrisma.equipmentStock.update.mockResolvedValue(updated);
 
       const res = await service.update(1, dto);
@@ -122,7 +143,7 @@ describe('EquipmentStocksService', () => {
     it('should verify equipment if equipmentId is updated', async () => {
       const dto: UpdateEquipmentStockDto = { equipmentId: 2 };
       mockPrisma.equipment.findUnique.mockResolvedValue({ id: 2 });
-      const updated = { id: 1, equipmentId: 2, durability: 100 };
+      const updated = { id: 1, equipmentId: 2, durability: 100, quantity: 1 };
       mockPrisma.equipmentStock.update.mockResolvedValue(updated);
 
       const res = await service.update(1, dto);
@@ -146,7 +167,7 @@ describe('EquipmentStocksService', () => {
       );
       mockPrisma.equipmentStock.update.mockRejectedValue(prismaError);
 
-      await expect(service.update(999, { durability: 10 })).rejects.toThrow(
+      await expect(service.update(999, { quantity: 5 })).rejects.toThrow(
         NotFoundException,
       );
     });

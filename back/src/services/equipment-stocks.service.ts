@@ -3,16 +3,20 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { CreateEquipmentStockDto } from '../dto/create-equipment-stock.dto';
 import { UpdateEquipmentStockDto } from '../dto/update-equipment-stock.dto';
-import { equipmentStockInclude } from '../dto/equipment-stock.dto';
+import { equipmentStockInclude } from '../dbo/equipment-stock.dbo';
 
 @Injectable()
 export class EquipmentStocksService {
   constructor(private prisma: PrismaService) {}
 
   async create(dto: CreateEquipmentStockDto) {
-    await this.findEquipment(dto.equipmentId);
+    const equipment = await this.findEquipment(dto.equipmentId);
     return this.prisma.equipmentStock.create({
-      data: { equipmentId: dto.equipmentId, durability: dto.durability },
+      data: {
+        equipmentId: dto.equipmentId,
+        durability: equipment.maxDurability,
+        quantity: dto.quantity ?? 1,
+      },
       include: equipmentStockInclude,
     });
   }
@@ -70,5 +74,6 @@ export class EquipmentStocksService {
       where: { id: equipmentId },
     });
     if (!e) throw new NotFoundException(`Equipment ${equipmentId} not found`);
+    return e;
   }
 }

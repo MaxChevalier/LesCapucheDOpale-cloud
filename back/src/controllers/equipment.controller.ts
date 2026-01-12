@@ -125,7 +125,6 @@ export class EquipmentController {
         equipmentTypeId: { type: 'number', example: 8 },
         cost: { type: 'number', example: 150 },
         maxDurability: { type: 'number', example: 60 },
-        currentDurability: { type: 'number', example: 45 },
       },
       additionalProperties: false,
     },

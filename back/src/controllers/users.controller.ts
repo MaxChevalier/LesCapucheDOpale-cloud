@@ -16,12 +16,16 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../guards/roles.decorator';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiParam,
+  ApiTags,
 } from '@nestjs/swagger';
 
+@ApiTags('Users')
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -33,15 +37,16 @@ export class UsersController {
     schema: {
       type: 'object',
       properties: {
+        name: { type: 'string', example: 'John Doe' },
         email: {
           type: 'string',
           format: 'email',
           example: 'john.doe@example.com',
         },
         password: { type: 'string', example: 'Secret123!' },
-        displayName: { type: 'string', example: 'John Doe' },
+        roleId: { type: 'number', example: 2 },
       },
-      required: ['email', 'password'],
+      required: ['name', 'email', 'password', 'roleId'],
       additionalProperties: false,
     },
   })
@@ -51,8 +56,9 @@ export class UsersController {
       type: 'object',
       properties: {
         id: { type: 'number', example: 1 },
+        name: { type: 'string', example: 'John Doe' },
         email: { type: 'string', example: 'john.doe@example.com' },
-        displayName: { type: 'string', example: 'John Doe' },
+        roleId: { type: 'number', example: 2 },
         createdAt: {
           type: 'string',
           format: 'date-time',
@@ -81,8 +87,9 @@ export class UsersController {
         type: 'object',
         properties: {
           id: { type: 'number', example: 1 },
+          name: { type: 'string', example: 'John Doe' },
           email: { type: 'string', example: 'john.doe@example.com' },
-          displayName: { type: 'string', example: 'John Doe' },
+          roleId: { type: 'number', example: 2 },
           createdAt: {
             type: 'string',
             format: 'date-time',
@@ -111,8 +118,9 @@ export class UsersController {
       type: 'object',
       properties: {
         id: { type: 'number', example: 1 },
+        name: { type: 'string', example: 'John Doe' },
         email: { type: 'string', example: 'john.doe@example.com' },
-        displayName: { type: 'string', example: 'John Doe' },
+        roleId: { type: 'number', example: 2 },
         createdAt: {
           type: 'string',
           format: 'date-time',
@@ -139,13 +147,14 @@ export class UsersController {
     schema: {
       type: 'object',
       properties: {
+        name: { type: 'string', example: 'Johnny Doe' },
         email: {
           type: 'string',
           format: 'email',
           example: 'johnny.doe@example.com',
         },
         password: { type: 'string', example: 'NewSecret123!' },
-        displayName: { type: 'string', example: 'Johnny Doe' },
+        roleId: { type: 'number', example: 1 },
       },
       additionalProperties: false,
     },
@@ -156,8 +165,9 @@ export class UsersController {
       type: 'object',
       properties: {
         id: { type: 'number', example: 1 },
+        name: { type: 'string', example: 'Johnny Doe' },
         email: { type: 'string', example: 'johnny.doe@example.com' },
-        displayName: { type: 'string', example: 'Johnny Doe' },
+        roleId: { type: 'number', example: 1 },
         createdAt: {
           type: 'string',
           format: 'date-time',

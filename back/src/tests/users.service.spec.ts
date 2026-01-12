@@ -37,12 +37,13 @@ describe('UsersService', () => {
   // ------------------------
   // CREATE
   // ------------------------
-  it('should create a new user', async () => {
+  it('should create a new admin user with admin token', async () => {
     (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
     (prisma.user.create as jest.Mock).mockResolvedValue({
       id: 1,
       name: 'Alice',
       email: 'alice@mail.com',
+      roleId: 1,
     });
 
     const result = await service.create({
@@ -53,12 +54,39 @@ describe('UsersService', () => {
     });
 
     expect(hashPassword).toHaveBeenCalledWith('secret');
+    expect(jwtService.signAsync).toHaveBeenCalledWith(
+      { sub: 1, email: 'alice@mail.com', roleId: 1 },
+      { secret: process.env.JWT_SECRET_ADMIN, expiresIn: '4h' },
+    );
     expect(result).toEqual({
-      user: {
-        id: 1,
-        name: 'Alice',
-        email: 'alice@mail.com',
-      },
+      user: { id: 1, name: 'Alice', email: 'alice@mail.com', roleId: 1 },
+      access_token: 'fakeJwtToken',
+    });
+  });
+
+  it('should create a new regular user with user token', async () => {
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+    (prisma.user.create as jest.Mock).mockResolvedValue({
+      id: 2,
+      name: 'Bob',
+      email: 'bob@mail.com',
+      roleId: 2,
+    });
+
+    const result = await service.create({
+      name: 'Bob',
+      email: 'bob@mail.com',
+      password: 'secret',
+      roleId: 2,
+    });
+
+    expect(hashPassword).toHaveBeenCalledWith('secret');
+    expect(jwtService.signAsync).toHaveBeenCalledWith(
+      { sub: 2, email: 'bob@mail.com', roleId: 2 },
+      { secret: process.env.JWT_SECRET, expiresIn: '1h' },
+    );
+    expect(result).toEqual({
+      user: { id: 2, name: 'Bob', email: 'bob@mail.com', roleId: 2 },
       access_token: 'fakeJwtToken',
     });
   });
@@ -183,6 +211,7 @@ describe('UsersService', () => {
       email: 'a@mail.com',
       password: 'hashed',
       name: 'Alice',
+      roleId: 2,
     };
     (prisma.user.findUnique as jest.Mock).mockResolvedValue(fakeUser);
     (comparePassword as jest.Mock).mockResolvedValue(true);
@@ -191,6 +220,11 @@ describe('UsersService', () => {
       'a@mail.com',
       '123',
     );
-    expect(result).toEqual({ id: 1, email: 'a@mail.com', name: 'Alice' });
+    expect(result).toEqual({
+      id: 1,
+      email: 'a@mail.com',
+      name: 'Alice',
+      roleId: 2,
+    });
   });
 });

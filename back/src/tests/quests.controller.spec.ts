@@ -7,7 +7,7 @@ import { CreateQuestDto } from '../dto/create-quest.dto';
 import { UpdateQuestDto } from '../dto/update-quest.dto';
 import { UpdateStatusDto } from '../dto/update-quest-status.dto';
 import { ValidateQuestDto } from '../dto/validate-quest.dto';
-import { IdsDto } from '../dto/quest_id.dto';
+import { IdsDto } from '../dto/ids.dto';
 
 describe('QuestsController', () => {
   let controller: QuestsController;
@@ -51,15 +51,14 @@ describe('QuestsController', () => {
   describe('findAll (Filtering & Sorting)', () => {
     it('should call service.findAll with all parameters parsed correctly', async () => {
       const query = {
-        rewardMin: '100',
-        rewardMax: '500',
-        statusId: '2',
-        statusName: 'validee',
+        rewardMin: 100,
+        rewardMax: 500,
+        statusId: 2,
         finalDateBefore: '2025-12-31',
         finalDateAfter: '2025-01-01',
-        userId: '5',
-        avgXpMin: '10',
-        avgXpMax: '50',
+        userId: 5,
+        avgXpMin: 10,
+        avgXpMax: 50,
         sortBy: 'reward' as const,
         order: 'desc' as const,
       };
@@ -68,19 +67,7 @@ describe('QuestsController', () => {
 
       await controller.findAll(query);
 
-      expect(service.findAll).toHaveBeenCalledWith({
-        rewardMin: 100,
-        rewardMax: 500,
-        statusId: 2,
-        statusName: 'validee',
-        finalDateBefore: '2025-12-31',
-        finalDateAfter: '2025-01-01',
-        userId: 5,
-        avgXpMin: 10,
-        avgXpMax: 50,
-        sortBy: 'reward',
-        order: 'desc',
-      });
+      expect(service.findAll).toHaveBeenCalledWith(query);
     });
 
     it('should call service.findAll with undefined when query is empty', async () => {
@@ -88,31 +75,7 @@ describe('QuestsController', () => {
 
       await controller.findAll({});
 
-      expect(service.findAll).toHaveBeenCalledWith({
-        rewardMin: undefined,
-        rewardMax: undefined,
-        statusId: undefined,
-        statusName: undefined,
-        finalDateBefore: undefined,
-        finalDateAfter: undefined,
-        userId: undefined,
-        avgXpMin: undefined,
-        avgXpMax: undefined,
-        sortBy: undefined,
-        order: undefined,
-      });
-    });
-
-    it('should sanitize invalid sortBy and order', async () => {
-      mockService.findAll.mockResolvedValue([]);
-      
-      // @ts-ignore
-      await controller.findAll({ sortBy: 'hacker', order: 'drop_table' });
-
-      expect(service.findAll).toHaveBeenCalledWith(expect.objectContaining({
-        sortBy: undefined,
-        order: undefined,
-      }));
+      expect(service.findAll).toHaveBeenCalledWith({});
     });
   });
 

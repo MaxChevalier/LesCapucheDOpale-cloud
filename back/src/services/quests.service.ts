@@ -7,26 +7,13 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { CreateQuestDto } from '../dto/create-quest.dto';
 import { UpdateQuestDto } from '../dto/update-quest.dto';
-
-export type FindQuestsOptions = {
-  rewardMin?: number;
-  rewardMax?: number;
-  statusId?: number;
-  statusName?: string;
-  finalDateBefore?: string;
-  finalDateAfter?: string;
-  userId?: number;
-  avgXpMin?: number;
-  avgXpMax?: number;
-  sortBy?: 'reward' | 'finalDate' | 'avgExperience' | 'createdAt';
-  order?: 'asc' | 'desc';
-};
+import { FindQuestsQueryDto } from '../dto/find-quests-query.dto';
 
 @Injectable()
 export class QuestsService {
   constructor(private prisma: PrismaService) {}
 
-  // Status IDs (must match database values)
+  // Status IDs
   private readonly STATUS_ID_WAITING = 1;
   private readonly STATUS_ID_VALIDATED = 2;
   private readonly STATUS_ID_STARTED = 3;
@@ -42,12 +29,11 @@ export class QuestsService {
     return q.statusId === this.STATUS_ID_STARTED;
   }
 
-  async findAll(options: FindQuestsOptions = {}) {
+  async findAll(options: FindQuestsQueryDto = {}) {
     const {
       rewardMin,
       rewardMax,
       statusId,
-      statusName,
       finalDateBefore,
       finalDateAfter,
       userId,
@@ -57,7 +43,6 @@ export class QuestsService {
       order,
     } = options;
 
-    // Build Prisma where clause
     const where: Prisma.QuestWhereInput = {
       ...(rewardMin != null || rewardMax != null
         ? {
@@ -68,7 +53,6 @@ export class QuestsService {
           }
         : {}),
       ...(typeof statusId === 'number' ? { statusId } : {}),
-      ...(statusName ? { status: { name: { contains: statusName } } } : {}),
       ...(finalDateBefore || finalDateAfter
         ? {
             finalDate: {
@@ -80,7 +64,6 @@ export class QuestsService {
       ...(typeof userId === 'number' ? { UserId: userId } : {}),
     };
 
-    // Determine orderBy (for DB-sortable fields)
     let orderBy: Prisma.QuestOrderByWithRelationInput | undefined;
     if (sortBy === 'reward') {
       orderBy = { reward: order ?? 'desc' };
@@ -149,30 +132,18 @@ export class QuestsService {
     return quest;
   }
 
-  async updateStatus(
-    questId: number,
-    opts: { statusId?: number; statusName?: string },
-  ) {
-    const { statusId, statusName } = opts || {};
-    if (!statusId && !statusName) {
-      throw new BadRequestException('Provide statusId or statusName');
+  async updateStatus(questId: number, opts: { statusId: number }) {
+    const { statusId } = opts || {};
+    if (!statusId) {
+      throw new BadRequestException('Provide statusId');
     }
 
-    let targetStatusId = statusId ?? null;
-
-    if (!targetStatusId && statusName) {
-      const status = await this.prisma.status.findFirst({
-        where: { name: statusName },
-      });
-      if (!status)
-        throw new NotFoundException(`Status not found: ${statusName}`);
-      targetStatusId = status.id;
-    }
+    const targetStatusId = statusId;
 
     try {
       return await this.prisma.quest.update({
         where: { id: questId },
-        data: { status: { connect: { id: targetStatusId! } } },
+        data: { status: { connect: { id: targetStatusId } } },
         include: {
           status: true,
           adventurers: true,
@@ -192,6 +163,20 @@ export class QuestsService {
   }
 
   async create(userId: number, dto: CreateQuestDto) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    const status = await this.prisma.status.findUnique({
+      where: { id: this.STATUS_ID_WAITING },
+    });
+    if (!status) {
+      throw new NotFoundException(
+        `Status with id ${this.STATUS_ID_WAITING} not found`,
+      );
+    }
+
     if (dto.adventurerIds?.length) {
       await this.findAdventurersExist(dto.adventurerIds);
     }
@@ -242,6 +227,7 @@ export class QuestsService {
 
     if (dto.adventurerIds?.length) {
       await this.findAdventurersExist(dto.adventurerIds);
+      await this.checkAdventurersAvailability(dto.adventurerIds);
     }
 
     if (dto.equipmentStockIds?.length) {
@@ -315,8 +301,65 @@ export class QuestsService {
       );
   }
 
+  private async checkAdventurersAvailability(ids: number[]) {
+    if (!ids?.length) return;
+
+    const onActiveQuest = await this.prisma.adventurer.findMany({
+      where: {
+        id: { in: ids },
+        quests: {
+          some: {
+            statusId: this.STATUS_ID_STARTED,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        quests: {
+          where: { statusId: this.STATUS_ID_STARTED },
+          select: { id: true, name: true },
+        },
+      },
+    });
+
+    if (onActiveQuest.length) {
+      const names = onActiveQuest
+        .map(
+          (a) =>
+            `${a.name} (en mission sur: ${a.quests.map((q) => q.name).join(', ')})`,
+        )
+        .join(', ');
+      throw new BadRequestException(
+        `Les aventuriers suivants sont en mission: ${names}`,
+      );
+    }
+
+    const now = new Date();
+    const inRest = await this.prisma.adventurer.findMany({
+      where: {
+        id: { in: ids },
+        availableUntil: { gt: now },
+      },
+      select: { id: true, name: true, availableUntil: true },
+    });
+
+    if (inRest.length) {
+      const names = inRest
+        .map(
+          (a) =>
+            `${a.name} (en repos jusqu'au ${a.availableUntil?.toLocaleDateString('fr-FR')})`,
+        )
+        .join(', ');
+      throw new BadRequestException(
+        `Les aventuriers suivants sont en repos: ${names}`,
+      );
+    }
+  }
+
   async attachAdventurers(questId: number, adventurerIds: number[]) {
     await this.findAdventurersExist(adventurerIds);
+    await this.checkAdventurersAvailability(adventurerIds);
     try {
       return await this.prisma.quest.update({
         where: { id: questId },
@@ -367,6 +410,7 @@ export class QuestsService {
       );
     }
     await this.findAdventurersExist(adventurerIds);
+    await this.checkAdventurersAvailability(adventurerIds);
     return this.prisma.quest.update({
       where: { id: questId },
       data: { adventurers: { set: adventurerIds.map((id) => ({ id })) } },
@@ -486,7 +530,11 @@ export class QuestsService {
   async startQuest(questId: number) {
     const quest = await this.prisma.quest.findUnique({
       where: { id: questId },
-      select: { statusId: true },
+      select: {
+        statusId: true,
+        estimatedDuration: true,
+        adventurers: { select: { id: true } },
+      },
     });
     if (!quest) throw new NotFoundException('Quest not found');
 
@@ -494,6 +542,20 @@ export class QuestsService {
       throw new BadRequestException(
         'Quest must be validated before it can be started',
       );
+    }
+
+    const adventurerIds = quest.adventurers.map((a) => a.id);
+    await this.checkAdventurersAvailability(adventurerIds);
+
+    // Calculer la date de fin d'indisponibilité (date actuelle + durée estimée en jours)
+    const availableUntil = new Date();
+    availableUntil.setDate(availableUntil.getDate() + quest.estimatedDuration);
+
+    if (adventurerIds.length) {
+      await this.prisma.adventurer.updateMany({
+        where: { id: { in: adventurerIds } },
+        data: { availableUntil },
+      });
     }
 
     return this.prisma.quest.update({
@@ -555,6 +617,75 @@ export class QuestsService {
     return this.prisma.quest.update({
       where: { id: questId },
       data: { status: { connect: { id: this.STATUS_ID_ABANDONED } } },
+      include: {
+        status: true,
+        adventurers: true,
+        questStockEquipments: true,
+        user: true,
+      },
+    });
+  }
+
+  /**
+   * Calcule la durée de repos d'un aventurier selon la formule du SAM:
+   * Dr = 0.5 × (Exp_r / Exp_rec) × Dq
+   * Arrondi au jour supérieur
+   *
+   * @param recommendedXP - Expérience recommandée de la quête (Exp_r)
+   * @param adventurerXP - Expérience de l'aventurier (Exp_rec)
+   * @param questDuration - Durée estimée de la quête en jours (Dq)
+   * @returns Durée de repos en jours (Dr)
+   */
+  private calculateRestDuration(
+    recommendedXP: number,
+    adventurerXP: number,
+    questDuration: number,
+  ): number {
+    // Éviter la division par zéro
+    if (adventurerXP <= 0) {
+      return questDuration; // Si pas d'expérience, repos = durée de la quête
+    }
+    const restDays = 0.5 * (recommendedXP / adventurerXP) * questDuration;
+    return Math.ceil(restDays); // Arrondi au jour supérieur
+  }
+
+  async finishQuest(questId: number) {
+    const quest = await this.prisma.quest.findUnique({
+      where: { id: questId },
+      select: {
+        statusId: true,
+        estimatedDuration: true,
+        recommendedXP: true,
+        adventurers: { select: { id: true, experience: true } },
+      },
+    });
+    if (!quest) throw new NotFoundException('Quest not found');
+
+    if (quest.statusId !== this.STATUS_ID_STARTED) {
+      throw new BadRequestException(
+        'Quest must be started before it can be finished',
+      );
+    }
+
+    // Calculer et appliquer la durée de repos pour chaque aventurier individuellement
+    const now = new Date();
+    for (const adventurer of quest.adventurers) {
+      const restDays = this.calculateRestDuration(
+        quest.recommendedXP,
+        adventurer.experience,
+        quest.estimatedDuration,
+      );
+      const availableUntil = new Date(now);
+      availableUntil.setDate(availableUntil.getDate() + restDays);
+
+      await this.prisma.adventurer.update({
+        where: { id: adventurer.id },
+        data: { availableUntil },
+      });
+    }
+
+    return this.prisma.quest.findUnique({
+      where: { id: questId },
       include: {
         status: true,
         adventurers: true,

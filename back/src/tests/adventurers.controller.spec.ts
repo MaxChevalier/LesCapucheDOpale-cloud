@@ -90,34 +90,22 @@ describe('AdventurersController', () => {
 
       await controller.findAll(query);
 
-      expect(service.findAll).toHaveBeenCalledWith({
-        name: undefined,
-        specialityId: undefined,
-        experienceMin: undefined,
-        experienceMax: undefined,
-        dailyRateOrder: undefined,
-      });
+      expect(service.findAll).toHaveBeenCalledWith({});
     });
 
     it('should call service.findAll with parsed options and ASC order', async () => {
       const query = {
         name: 'Aria',
-        specialityId: '3',
-        xpMin: '10',
-        xpMax: '50',
+        specialityId: 3,
+        experienceMin: 10,
+        experienceMax: 50,
         dailyRateOrder: 'asc' as const,
       };
       mockAdventurersService.findAll.mockResolvedValue([]);
 
       await controller.findAll(query);
 
-      expect(service.findAll).toHaveBeenCalledWith({
-        name: 'Aria',
-        specialityId: 3,
-        experienceMin: 10,
-        experienceMax: 50,
-        dailyRateOrder: 'asc',
-      });
+      expect(service.findAll).toHaveBeenCalledWith(query);
     });
 
     it('should call service.findAll with DESC order', async () => {
@@ -126,13 +114,7 @@ describe('AdventurersController', () => {
 
       await controller.findAll(query);
 
-      expect(service.findAll).toHaveBeenCalledWith({
-        name: undefined,
-        specialityId: undefined,
-        experienceMin: undefined,
-        experienceMax: undefined,
-        dailyRateOrder: 'desc',
-      });
+      expect(service.findAll).toHaveBeenCalledWith(query);
     });
   });
 

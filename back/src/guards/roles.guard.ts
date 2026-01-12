@@ -20,9 +20,6 @@ export class RolesGuard implements CanActivate {
       .getRequest<Request & { user?: { roleId: number } }>();
     const user = request.user;
 
-    console.log('[RolesGuard] Required roles:', requiredRoles);
-    console.log('[RolesGuard] User from request:', user);
-
     if (!user?.roleId) {
       throw new ForbiddenException('No role found for user');
     }

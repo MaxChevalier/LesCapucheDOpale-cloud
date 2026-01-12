@@ -104,7 +104,7 @@ export class EquipmentStocksController {
         equipmentId: { type: 'number', example: 12 },
         quantity: { type: 'number', example: 25 },
       },
-      required: ['equipmentId', 'quantity'],
+      required: ['equipmentId'],
       additionalProperties: false,
     },
   })
@@ -145,7 +145,6 @@ export class EquipmentStocksController {
       properties: {
         equipmentId: { type: 'number', example: 15 },
         quantity: { type: 'number', example: 30 },
-        available: { type: 'number', example: 28 },
       },
       additionalProperties: false,
     },
