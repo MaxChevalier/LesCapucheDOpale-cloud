@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UpdateEquipment } from './update-equipment';
 import { EquipmentService } from '../../services/equipment/equipment.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { EquipmentFormData } from '../../models/models';
 
@@ -11,123 +10,87 @@ describe('UpdateEquipment', () => {
   let fixture: ComponentFixture<UpdateEquipment>;
 
   let mockEquipmentService: jasmine.SpyObj<EquipmentService>;
+  let mockActivatedRoute: any;
+  let mockRouter: jasmine.SpyObj<Router>;
 
   const mockEquipment: EquipmentFormData = {
     name: 'Sword',
-    cost: 100,
     equipmentTypeId: 1,
+    cost: 100,
     maxDurability: 250
   };
 
   beforeEach(async () => {
-    mockEquipmentService = jasmine.createSpyObj('EquipmentService', [
-      'getEquipmentById',
-      'createEquipment',
-      'getEquipmentType' 
-    ]);
+    mockEquipmentService = jasmine.createSpyObj('EquipmentService', ['getEquipmentById', 'updateEquipment', 'getEquipmentType']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
-    mockEquipmentService.getEquipmentById.and.returnValue(of(mockEquipment));
-    mockEquipmentService.createEquipment.and.returnValue(of({} as any));
+    // Par défaut, paramMap.get renvoie "1"
+    mockActivatedRoute = {
+      snapshot: {
+        paramMap: {
+          get: jasmine.createSpy('get').and.returnValue('1')
+        }
+      }
+    };
 
     await TestBed.configureTestingModule({
       imports: [UpdateEquipment],
       providers: [
-        provideRouter([]),
         { provide: EquipmentService, useValue: mockEquipmentService },
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            snapshot: {
-              paramMap: {
-                get: () => '1'
-              }
-            }
-          }
-        }
-      ]
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Router, useValue: mockRouter }
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UpdateEquipment);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
-  // ---------------------------------------------
-  //              BASIC CREATION
-  // ---------------------------------------------
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // ---------------------------------------------
-  //              INIT LOGIC
-  // ---------------------------------------------
-  it('should load equipment on init with valid id', () => {
-    expect(component.id).toBe(1);
+  it('should load equipment on init when id is valid', () => {
+    mockEquipmentService.getEquipmentById.and.returnValue(of(mockEquipment));
+    fixture.detectChanges(); // déclenche ngOnInit
+
+    expect(component['id']).toBe(1);
     expect(mockEquipmentService.getEquipmentById).toHaveBeenCalledWith(1);
     expect(component['equipment']).toEqual(mockEquipment);
   });
 
-  // ---------------------------------------------
-  //        INVALID ID HANDLING
-  // ---------------------------------------------
-  it('should not load equipment if id is invalid', () => {
-    const consoleSpy = spyOn(console, 'error');
-    mockEquipmentService.getEquipmentById.calls.reset();
+  it('should navigate away if id is invalid', () => {
+    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('invalid-id');
+    fixture = TestBed.createComponent(UpdateEquipment);
+    component = fixture.componentInstance;
 
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({
-      imports: [UpdateEquipment],
-      providers: [
-        provideRouter([]),
-        { provide: EquipmentService, useValue: mockEquipmentService },
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            snapshot: {
-              paramMap: {
-                get: () => 'abc2'
-              }
-            }
-          }
-        }
-      ]
-    }).compileComponents();
+    spyOn(console, 'error');
 
-    const fixture2 = TestBed.createComponent(UpdateEquipment);
-    fixture2.detectChanges();
+    fixture.detectChanges(); // ngOnInit
 
-    expect(consoleSpy).toHaveBeenCalledWith('Invalid adventurer ID');
-    expect(mockEquipmentService.getEquipmentById).not.toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalledWith('Invalid equipment ID');
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/equipments']);
   });
 
-  // ---------------------------------------------
-  //        FORM SUBMIT SUCCESS
-  // ---------------------------------------------
-  it('should update equipment and navigate on success', () => {
-    const router = TestBed.inject(Router);
-    spyOn(router, 'navigate');
+  it('should call updateEquipment and navigate on successful form submission', () => {
+    mockEquipmentService.updateEquipment.and.returnValue(of(mockEquipment));
+    component['id'] = 1;
 
-    component['onFormSubmitted'](mockEquipment);
+    (component as any).onFormSubmitted(mockEquipment);
 
-    expect(mockEquipmentService.createEquipment).toHaveBeenCalledWith(mockEquipment);
-    expect(router.navigate).toHaveBeenCalledWith(['/equipments']);
+    expect(mockEquipmentService.updateEquipment).toHaveBeenCalledWith(mockEquipment, 1);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/equipments']);
   });
 
-  // ---------------------------------------------
-  //        FORM SUBMIT ERROR
-  // ---------------------------------------------
-  it('should log error when update fails', () => {
-    const consoleSpy = spyOn(console, 'error');
-    mockEquipmentService.createEquipment.and.returnValue(
-      throwError(() => new Error('Update failed'))
-    );
+  it('should log error if updateEquipment fails', () => {
+    const error = new Error('Update failed');
+    mockEquipmentService.updateEquipment.and.returnValue(throwError(() => error));
+    component['id'] = 1;
 
-    component['onFormSubmitted'](mockEquipment);
+    spyOn(console, 'error');
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Error updating equipment:',
-      jasmine.any(Error)
-    );
+    (component as any).onFormSubmitted(mockEquipment);
+
+    expect(console.error).toHaveBeenCalledWith('Error updating equipment:', error);
   });
 });

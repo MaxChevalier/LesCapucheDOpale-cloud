@@ -27,7 +27,8 @@ export class UpdateEquipment implements OnInit {
     this.id = idStr ? Number(idStr) : -1;
 
     if (!idStr || !/^\d+$/.test(idStr) || this.id < 0 || isNaN(this.id)) {
-      console.error('Invalid adventurer ID');
+      console.error('Invalid equipment ID');
+      this.router.navigate(['/equipments']);
     }
     else {
       this.equipmentService.getEquipmentById(this.id).subscribe(equipment => {
@@ -37,7 +38,7 @@ export class UpdateEquipment implements OnInit {
   }
 
   protected onFormSubmitted(data: EquipmentFormData): void {
-    this.equipmentService.createEquipment(data).subscribe({
+    this.equipmentService.updateEquipment(data, this.id).subscribe({
       next: (equipment) => {
         this.router.navigate(['/equipments']);
       },

@@ -7,3 +7,12 @@
         }
      </div>
 </div>
+<div>
+    <h3>Consommables en stock</h3>
+    <a routerLink="/consumables" routerLinkActive="active">Ajouter du nouveau stock</a>
+     <div>
+        @for (consumable of stockConsumables; track consumable.id) {
+            <app-item-consumable [consumable]="consumable" [update]="false"></app-item-consumable>
+        }
+     </div>
+</div>

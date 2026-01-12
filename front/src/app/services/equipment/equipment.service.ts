@@ -25,6 +25,10 @@ export class EquipmentService {
     return this.http.post<EquipmentFormData>(`/api/equipment`, data);
   }
 
+  updateEquipment(data: EquipmentFormData, id: number) {
+    return this.http.patch<EquipmentFormData>(`/api/equipment/${id}`, data);
+  }
+
   getAllEquipment() {
     return this.http.get<Equipment[]>(`/api/equipment`);
   }

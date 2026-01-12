@@ -8,10 +8,39 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ConsumableService {
   private readonly baseUrlType = `/api/consumable-types`;
+  private readonly baseUrl = `/api/consumables`;
 
   constructor(private readonly http: HttpClient) { }
 
-  getConsumables(): Observable<ConsumableType[]> {
+  getConsumableTypes(): Observable<ConsumableType[]> {
     return this.http.get<ConsumableType[]>(this.baseUrlType);
+  }
+
+  addConsumableType(name: string): Observable<ConsumableType> {
+    return this.http.post<ConsumableType>(this.baseUrlType, { name });
+  }
+
+  createConsumable(data: any): Observable<any> {
+    return this.http.post<any>(this.baseUrl, data);
+  }
+
+  updateConsumable(data: any, id: number): Observable<any> {
+    return this.http.patch<any>(`${this.baseUrl}/${id}`, data);
+  }
+
+  deleteConsumable(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  getAllConsumables(): Observable<any[]> {
+    return this.http.get<any[]>(this.baseUrl);
+  }
+
+  getConsumableById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${id}`);
+  }
+
+  purchaseConsumable(id: number, quantity: number): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/${id}/purchase`, { quantity });
   }
 }

@@ -1,0 +1,11 @@
+<div class="consumable-item">
+    <h3>{{ consumable.name }}</h3>
+    <p>Type: {{ consumable.consumableType.name }}</p>
+    <p>Coût: {{ consumable.cost }} Pc</p>
+    <p>Quantité: {{ consumable.quantity }}</p>
+    @if (update) {
+        <button (click)="onUpdate()">Modifier</button>
+        <label for="quantity">Quantité à ajouter au stock:</label>
+        <input id="quantity" type="number" (change)="onQuantityChange($event)" min="0" />
+    }
+</div>

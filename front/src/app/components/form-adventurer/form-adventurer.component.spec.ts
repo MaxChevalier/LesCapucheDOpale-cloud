@@ -16,11 +16,11 @@ describe('FormAdventurerComponent', () => {
   beforeEach(async () => {
     specialityServiceSpy = jasmine.createSpyObj('SpecialityService', ['getSpecialities']);
     equipmentServiceSpy = jasmine.createSpyObj('EquipmentService', ['getEquipmentType']);
-    consumableServiceSpy = jasmine.createSpyObj('ConsumableService', ['getConsumables']);
+    consumableServiceSpy = jasmine.createSpyObj('ConsumableService', ['getConsumableTypes']);
 
     specialityServiceSpy.getSpecialities.and.returnValue(of([{ id: 1, name: 'Guerrier' }]));
     equipmentServiceSpy.getEquipmentType.and.returnValue(of([{ id: 10, name: 'Épée' }]));
-    consumableServiceSpy.getConsumables.and.returnValue(of([{ id: 20, name: 'Potion' }]));
+    consumableServiceSpy.getConsumableTypes.and.returnValue(of([{ id: 20, name: 'Potion' }]));
 
     await TestBed.configureTestingModule({
       imports: [FormAdventurerComponent],
@@ -45,7 +45,7 @@ describe('FormAdventurerComponent', () => {
 
     expect(specialityServiceSpy.getSpecialities).toHaveBeenCalled();
     expect(equipmentServiceSpy.getEquipmentType).toHaveBeenCalled();
-    expect(consumableServiceSpy.getConsumables).toHaveBeenCalled();
+    expect(consumableServiceSpy.getConsumableTypes).toHaveBeenCalled();
 
     expect((component as any).specialities).toEqual([{ id: 1, name: 'Guerrier' }]);
     expect((component as any).equipmentTypes).toEqual([{ id: 10, name: 'Épée' }]);

@@ -1,0 +1,9 @@
+<a routerLink="/consumable/new" routerLinkActive="active">Nouveau Consommable</a>
+<div class="container">
+    @for (consumable of consumables; track consumable.id) {
+        <app-item-consumable [consumable]="consumable" (quantityChange)="onQuantityChange(consumable.id, $event)"></app-item-consumable>
+    } @empty {
+        <p>Aucun élément</p>
+    }
+</div>
+<button (click)="onPurchase()">Ajouter au stock</button>

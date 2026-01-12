@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormEquipment } from '../../components/form-equipment/form-equipment';
 import { Router } from '@angular/router';
 import { EquipmentService } from '../../services/equipment/equipment.service';
-import { Equipment, EquipmentFormData } from '../../models/equipment';
+import { EquipmentFormData } from '../../models/equipment';
 
 @Component({
   selector: 'app-new-equipment',
