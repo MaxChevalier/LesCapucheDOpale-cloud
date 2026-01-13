@@ -928,10 +928,6 @@ paths:
             type: number
       requestBody:
         required: true
-        description: >-
-          Informations de fin de quête. Si succès: +80% récompense, XP
-          distribué, salaires 100%. Si échec: pas de récompense, pas XP,
-          salaires 40%.
         content:
           application/json:
             schema:
@@ -947,10 +943,7 @@ paths:
                 isSuccess: true
       responses:
         '200':
-          description: >-
-            Quête terminée. Transactions créées: salaires (100% ou 40%) et
-            récompense finale (80% si succès). XP distribué si succès.
-            Équipements libérés avec durabilité réduite. Aventuriers en repos.
+          description: ''
           content:
             application/json:
               schema:
@@ -3042,6 +3035,160 @@ paths:
         - bearer: []
       tags:
         - Roles
+  /finances/balance:
+    get:
+      operationId: FinancesController_getBalance
+      parameters: []
+      responses:
+        '200':
+          description: Solde actuel de la guilde
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: number
+                    example: 15000
+      security:
+        - bearer: []
+      tags:
+        - Finances
+  /finances/history:
+    get:
+      operationId: FinancesController_getHistory
+      parameters:
+        - name: skip
+          required: false
+          in: query
+          schema:
+            example: 0
+            type: number
+        - name: take
+          required: false
+          in: query
+          schema:
+            example: 50
+            type: number
+      responses:
+        '200':
+          description: Historique des transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          example: 1
+                        amount:
+                          type: number
+                          example: 1000
+                        description:
+                          type: string
+                          example: 'Avance 20% quête #5'
+                        date:
+                          type: string
+                          format: date-time
+                          example: '2026-01-12T10:00:00.000Z'
+                        total:
+                          type: number
+                          example: 15000
+                  totalCount:
+                    type: number
+                    example: 100
+                  skip:
+                    type: number
+                    example: 0
+                  take:
+                    type: number
+                    example: 50
+      security:
+        - bearer: []
+      tags:
+        - Finances
+  /finances/statistics:
+    get:
+      operationId: FinancesController_getStatistics
+      parameters: []
+      responses:
+        '200':
+          description: Statistiques financières
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalIncome:
+                    type: number
+                    example: 50000
+                  totalExpenses:
+                    type: number
+                    example: 35000
+                  balance:
+                    type: number
+                    example: 15000
+                  transactionCount:
+                    type: number
+                    example: 100
+      security:
+        - bearer: []
+      tags:
+        - Finances
+  /finances/transaction:
+    post:
+      operationId: FinancesController_addTransaction
+      parameters: []
+      requestBody:
+        required: true
+        description: Nouvelle transaction (amount positif = recette, négatif = dépense)
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  example: 1000
+                description:
+                  type: string
+                  example: Vente équipement
+              required:
+                - amount
+                - description
+      responses:
+        '201':
+          description: Transaction créée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    example: 42
+                  amount:
+                    type: number
+                    example: 1000
+                  description:
+                    type: string
+                    example: Vente équipement
+                  date:
+                    type: string
+                    format: date-time
+                    example: '2026-01-12T10:00:00.000Z'
+                  total:
+                    type: number
+                    example: 16000
+      security:
+        - bearer: []
+      tags:
+        - Finances
   /:
     get:
       operationId: AppController_getHello

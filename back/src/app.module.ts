@@ -15,6 +15,7 @@ import { QuestStockEquipmentModule } from './modules/quest-stock-equipment.modul
 import { StatusesModule } from './modules/statuses.module';
 import { AuthModule } from './modules/auth.module';
 import { RolesModule } from './modules/roles.module';
+import { FinancesModule } from './modules/finances.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { RolesModule } from './modules/roles.module';
     QuestStockEquipmentModule,
     StatusesModule,
     RolesModule,
+    FinancesModule,
     AuthModule,
   ],
   controllers: [AppController],

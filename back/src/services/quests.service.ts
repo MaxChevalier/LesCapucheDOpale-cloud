@@ -709,7 +709,11 @@ export class QuestsService {
     });
   }
 
-  private calculateRestDuration(recommendedXP: number,adventurerXP: number,questDuration: number,): number {
+  private calculateRestDuration(
+    recommendedXP: number,
+    adventurerXP: number,
+    questDuration: number,
+  ): number {
     if (adventurerXP <= 0) {
       return questDuration;
     }
@@ -795,7 +799,9 @@ export class QuestsService {
       }
 
       for (const adventurer of quest.adventurers) {
-        const currentXP = isSuccess? adventurer.experience + quest.recommendedXP: adventurer.experience;
+        const currentXP = isSuccess
+          ? adventurer.experience + quest.recommendedXP
+          : adventurer.experience;
 
         const restDays = this.calculateRestDuration(
           quest.recommendedXP,
@@ -845,7 +851,9 @@ export class QuestsService {
         });
       }
 
-      const finalStatusId = isSuccess? this.STATUS_ID_SUCCEEDED : this.STATUS_ID_FAILED;
+      const finalStatusId = isSuccess
+        ? this.STATUS_ID_SUCCEEDED
+        : this.STATUS_ID_FAILED;
 
       await tx.quest.update({
         where: { id: questId },
@@ -887,7 +895,10 @@ export class QuestsService {
     }
   }
 
-  async attachConsumables(questId: number,consumables: { consumableId: number; quantity: number }[],) {
+  async attachConsumables(
+    questId: number,
+    consumables: { consumableId: number; quantity: number }[],
+  ) {
     const consumableIds = consumables.map((c) => c.consumableId);
     await this.findConsumablesExist(consumableIds);
 
@@ -954,7 +965,10 @@ export class QuestsService {
     return this.findOne(questId);
   }
 
-  async detachConsumables(questId: number,consumables: { consumableId: number; quantity: number }[],) {
+  async detachConsumables(
+    questId: number,
+    consumables: { consumableId: number; quantity: number }[],
+  ) {
     if (await this.isStarted(questId)) {
       throw new BadRequestException(
         'Quest is started: cannot detach consumables',
@@ -1003,7 +1017,10 @@ export class QuestsService {
     return this.findOne(questId);
   }
 
-  async setConsumables(questId: number,consumables: { consumableId: number; quantity: number }[], ) {
+  async setConsumables(
+    questId: number,
+    consumables: { consumableId: number; quantity: number }[],
+  ) {
     if (await this.isStarted(questId)) {
       throw new BadRequestException(
         'Quest is started: cannot change consumables',
