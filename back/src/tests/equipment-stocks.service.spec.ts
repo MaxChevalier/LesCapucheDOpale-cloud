@@ -128,7 +128,7 @@ describe('EquipmentStocksService', () => {
   });
   describe('update', () => {
     it('should update and return the updated row', async () => {
-      const dto: UpdateEquipmentStockDto = { durability: 80 };
+      const dto: UpdateEquipmentStockDto = { quantity: 80 };
       const updated = { id: 1, equipmentId: 1, durability: 80 };
       mockPrisma.equipmentStock.update.mockResolvedValue(updated);
 

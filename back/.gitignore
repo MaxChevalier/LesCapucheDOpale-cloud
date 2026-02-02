@@ -35,4 +35,3 @@ yarn-error.log*
 
 # Optional: Coverage
 coverage/
-package-lock.json

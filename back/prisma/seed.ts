@@ -23,12 +23,21 @@ const EQUIPMENT_STATUSES = {
   BROKEN: 'Cassé',
 };
 
+const USERS = {
+  ASSISTANT: {
+    name: 'Admin',
+    email: 'admin@gmail.com',
+    password: 'admin123',
+    roleId: ROLES.ASSISTANT,
+  },
+};
+
 async function main() {
 
   await prisma.equipmentStatus.deleteMany({});
   await prisma.status.deleteMany({});
   await prisma.role.deleteMany({});
-
+  await prisma.user.deleteMany({});
 
   await Promise.all([
     prisma.role.create({ data: { name: ROLES.ASSISTANT } }),
@@ -49,6 +58,16 @@ async function main() {
     await prisma.equipmentStatus.create({ data: { name: EQUIPMENT_STATUSES.BROKEN } });
 
 
+  await Promise.all([
+    prisma.user.create({
+      data: {
+        name: USERS.ASSISTANT.name,
+        email: USERS.ASSISTANT.email,
+        password: USERS.ASSISTANT.password,
+        role: { connect: { name: ROLES.ASSISTANT } },
+      },
+    }),
+  ]);
 
 }
 

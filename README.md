@@ -81,9 +81,9 @@ Application web développée avec **Angular**.
 
 ### Prérequis
 
--   Node.js (version LTS)
--   npm
--   PostgreSQL
+- NodeJS  
+- npm
+- Docker
 
 ### 1. Cloner le repository
 
@@ -92,37 +92,83 @@ git clone https://github.com/MaxChevalier/LesCapucheDOpale.git
 cd LesCapucheDOpale
 ```
 
-### 2. Configurer le Backend
+### 2. Configuration de l'environnement
+
+```bash
+# Créer le fichier .env à la racine du projet
+cp .env.example .env
+# Éditer .env avec vos configurations (voir les variables nécessaires ci-dessous)
+```
+
+**Variables d'environnement requises :**
+
+```env
+POSTGRES_DB=capuches_opale
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=votre_mot_de_passe
+JWT_SECRET=votre_secret_jwt
+JWT_SECRET_ADMIN=votre_secret_jwt_admin
+```
+
+### 3. Lancer l'application avec Docker
+
+```bash
+# Construire et démarrer tous les services
+docker compose up --build
+
+# Ou en mode détaché
+docker compose up -d
+```
+
+**Services disponibles :**
+
+-   **Frontend** : `http://localhost` (via nginx)
+-   **Backend API** : `http://localhost/api` (via nginx)
+-   **Base de données PostgreSQL** : `localhost:5432` (disponible en local seulement)
+-   **Documentation Swagger** : `http://localhost/api`
+
+### 4. Gérer les conteneurs
+
+```bash
+# Arrêter tous les services
+docker compose down
+
+# Arrêter et supprimer les volumes (⚠️ supprime les données)
+docker compose down -v
+
+# Voir les logs
+docker compose logs -f
+
+# Voir les logs d'un service spécifique
+docker compose logs -f api
+
+# Reconstruire un service spécifique
+docker compose up --build api
+```
+
+### 5. Développement local (sans Docker)
+
+Si vous souhaitez développer sans Docker :
+
+**Backend :**
 
 ```bash
 cd back
 npm install
 
-# Créer le fichier .env
-cp .env.example .env
-# Éditer .env avec vos configurations
-
-# Initialiser la base de données
+# Configurer .env avec DATABASE_URL pointant vers votre PostgreSQL local
 npx prisma generate
 npx prisma migrate dev
-
-# Démarrer le serveur
 npm run start:dev
 ```
 
-Le backend sera accessible à `http://localhost:3000`
-
-### 3. Configurer le Frontend
+**Frontend :**
 
 ```bash
 cd front
 npm install
-
-# Démarrer l'application
 npm start
 ```
-
-Le frontend sera accessible à `http://localhost:4200`
 
 ## 📊 Base de Données
 

@@ -1,0 +1,54 @@
+name: CI DEVELOPMENT
+
+# Trigger
+on:
+  pull_request:
+    branches: ["dev"]
+    types: [opened, synchronize]
+
+# JOBS
+jobs:
+
+  test-front:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.14"
+
+      - name: Front - Install
+        run: npm i
+        working-directory: ./front
+
+      - name: Front - Install Ci
+        run: npm ci
+        working-directory: ./front
+
+      - name: Front - Run CI
+        run: npm run testCi
+        working-directory: ./front
+
+  test-back:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.10"
+
+      - name: Back - Install
+        run: npm install
+        working-directory: ./back
+
+      - name: Back - Build
+        run: npm run build
+        working-directory: ./back
+
+      - name: Back - Lint
+        run: npm run lint
+        working-directory: ./back
+
+      - name: Back - Test
+        run: npm run test --coverage
+        working-directory: ./back

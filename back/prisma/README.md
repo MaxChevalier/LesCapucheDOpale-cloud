@@ -36,59 +36,35 @@ npm run prisma:reset
 3. Applique toutes les migrations
 4. Exécute le script de seed
 
+### accéder aux données sur le navigateur en local
+
+```bash 
+npm run studio
+```
+
 ## Données créées
 
 Le script crée les données suivantes :
 
 ### 👥 Utilisateurs
 
-- **Assistant** : jean.dupont@guild.com / password123
-- **Client** : marie.martin@guild.com / password123
-
-### 🦸 Aventuriers
-
-- Aragorn (Guerrier) - 850 XP
-- Gandalf (Mage) - 1200 XP
-- Legolas (Rôdeur) - 720 XP
-- Elrond (Soigneur) - 950 XP
-- Frodon (Voleur) - 320 XP
-
-### 🎯 Spécialités
-
-- Guerrier
-- Mage
-- Voleur
-- Soigneur
-- Rôdeur
-
-### ⚔️ Équipements
-
-- Épée longue
-- Arc elven
-- Bâton de mage
-- Armure de plates
-- Bouclier du courage
-- Anneau de sagesse
-
-### 🧪 Consommables
-
-- Potions de santé et mana
-- Pain elfique et viande séchée
-- Parchemins de téléportation et guérison
-
-### 📜 Quêtes
-
-- Défendre le village de Bree (En cours)
-- Récupérer l'artefact ancien (En attente)
-- Escorte de caravane (Terminée)
-- Enquête sur la disparition (En attente)
+- **Assistant** : admin@gmail.com / admin123
 
 ### 📋 Statuts
 
-- En attente
-- En cours
+- Validée
+- En attente de validation
+- Échouée
+- Abandonnée
 - Terminée
-- Annulée
+- Refusée
+- Commencée
+
+### Statut d'équipement
+
+ - Disponible
+ - Cassé
+ - Emprunté
 
 ## Structure du script
 
