@@ -1,5 +1,6 @@
-<div class="quest-item">
-    <p>{{ quest.name }}</p>
+<div class="quest-item commun-card ">
+    <h3 class="title">{{ quest.name }}</h3>
+    <div class="quest-details">
     <span><label class="bold" for="finalDate">Date d'expiration : </label>
         <p id="finalDate">{{ getFinalDate() }}</p>
     </span>
@@ -18,4 +19,5 @@
         <label class="bold" for="status">Statut : </label>
         <p id="status">{{ quest.status.name }}</p>
     </span>
+</div>
 </div>

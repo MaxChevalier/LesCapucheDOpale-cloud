@@ -1,8 +1,10 @@
-<a routerLink="/quest/new" routerLinkActive="active">Nouvelles Quêtes</a>
-<div class="container">
+<section class="container">
+<a routerLink="/quest/new" routerLinkActive="active" class="commun-btn btn-new-quest">Nouvelles Quêtes</a>
+<div class="container-quest">
     @for (quest of quests; track quest.id) {
         <app-item-quest [quest]="quest" (click)="onQuestClick(quest.id)"></app-item-quest>
     } @empty {
         <p>Aucun élément</p>
     }
 </div>
+</section>

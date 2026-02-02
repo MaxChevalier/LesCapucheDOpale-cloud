@@ -1,3 +1,9 @@
+<section class="update-quest-container">
+
+<div class="contain-title">
+    <h2 class="title">Modifier la quête</h2>
+</div>
+
 <app-form-quest 
   (formSubmitted)="onFormSubmitted($event)" 
   [initialData]="quest">
@@ -5,15 +11,18 @@
 
 @if (isAssistant()) {
   <form [formGroup]="form">
-    <label for="recommendedXP">Expérience recommandée :</label>
+    <label class="form-label" for="recommendedXP">Expérience recommandée :</label>
     <input 
       id="recommendedXP" 
       formControlName="recommendedXP" 
-      type="number" />
-    <button type="button" (click)="onValidate()">Valider la Requête</button>
-    <button type="button" (click)="onRefuse()">Refuser la Requête</button>
+      type="number" 
+      class="commun-input"
+      />
+    <button type="button" class="commun-btn" (click)="onValidate()">Valider la Requête</button>
+    <button type="button" class="commun-btn" (click)="onRefuse()">Refuser la Requête</button>
   </form>
 }
 @else if (isClient()) {
   <button type="button" (click)="onAbandon()">Abandonner la Requête</button>
 }
+</section>

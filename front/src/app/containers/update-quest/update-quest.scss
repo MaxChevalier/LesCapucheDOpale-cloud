@@ -1,0 +1,67 @@
+@import "../../../styles.scss";
+
+
+
+.update-quest-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  padding-top: 5rem;
+  justify-content: flex-start;
+  align-items: center;
+  height: auto;
+  width: 100%;
+  padding-bottom: 3rem;
+}
+
+.title {
+  font-size: 2rem;
+  color: $color3;
+  text-align: center;
+}
+
+.contain-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.contain-title::after {
+  content: "";
+  flex-grow: 1;
+  height: 4px;
+  background-color: $color3;
+  border-radius: 2px;
+}
+
+.contain-title::before {
+  content: "";
+  flex-grow: 1;
+  height: 4px;
+  background-color: $color3;
+  border-radius: 2px;
+}
+
+form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+  background-color: $color3;
+  box-shadow: inset 8px 8px 16px #093457, inset -8px -8px 16px #1370bd;
+  border-radius: 20px;
+  padding: 2em;
+}
+
+.form-label {
+    color: white;
+    font-size: 20px;
+    text-align: center;
+}
+
+.commun-input {
+    color: white !important;
+}
