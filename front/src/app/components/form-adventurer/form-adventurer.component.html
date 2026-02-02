@@ -1,23 +1,14 @@
-<form [formGroup]="adventurerForm" (ngSubmit)="onSubmit()">
+<form class="form-main" [formGroup]="adventurerForm" (ngSubmit)="onSubmit()">
   <span class="left">
     <div class="form-group">
       <label for="name">Nom:</label>
-      <input
-        class="commun-input"
-        id="name"
-        formControlName="name"
-        placeholder="John"
-      />
+      <input class="commun-input" id="name" formControlName="name" placeholder="John" />
       @if ((adventurerForm.get('name')?.touched || hasSubmitted) &&
       adventurerForm.get('name')?.invalid) {
       <p class="error">Le nom doit contenir au moins 3 caractères.</p>
       }
     </div>
-    <app-form-money
-      label="Taux journalier : "
-      [money]="getMoney()"
-      (moneyChange)="setMoney($event)"
-    ></app-form-money>
+    <app-form-money label="Taux journalier : " [money]="getMoney()" (moneyChange)="setMoney($event)"></app-form-money>
     <button class="submit-btn commun-btn" type="submit">
       {{ initialData ? "Modifier l'" : "Créer un " }}aventurier
     </button>
@@ -26,17 +17,37 @@
     <div class="form-group">
       <label for="speciality">Spécialité:</label>
       <mat-form-field class="custom-form-field speciality-field">
-        <mat-select
-          placeholder="Sélectionner une spécialité"
-          id="speciality"
-          formControlName="specialityId"
-          panelClass="speciality-panel"
-        >
+        <mat-select placeholder="Sélectionner une spécialité" id="speciality" formControlName="specialityId"
+          panelClass="speciality-panel">
           @for (spe of specialities; track spe) {
           <mat-option [value]="spe.id">{{ spe.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
+      <button type="button" class="add-type-btn commun-btn" (click)="showTypePopupSpe = true">
+        Ajouter une spécialité
+      </button>
+
+      @if (showTypePopupSpe) {
+      <div class="popup-backdrop">
+        <div class="popup">
+          <form [formGroup]="newSpecialityForm">
+            <h3>Nouvelle spécialité</h3>
+
+            <input class="commun-input" type="text" formControlName="name" placeholder="Nom du type" />
+
+            <div class="popup-actions">
+              <button class="commun-btn" type="button" (click)="addNewSpeciality()">Ajouter</button>
+              <button class="commun-btn" type="button" (click)="cancelPopupSpe()">Annuler</button>
+            </div>
+
+            @if(newSpeError) {
+            <p class="error">{{ newSpeError }}</p>
+            }
+          </form>
+        </div>
+      </div>
+      }
       @if ((adventurerForm.get('specialityId')?.touched || hasSubmitted) &&
       adventurerForm.get('specialityId')?.invalid) {
       <p class="error">La spécialité est requise.</p>
@@ -46,35 +57,73 @@
     <div class="form-group">
       <label for="equipmentTypes">Type d'équipement:</label>
       <mat-form-field class="custom-form-field">
-        <mat-select
-          placeholder="Sélectionner les types d'équipement"
-          formControlName="equipmentTypeIds"
-          multiple
-          class="test2"
-          panelClass="select-panel"
-        >
+        <mat-select placeholder="Sélectionner les types d'équipement" formControlName="equipmentTypeIds" multiple
+          class="test2" panelClass="select-panel">
           @for (type of equipmentTypes; track type) {
           <mat-option [value]="type.id">{{ type.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
+      <button type="button" class="add-type-btn commun-btn" (click)="showTypePopupEquip = true">
+        Ajouter un type d'équipement
+      </button>
+
+      @if (showTypePopupEquip) {
+      <div class="popup-backdrop">
+        <div class="popup">
+          <form [formGroup]="newEquipementTypeForm">
+            <h3>Nouveaux type d'équipement</h3>
+
+            <input class="commun-input" type="text" formControlName="name" placeholder="Nom du type" />
+
+            <div class="popup-actions">
+              <button class="commun-btn" type="button" (click)="addNewEquipmentType()">Ajouter</button>
+              <button class="commun-btn" type="button" (click)="cancelPopupEquip()">Annuler</button>
+            </div>
+
+            @if(newEquipTypeError) {
+            <p class="error">{{ newEquipTypeError }}</p>
+            }
+          </form>
+        </div>
+      </div>
+      }
     </div>
 
     <div class="form-group">
       <label for="consumableTypes">Type de consommable:</label>
       <mat-form-field class="custom-form-field">
-        <mat-select
-          placeholder="Sélectionner les types de consommable"
-          id="consumableTypes"
-          formControlName="consumableTypeIds"
-          multiple
-          panelClass="select-panel"
-        >
+        <mat-select placeholder="Sélectionner les types de consommable" id="consumableTypes"
+          formControlName="consumableTypeIds" multiple panelClass="select-panel">
           @for (type of consumableTypes; track type) {
           <mat-option [value]="type.id">{{ type.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
+      <button type="button" class="add-type-btn commun-btn" (click)="showTypePopupCons = true">
+        Ajouter un type de consommable
+      </button>
+
+      @if (showTypePopupCons) {
+      <div class="popup-backdrop">
+        <div class="popup">
+          <form [formGroup]="newConsumableTypeForm">
+            <h3>Nouveaux types de consommable</h3>
+
+            <input class="commun-input" type="text" formControlName="name" placeholder="Nom du type" />
+
+            <div class="popup-actions">
+              <button type="button" (click)="addNewConsumableType()" class="commun-btn">Ajouter</button>
+              <button type="button" (click)="cancelPopupCons()" class="commun-btn">Annuler</button>
+            </div>
+
+            @if(newConsTypeError) {
+            <p class="error">{{ newConsTypeError }}</p>
+            }
+          </form>
+        </div>
+      </div>
+      }
       @if ((adventurerForm.get('consumableTypeIds')?.touched || hasSubmitted) &&
       adventurerForm.get('consumableTypeIds')?.invalid) {
       <p class="error">Le type de consommable est requis.</p>

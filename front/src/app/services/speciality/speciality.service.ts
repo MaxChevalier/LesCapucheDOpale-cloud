@@ -14,4 +14,8 @@ export class SpecialityService {
   getSpecialities(): Observable<Speciality[]> {
     return this.http.get<Speciality[]>(this.baseUrl);
   }
+
+  addSpeciality(name: string): Observable<Speciality> {
+    return this.http.post<Speciality>(this.baseUrl, { name });
+  }
 }

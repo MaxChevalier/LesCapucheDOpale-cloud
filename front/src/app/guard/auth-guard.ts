@@ -11,6 +11,9 @@ export const authGuard: CanActivateFn = (route, state) => {
   return accountService.isLogin().pipe(
     map((response) => {
       if (response === false || !response) {
+        localStorage.removeItem('role');
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
         router.navigate(['/login']);
         return false;
       }
@@ -18,6 +21,9 @@ export const authGuard: CanActivateFn = (route, state) => {
       return true;
     }),
     catchError((error) => {
+      localStorage.removeItem('role');
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
       router.navigate(['/login']);
       return of(false);
     })

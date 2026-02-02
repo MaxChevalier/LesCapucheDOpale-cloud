@@ -41,7 +41,7 @@ export class FormLogin {
     this.AuthService.login(user).subscribe({
       next: (response) => {
         localStorage.setItem('token', response.access_token);
-        localStorage.setItem('userName', response.username);
+        localStorage.setItem('username', response.username);
         
         this.router.navigate(['/']);
       },

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 @Component({
   selector: 'app-menu',
   imports: [
@@ -11,4 +11,22 @@ import { RouterLink } from '@angular/router';
 export class MenuComponent {
   open = false;
 
+  constructor(
+    private readonly router: Router
+  ){}
+
+  get isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  get username(): string | null {
+    return localStorage.getItem('username');
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('username');
+    this.router.navigate(['/login']);
+  }
 }

@@ -27,11 +27,26 @@ export class FormAdventurerComponent implements OnInit, OnChanges {
     consumableTypeIds: new FormControl([] as number[], []),
     dailyRate: new FormControl(0, [Validators.required, Validators.min(0)]),
   });
+  protected newSpecialityForm = new FormGroup({
+    name: new FormControl(''),
+  })
+  protected newEquipementTypeForm = new FormGroup({
+    name: new FormControl(''),
+  })
+  protected newConsumableTypeForm = new FormGroup({
+    name: new FormControl(''),
+  })
 
   protected specialities: Speciality[] = [];
   protected equipmentTypes: EquipmentType[] = [];
   protected consumableTypes: ConsumableType[] = [];
   protected hasSubmitted = false;
+  protected showTypePopupSpe = false;
+  protected showTypePopupEquip = false;
+  protected showTypePopupCons = false;
+  protected newEquipTypeError = '';
+  protected newConsTypeError = '';
+  protected newSpeError = '';
 
   constructor(
     private readonly specialityService: SpecialityService,
@@ -85,5 +100,83 @@ export class FormAdventurerComponent implements OnInit, OnChanges {
 
   protected setMoney(value: number): void {
     this.adventurerForm.get('dailyRate')?.setValue(value);
+  }
+
+  addNewEquipmentType(): void {
+    this.newEquipTypeError = '';
+
+    if (!this.newEquipementTypeForm.get('name')?.value?.trim()) {
+      this.newEquipTypeError = 'Le nom du type est requis.';
+      return;
+    }
+    this.equipmentService.addEquipmentType(this.newEquipementTypeForm.get('name')?.value ?? '').subscribe({
+      next: (createdType) => {
+        this.equipmentTypes.push(createdType);
+        this.adventurerForm.get('equipmentTypeIds')?.setValue(this.adventurerForm.get('equipmentTypeIds')?.value?.concat([createdType.id]) ?? [createdType.id]);
+        this.showTypePopupEquip = false;
+        this.newEquipementTypeForm.get('name')?.setValue('');
+      },
+      error: (err) => {
+        this.newEquipTypeError = 'Erreur lors de l\'ajout du type : ' + err.message;
+      }
+    });
+  }
+
+  cancelPopupEquip(): void {
+    this.showTypePopupEquip = false;
+    this.newEquipementTypeForm.get('name')?.setValue('');
+    this.newEquipTypeError = '';
+  }
+
+  addNewConsumableType(): void {
+    this.newConsTypeError = '';
+
+    if (!this.newConsumableTypeForm.get('name')?.value?.trim()) {
+      this.newConsTypeError = 'Le nom du type est requis.';
+      return;
+    }
+    this.consumableService.addConsumableType(this.newConsumableTypeForm.get('name')?.value ?? '').subscribe({
+      next: (createdType) => {
+        this.consumableTypes.push(createdType);
+        this.adventurerForm.get('consumableTypeIds')?.setValue(this.adventurerForm.get('consumableTypeIds')?.value?.concat([createdType.id]) ?? [createdType.id]);
+        this.showTypePopupCons = false;
+        this.newConsumableTypeForm.get('name')?.setValue('');
+      },
+      error: (err) => {
+        this.newConsTypeError = 'Erreur lors de l\'ajout du type : ' + err.message;
+      }
+    });
+  }
+
+  cancelPopupCons(): void {
+    this.showTypePopupCons = false;
+    this.newConsumableTypeForm.get('name')?.setValue('');
+    this.newConsTypeError = '';
+  }
+
+  addNewSpeciality(): void {
+    this.newSpeError = '';
+
+    if (!this.newSpecialityForm.get('name')?.value?.trim()) {
+      this.newSpeError = 'Le nom du type est requis.';
+      return;
+    }
+    this.specialityService.addSpeciality(this.newSpecialityForm.get('name')?.value ?? '').subscribe({
+      next: (createdSpe) => {
+        this.specialities.push(createdSpe);
+        this.adventurerForm.get('specialityId')?.setValue(createdSpe.id);
+        this.showTypePopupSpe = false;
+        this.newSpecialityForm.get('name')?.setValue('');
+      },
+      error: (err) => {
+        this.newSpeError = 'Erreur lors de l\'ajout du type : ' + err.message;
+      }
+    });
+  }
+
+  cancelPopupSpe(): void {
+    this.showTypePopupSpe = false;
+    this.newSpecialityForm.get('name')?.setValue('');
+    this.newSpeError = '';
   }
 }

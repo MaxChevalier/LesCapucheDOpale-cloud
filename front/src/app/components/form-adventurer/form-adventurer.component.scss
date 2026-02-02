@@ -6,7 +6,7 @@
   margin-top: 4px;
 }
 
-form {
+.form-main {
   display: flex;
   flex-direction: row;
   gap: 1em;
@@ -141,4 +141,45 @@ form {
     width: 100% !important;
     font-size: 90% !important;
   }
+}
+
+.popup-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.popup {
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .2);
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    background-color: $color3;
+    box-shadow: inset 8px 8px 16px #093457, inset -8px -8px 16px #1370bd;
+    border-radius: 20px;
+    padding: 2em;
+  }
+}
+
+.popup-actions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.add-type-btn {
+  font-size: .5rem;
+  padding: 2px 4px;
+  width: 10rem;
+  margin-top: -1rem;
+  z-index: 2;
 }

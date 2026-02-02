@@ -75,7 +75,7 @@ describe('FormLogin', () => {
     });
 
     expect(localStorage.setItem).toHaveBeenCalledWith('token', 'abc123');
-    expect(localStorage.setItem).toHaveBeenCalledWith('userName', 'John');
+    expect(localStorage.setItem).toHaveBeenCalledWith('username', 'John');
     expect(router.navigate).toHaveBeenCalledWith(['/']);
   });
 
