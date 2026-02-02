@@ -1,24 +1,31 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <label for="title">Titre:</label>
-    <input id="title" formControlName="name" type="text" />
+<div class="quest-form-wrapper">
+  <!-- Formulaire avec style neumorphique -->
+  <div class="commun-form-container">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <label for="title" class="commun-label">Titre :</label>
+      <input id="title" formControlName="name" type="text" placeholder="Titre" class="commun-input" />
 
-    <label for="description">Description:</label>
-    <textarea id="description" formControlName="description"></textarea>
+      <label for="description" class="commun-label">Description :</label>
+      <textarea id="description" formControlName="description" placeholder="Description" class="commun-input"></textarea>
 
-    <label for="finalDate">Date limite:</label>
-    <input id="finalDate" formControlName="finalDate" type="date"/>
+      <label for="finalDate" class="commun-label">Date limite :</label>
+      <input id="finalDate" formControlName="finalDate" type="date" class="commun-input"/>
 
-    <label for="estimatedDuration">Durée:</label>
-    <input id="estimatedDuration" formControlName="estimatedDuration" type="number" min="1"/>
-    <label for="estimatedDuration">Journées</label>
+      <label for="estimatedDuration" class="commun-label">Durée :</label>
+      <div class="duration-wrapper">
+        <input id="estimatedDuration" formControlName="estimatedDuration" type="number" min="1" placeholder="1" class="commun-input"/>
+        <label for="estimatedDuration" class="duration-label">Journées</label>
+      </div>
 
-    <app-form-money label="Prime : " [money]="getMoney()" (moneyChange)="setMoney($event)"></app-form-money>
+      <app-form-money label="Prime : " [money]="getMoney()" (moneyChange)="setMoney($event)"></app-form-money>
 
-    <button type="submit">
+      <button type="submit" class="commun-btn">
         @if (initialData) {
-            Mettre à jour la Requête
+          Mettre à jour la Requête
         }@else {
-            Soumettre la Requête
+          Soumettre la Requête
         }
-    </button>
-</form>
+      </button>
+    </form>
+  </div>
+</div>

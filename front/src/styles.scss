@@ -67,8 +67,26 @@ $color5: #6a45ba;
   background-color: $color3 !important;
 }
 
+.commun-form-container {
+  background: #0e528a;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: inset 13px 13px 26px #082d4c,
+  inset -13px -13px 26px #1477c8;
+}
 
+.commun-label {
+  display: block;
+  color: white;
+  margin-bottom: 0.5rem;
+  font-size: 25px;
+}
 
+app-form-money {
+  input {
+    @extend .commun-input;
+  }
+}
 
 ::ng-deep .custom-form-field {
   .mat-mdc-text-field-wrapper {

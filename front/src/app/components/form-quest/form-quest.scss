@@ -1,0 +1,113 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.quest-form-wrapper {
+  max-width: 1000px;
+  margin: 3rem auto;
+}
+
+.form-title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.title-line {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(to right, transparent, white);
+
+  &:last-child {
+    background: linear-gradient(to left, transparent, white);
+  }
+}
+
+.form-title {
+  padding: 0 1.5rem;
+  font-size: 1.5rem;
+  color: white;
+}
+
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+
+  label,
+  .commun-label {
+    color: white !important;
+  }
+
+  input,
+  textarea {
+    color: white !important;
+  }
+
+  // Titre à gauche
+  label[for="title"] {
+    grid-column: 1;
+  }
+  input#title {
+    grid-column: 1;
+  }
+
+  // Description à droite
+  label[for="description"] {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  textarea#description {
+    grid-column: 2;
+    grid-row: 2;
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  // Date limite à gauche
+  label[for="finalDate"] {
+    grid-column: 1;
+  }
+  input#finalDate {
+    grid-column: 1;
+  }
+
+  // Durée à droite
+  label[for="estimatedDuration"].commun-label {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .duration-wrapper {
+    grid-column: 2;
+    grid-row: 4;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    input {
+      width: 150px;
+    }
+
+    .duration-label {
+      color: white;
+      font-size: 1.2rem;
+    }
+  }
+
+  // Prime sur toute la largeur
+  app-form-money {
+    grid-column: 1 / -1;
+    margin-top: 1rem;
+  }
+
+  // Bouton centré
+  button {
+    grid-column: 1 / -1;
+    padding: 0.75rem 3rem;
+    margin: 1rem auto 0;
+  }
+}
