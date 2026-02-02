@@ -1,3 +1,4 @@
+import { ResumeQuest } from './containers/resume-quest/resume-quest';
 import { Routes } from '@angular/router';
 import { NewAdventurerComponent } from './containers/new-adventurer/new-adventurer.component';
 import { ListAdventurer } from './containers/list-adventurer/list-adventurer';
@@ -27,7 +28,7 @@ export const routes: Routes = [
     { path: 'adventurer/:id', component: UpdateAdventurer, canActivate: [authGuard]},
 
     // User
-    { path: 'user/new', component: NewUserComponent},
+    { path: 'user/new', component: NewUserComponent },
     { path: 'login', component: Login },
 
     // Stock
@@ -48,4 +49,5 @@ export const routes: Routes = [
     { path: 'quests', component: ListQuest, canActivate: [authGuard] },
     { path: 'quest/:id', component: UpdateQuest, canActivate: [authGuard] },
     { path: 'quest/:id/assign', component: AssignQuest, canActivate: [authGuard] },
+    { path: 'quest/:id/resume', component: ResumeQuest, canActivate: [authGuard] },
 ];

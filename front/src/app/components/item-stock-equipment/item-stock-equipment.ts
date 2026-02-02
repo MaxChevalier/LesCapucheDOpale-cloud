@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { StockEquipment } from '../../models/models';
 
 @Component({
@@ -7,7 +7,11 @@ import { StockEquipment } from '../../models/models';
   templateUrl: './item-stock-equipment.html',
   styleUrl: './item-stock-equipment.scss',
 })
-export class ItemStockEquipment {
+export class ItemStockEquipment implements OnChanges{
   @Input() equipment!: StockEquipment;
   @Input() isSelected: boolean = false;
+
+  ngOnChanges() {
+    console.log('ItemStockEquipment - equipment changed:', this.equipment);
+  }
 }

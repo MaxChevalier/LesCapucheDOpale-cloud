@@ -11,7 +11,7 @@ import { FindQuestsQueryDto } from '../dto/find-quests-query.dto';
 
 @Injectable()
 export class QuestsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // Status IDs
   private readonly STATUS_ID_WAITING = 1;
@@ -68,20 +68,20 @@ export class QuestsService {
     const where: Prisma.QuestWhereInput = {
       ...(rewardMin != null || rewardMax != null
         ? {
-            reward: {
-              ...(rewardMin != null ? { gte: rewardMin } : {}),
-              ...(rewardMax != null ? { lte: rewardMax } : {}),
-            },
-          }
+          reward: {
+            ...(rewardMin != null ? { gte: rewardMin } : {}),
+            ...(rewardMax != null ? { lte: rewardMax } : {}),
+          },
+        }
         : {}),
       ...(typeof statusId === 'number' ? { statusId } : {}),
       ...(finalDateBefore || finalDateAfter
         ? {
-            finalDate: {
-              ...(finalDateAfter ? { gte: new Date(finalDateAfter) } : {}),
-              ...(finalDateBefore ? { lte: new Date(finalDateBefore) } : {}),
-            },
-          }
+          finalDate: {
+            ...(finalDateAfter ? { gte: new Date(finalDateAfter) } : {}),
+            ...(finalDateBefore ? { lte: new Date(finalDateBefore) } : {}),
+          },
+        }
         : {}),
       ...(typeof userId === 'number' ? { UserId: userId } : {}),
     };
@@ -115,7 +115,7 @@ export class QuestsService {
       const avgExperience =
         adventurers.length > 0
           ? adventurers.reduce((sum, a) => sum + (a.experience ?? 0), 0) /
-            adventurers.length
+          adventurers.length
           : 0;
       return { ...quest, avgExperience };
     });
@@ -145,8 +145,26 @@ export class QuestsService {
       where: { id },
       include: {
         status: true,
-        adventurers: true,
-        questStockEquipments: true,
+        adventurers: {
+          include: {
+            speciality: true,
+            equipmentTypes: true,
+            consumableTypes: true,
+          }
+        },
+        questStockEquipments: {
+          include: {
+            equipmentStock: {
+              include: {
+                equipment: {
+                  include: {
+                    equipmentType: true,
+                  }
+                },
+              }
+            },
+          }
+        },
         questConsumables: {
           include: {
             consumable: { include: { consumableType: true } },
@@ -224,10 +242,10 @@ export class QuestsService {
           : undefined,
         questStockEquipments: dto.equipmentStockIds?.length
           ? {
-              create: dto.equipmentStockIds.map((equipmentStockId) => ({
-                equipmentStockId,
-              })),
-            }
+            create: dto.equipmentStockIds.map((equipmentStockId) => ({
+              equipmentStockId,
+            })),
+          }
           : undefined,
       },
       include: {
@@ -509,14 +527,14 @@ export class QuestsService {
     });
     const tx = equipmentStockIds.length
       ? [
-          deletePromise,
-          this.prisma.questStockEquipment.createMany({
-            data: equipmentStockIds.map((equipmentStockId) => ({
-              questId,
-              equipmentStockId,
-            })),
-          }),
-        ]
+        deletePromise,
+        this.prisma.questStockEquipment.createMany({
+          data: equipmentStockIds.map((equipmentStockId) => ({
+            questId,
+            equipmentStockId,
+          })),
+        }),
+      ]
       : [deletePromise];
     await this.prisma.$transaction(tx);
     return this.findOne(questId);

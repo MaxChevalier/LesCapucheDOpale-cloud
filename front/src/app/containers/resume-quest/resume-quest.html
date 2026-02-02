@@ -1,3 +1,4 @@
+@if (quest) {
 <h2>{{quest.name}}</h2>
 <div class="status">{{quest.status.name}}</div>
 <div class="quest-details">
@@ -62,22 +63,22 @@
         <span id="succes">{{ successRate }}%</span>
     </div>
     <div assign-container>
-        @for (adventurer of adventurers; track adventurer.id) {
-        <app-item-adventurer (click)="onToggleAdventurer(adventurer)" [adventurer]="adventurer"
-            [isSelected]="selectedAdventurerIds.has(adventurer.id)">
-        </app-item-adventurer>
+        @for (adventurer of quest.adventurers; track adventurer.id) {
+        <app-item-adventurer [adventurer]="adventurer" />
         } @empty {
-        <p>Aucun aventurier trouvé</p>
+        <p>Aucun aventurier assigné</p>
         }
     </div>
     <div assign-container>
-        @for (equipment of equipments; track equipment.id) {
-        <app-item-stock-equipment (click)="onToggleEquipment(equipment)" [equipment]="equipment"
-            [isSelected]="selectedEquipmentIds.has(equipment.id)">
-        </app-item-stock-equipment>
+        @for (equipment of quest.questStockEquipments; track equipment.equipmentStock.id) {
+        <app-item-stock-equipment [equipment]="equipment.equipmentStock" />
         } @empty {
-        <p>Aucun equipment trouvé</p>
+        <p>Aucun équipement assigné</p>
         }
     </div>
-    <button (click)="startQuest()" [disabled]="selectedAdventurerIds.size === 0">Démarrer la quête</button>
+    @if (quest.status.id === 4) {
+        <button (click)="finish(true)">Réussite de la quête</button>
+        <button (click)="finish(false)">Échec de la quête</button>
+    }
 </div>
+}

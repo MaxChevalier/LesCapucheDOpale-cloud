@@ -14,7 +14,11 @@ export interface Quest {
     UserId: number;
     status: Status;
     adventurers: Adventurer[];
-    questStockEquipments: StockEquipment[];
+    questStockEquipments: QuestStockEquipment[];
+}
+
+interface QuestStockEquipment {
+    equipmentStock: StockEquipment;
 }
 
 export interface QuestForm {

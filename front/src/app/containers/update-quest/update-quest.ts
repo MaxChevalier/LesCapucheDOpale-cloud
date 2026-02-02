@@ -37,8 +37,20 @@ export class UpdateQuest implements OnInit {
 
     this.questService.getQuestById(this.id).subscribe((quest) => {
       this.quest = quest;
-      if (this.quest.statusId === 2) {
+      switch (this.quest.statusId) {
+      case 2: // Validée
         this.router.navigate(['/quest', this.id, 'assign']);
+        return;
+      case 4: // En cours
+      case 7: // Terminée
+      case 6: // Refusée
+      case 5: // Abandonnée
+      case 3: // Echec
+        this.router.navigate(['/quest', this.id, 'resume']);
+        return;
+      default:
+        // Reste sur la page de mise à jour
+        break;
       }
     });
   }

@@ -130,7 +130,7 @@ describe('EquipmentService', () => {
 
     const req = httpMock.expectOne('/api/equipment-stocks');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ equipmentId, durability: quantity });
+    expect(req.request.body).toEqual({ equipmentId, quantity });
     req.flush({});
   });
 

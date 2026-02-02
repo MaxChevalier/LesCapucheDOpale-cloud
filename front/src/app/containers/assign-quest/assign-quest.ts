@@ -58,7 +58,7 @@ export class AssignQuest implements OnInit {
         (sum, a) => sum + a.dailyRate * quest.estimatedDuration,
         0
       );
-      this.selectedEquipmentIds = new Set<number>(quest.questStockEquipments.map(e => e.id));
+      this.selectedEquipmentIds = new Set<number>(quest.questStockEquipments.map(e => e.equipmentStock.id));
       for (const adventurer of quest.adventurers) {
         this.successRateForAdventurer[adventurer.id] = Math.min(
           this.quest.recommendedXP,
@@ -135,5 +135,13 @@ export class AssignQuest implements OnInit {
     const totalSuccess = Object.values(this.successRateForAdventurer).reduce((sum, rate) => sum + rate, 0);
     const totalAdventurers = Object.keys(this.successRateForAdventurer).length;
     return totalAdventurers > 0 ? Math.round((Math.min(1, totalSuccess / Math.max(1,totalAdventurers*0.8)) * 80) * 100) / 100 : 0;
+  }
+
+  startQuest() {
+    this.questService.startQuest(this.id).subscribe({
+      next: () => {
+        this.router.navigate(['/quest/', this.id]);
+      }
+    });
   }
 }

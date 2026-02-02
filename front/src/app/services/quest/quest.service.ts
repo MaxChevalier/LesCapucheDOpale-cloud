@@ -39,6 +39,14 @@ export class QuestService {
     return this.http.patch<void>(`${this.baseUrl}/${id}/abandon`, {});
   }
 
+  startQuest(id: number): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/${id}/start`, {});
+  }
+
+  finishQuest(id: number, isSuccess: boolean): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/${id}/finish`, { isSuccess });
+  }
+
   assignAdventurer(questId: number, adventurerId: number): Observable<void> {
     return this.http.patch<void>(`${this.baseUrl}/${questId}/adventurers/attach`, { "ids": [adventurerId] });
   }

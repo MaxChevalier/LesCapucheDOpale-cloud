@@ -43,8 +43,8 @@ export class EquipmentService {
 
   createEquipmentStock(equipmentId: number, quantity: number) {
     return this.http.post(`/api/equipment-stocks`, {
-      equipmentId: equipmentId,
-      durability: quantity,
+      equipmentId,
+      quantity,
     });
   }
 
