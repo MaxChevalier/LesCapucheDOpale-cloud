@@ -102,32 +102,58 @@ export class EquipmentStocksController {
       type: 'object',
       properties: {
         equipmentId: { type: 'number', example: 12 },
-        quantity: { type: 'number', example: 25 },
+        quantity: { type: 'number', example: 5, description: 'Number of items to create (default: 1)' },
       },
       required: ['equipmentId'],
       additionalProperties: false,
     },
   })
   @ApiCreatedResponse({
-    description: 'Equipment stock created',
+    description: 'Equipment stock(s) created',
     schema: {
-      type: 'object',
-      properties: {
-        id: { type: 'number', example: 3 },
-        equipmentId: { type: 'number', example: 12 },
-        quantity: { type: 'number', example: 25 },
-        available: { type: 'number', example: 25 },
-        createdAt: {
-          type: 'string',
-          format: 'date-time',
-          example: '2025-10-30T12:00:00.000Z',
+      oneOf: [
+        {
+          type: 'object',
+          description: 'Single equipment stock (when quantity is 1 or omitted)',
+          properties: {
+            id: { type: 'number', example: 3 },
+            equipmentId: { type: 'number', example: 12 },
+            durability: { type: 'number', example: 100 },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              example: '2025-10-30T12:00:00.000Z',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+              example: '2025-10-30T12:00:00.000Z',
+            },
+          },
         },
-        updatedAt: {
-          type: 'string',
-          format: 'date-time',
-          example: '2025-10-30T12:00:00.000Z',
+        {
+          type: 'array',
+          description: 'Array of equipment stocks (when quantity > 1)',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'number', example: 3 },
+              equipmentId: { type: 'number', example: 12 },
+              durability: { type: 'number', example: 100 },
+              createdAt: {
+                type: 'string',
+                format: 'date-time',
+                example: '2025-10-30T12:00:00.000Z',
+              },
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+                example: '2025-10-30T12:00:00.000Z',
+              },
+            },
+          },
         },
-      },
+      ],
     },
   })
   create(@Body() dto: CreateEquipmentStockDto) {

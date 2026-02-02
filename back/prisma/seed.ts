@@ -35,22 +35,19 @@ async function main() {
     prisma.role.create({ data: { name: ROLES.CLIENT } }),
   ]);
 
-  await Promise.all([
-    prisma.status.create({ data: { name: STATUSES.STATUS_WAITING } }),
-    prisma.status.create({ data: { name: STATUSES.STATUS_VALIDATED } }),
-    prisma.status.create({ data: { name: STATUSES.STATUS_FAILED } }),
-    prisma.status.create({ data: { name: STATUSES.STATUS_STARTED } }),
-    prisma.status.create({ data: { name: STATUSES.STATUS_CANCELLED } }),
-    prisma.status.create({ data: { name: STATUSES.STATUS_REFUSED } }),
-    prisma.status.create({ data: { name: STATUSES.STATUS_SUCCEEDED } }),
-  ]);
+    await prisma.status.create({ data: { name: STATUSES.STATUS_WAITING } });
+    await prisma.status.create({ data: { name: STATUSES.STATUS_VALIDATED } });
+    await prisma.status.create({ data: { name: STATUSES.STATUS_FAILED } });
+    await prisma.status.create({ data: { name: STATUSES.STATUS_STARTED } });
+    await prisma.status.create({ data: { name: STATUSES.STATUS_CANCELLED } });
+    await prisma.status.create({ data: { name: STATUSES.STATUS_REFUSED } });
+    await prisma.status.create({ data: { name: STATUSES.STATUS_SUCCEEDED } });
 
 
-  await Promise.all([
-    prisma.equipmentStatus.create({ data: { name: EQUIPMENT_STATUSES.AVAILABLE } }),
-    prisma.equipmentStatus.create({ data: { name: EQUIPMENT_STATUSES.BORROWED } }),
-    prisma.equipmentStatus.create({ data: { name: EQUIPMENT_STATUSES.BROKEN } }),
-  ]);
+    await prisma.equipmentStatus.create({ data: { name: EQUIPMENT_STATUSES.AVAILABLE } });
+    await prisma.equipmentStatus.create({ data: { name: EQUIPMENT_STATUSES.BORROWED } });
+    await prisma.equipmentStatus.create({ data: { name: EQUIPMENT_STATUSES.BROKEN } });
+
 
 
 }

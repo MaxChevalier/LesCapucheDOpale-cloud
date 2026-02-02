@@ -52,6 +52,36 @@ describe('EquipmentStocksService', () => {
       expect(res).toEqual(expect.objectContaining({ id: 1, equipmentId: 1 }));
     });
 
+    it('should create multiple equipment stocks when quantity > 1', async () => {
+      const dto: CreateEquipmentStockDto = { equipmentId: 1, quantity: 3 };
+      mockPrisma.equipment.findUnique.mockResolvedValue({ id: 1, maxDurability: 100 });
+      mockPrisma.equipmentStock.create
+        .mockResolvedValueOnce({ id: 1, equipmentId: 1, durability: 100 })
+        .mockResolvedValueOnce({ id: 2, equipmentId: 1, durability: 100 })
+        .mockResolvedValueOnce({ id: 3, equipmentId: 1, durability: 100 });
+
+      const res = await service.create(dto);
+
+      expect(mockPrisma.equipmentStock.create).toHaveBeenCalledTimes(3);
+      expect(Array.isArray(res)).toBe(true);
+      expect(res).toHaveLength(3);
+    });
+
+    it('should return single object when quantity is 1', async () => {
+      const dto: CreateEquipmentStockDto = { equipmentId: 1, quantity: 1 };
+      mockPrisma.equipment.findUnique.mockResolvedValue({ id: 1, maxDurability: 100 });
+      mockPrisma.equipmentStock.create.mockResolvedValue({
+        id: 1,
+        equipmentId: 1,
+        durability: 100,
+      });
+
+      const res = await service.create(dto);
+
+      expect(mockPrisma.equipmentStock.create).toHaveBeenCalledTimes(1);
+      expect(Array.isArray(res)).toBe(false);
+    });
+
     it('should throw NotFoundException if equipment does not exist', async () => {
       const dto: CreateEquipmentStockDto = { equipmentId: 999 };
       mockPrisma.equipment.findUnique.mockResolvedValue(null);

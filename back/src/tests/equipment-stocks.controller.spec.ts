@@ -53,6 +53,18 @@ describe('EquipmentStocksController', () => {
     expect(mockService.create).toHaveBeenCalledWith(dto);
   });
 
+  it('should call service.create with dto and quantity', () => {
+    const dto: CreateEquipmentStockDto = { equipmentId: 1, quantity: 3 };
+    const result = [
+      { id: 1, equipmentId: 1, durability: 100 },
+      { id: 2, equipmentId: 1, durability: 100 },
+      { id: 3, equipmentId: 1, durability: 100 },
+    ];
+    mockService.create.mockReturnValue(result);
+    expect(controller.create(dto)).toEqual(result);
+    expect(mockService.create).toHaveBeenCalledWith(dto);
+  });
+
   it('should call service.update with id and dto', () => {
     const dto: UpdateEquipmentStockDto = { equipmentId: 2 };
     mockService.update.mockReturnValue({ id: 1, ...dto });

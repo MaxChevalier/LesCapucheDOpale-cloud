@@ -11,13 +11,21 @@ export class EquipmentStocksService {
 
   async create(dto: CreateEquipmentStockDto) {
     const equipment = await this.findEquipment(dto.equipmentId);
-    return this.prisma.equipmentStock.create({
-      data: {
-        equipmentId: dto.equipmentId,
-        durability: equipment.maxDurability,
-      },
-      include: equipmentStockInclude,
-    });
+    const quantity = dto.quantity ?? 1;
+
+    const createdStocks = await Promise.all(
+      Array.from({ length: quantity }, () =>
+        this.prisma.equipmentStock.create({
+          data: {
+            equipmentId: dto.equipmentId,
+            durability: equipment.maxDurability,
+          },
+          include: equipmentStockInclude,
+        }),
+      ),
+    );
+
+    return quantity === 1 ? createdStocks[0] : createdStocks;
   }
 
   findAll() {
