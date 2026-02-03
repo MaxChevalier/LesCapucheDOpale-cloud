@@ -1,71 +1,81 @@
-<form (ngSubmit)="onSubmit()" [formGroup]="consumableForm" novalidate>
-  <label for="name">Nom du consomable:</label>
-  <input id="name" formControlName="name" />
-  @if (name.invalid && (name.dirty || name.touched)) {
-  @if (name.errors?.['required']) {
-  <div class="error"><small>Le nom est requis.</small></div>
-  }
-  @if (name.errors?.['minlength']) {
-  <div class="error"><small>Le nom doit contenir au moins 3 caractères.</small></div>
-  }
-  }
+<form class="form-main" [formGroup]="consumableForm" (ngSubmit)="onSubmit()">
+  <span class="left">
+    <div class="form-group">
+      <label for="name">Nom du consommable :</label>
+      <input class="commun-input" id="name" formControlName="name" placeholder="Ex: Potion de soin" />
 
-  <label for="type">Type d'consomable:</label>
-  <select id="type" formControlName="consumableTypeId">
-    <option value="" disabled>Choisissez un type</option>
-    @for (type of consumableTypes; track type.id) {
-    <option [value]="type.id">{{ type.name }}</option>
-    }
-  </select>
-  <button type="button" class="add-type-btn" (click)="showTypePopup = true">
-    Ajouter un type d'consomable
-  </button>
-
-  @if (showTypePopup) {
-  <div class="popup-backdrop">
-    <div class="popup">
-      <h3>Nouveau type d'consomable</h3>
-
-      <input type="text" formControlName="newTypeName" placeholder="Nom du type" />
-
-      <div class="popup-actions">
-        <button type="button" (click)="addNewConsumableType()">Ajouter</button>
-        <button type="button" (click)="cancelPopup()">Annuler</button>
-      </div>
-
-      @if(newTypeError) {
-      <p class="error">{{ newTypeError }}</p>
+      @if ((consumableForm.get('name')?.touched || consumableForm.get('name')?.dirty) && consumableForm.get('name')?.invalid) {
+        @if (consumableForm.get('name')?.errors?.['required']) {
+          <p class="error">Le nom est requis.</p>
+        }
+        @if (consumableForm.get('name')?.errors?.['minlength']) {
+          <p class="error">Le nom doit contenir au moins 3 caractères.</p>
+        }
       }
     </div>
-  </div>
-  }
-  @if (consumableTypeId.invalid && (consumableTypeId.dirty || consumableTypeId.touched)) {
-  @if (consumableTypeId.errors?.['required']) {
-  <div class="error"><small>Le type d'consomable est requis.</small></div>
-  }
-  }
 
-  <app-form-money label="Coût du consomable : " [money]="getMoney()" (moneyChange)="setMoney($event)"></app-form-money>
-  @if (cost.invalid && (cost.dirty || cost.touched)) {
-  @if (cost.errors?.['required']) {
-  <div class="error"><small>Le coût est requis.</small></div>
-  }
-  @if (cost.errors?.['min']) {
-  <div class="error"><small>Le coût doit être supérieur ou égal à 0.</small></div>
-  }
-  }
+    <app-form-money label="Coût du consommable : " [money]="getMoney()" (moneyChange)="setMoney($event)"></app-form-money>
 
-  @if (!initialData){
-    <label for="quantity">Quantité :</label>
-    <input id="quantity" type="number" formControlName="quantity" />
-    @if (quantity.invalid && (quantity.dirty || quantity.touched)) {
-      @if (quantity.errors?.['required']) {
-      <div class="error"><small>La quantité est requise.</small></div>
-      }
-      @if (quantity.errors?.['min']) {
-      <div class="error"><small>La quantité doit être au moins 1.</small></div>
-      }
+    @if ((consumableForm.get('cost')?.touched || consumableForm.get('cost')?.dirty) && consumableForm.get('cost')?.invalid) {
+      <p class="error">Le coût est requis et doit être positif.</p>
     }
-  }
-  <button type="submit" [disabled]="consumableForm.invalid">Submit</button>
+
+    @if (!initialData){
+      <div class="form-group">
+        <label for="quantity">Quantité :</label>
+        <input class="commun-input" id="quantity" type="number" formControlName="quantity" />
+
+        @if ((consumableForm.get('quantity')?.touched || consumableForm.get('quantity')?.dirty) && consumableForm.get('quantity')?.invalid) {
+          <p class="error">La quantité est requise (1 caractère min).</p>
+        }
+      </div>
+    }
+
+    <button class="submit-btn commun-btn" type="submit" [disabled]="consumableForm.invalid">
+      {{ initialData ? "Modifier" : "Ajouter" }} le consommable
+    </button>
+  </span>
+
+  <span class="right">
+    <div class="form-group">
+      <label for="type">Type de consommable :</label>
+
+      <mat-form-field class="custom-form-field">
+        <mat-select placeholder="Choisir un type" id="type" formControlName="consumableTypeId" panelClass="select-panel">
+          @for (type of consumableTypes; track type.id) {
+            <mat-option [value]="type.id">{{ type.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <button type="button" class="add-type-btn commun-btn" (click)="showTypePopup = true">
+        Ajouter un type de consommable
+      </button>
+
+      @if (showTypePopup) {
+        <div class="popup-backdrop">
+        <div class="popup">
+          <div class="inner-form">
+            <h3>Nouveau type de consommable</h3>
+
+            <input class="commun-input" type="text" formControlName="newTypeName" placeholder="Nom du type" />
+
+            <div class="popup-actions">
+              <button class="commun-btn" type="button" (click)="addNewConsumableType()">Ajouter</button>
+              <button class="commun-btn annuler" type="button" (click)="cancelPopup()">Annuler</button>
+            </div>
+
+            @if(newTypeError) {
+              <p class="error">{{ newTypeError }}</p>
+            }
+          </div>
+        </div>
+      </div>
+      }
+
+      @if ((consumableForm.get('consumableTypeId')?.touched || consumableForm.get('consumableTypeId')?.dirty) && consumableForm.get('consumableTypeId')?.invalid) {
+        <p class="error">Le type de consommable est requis.</p>
+      }
+    </div>
+  </span>
 </form>

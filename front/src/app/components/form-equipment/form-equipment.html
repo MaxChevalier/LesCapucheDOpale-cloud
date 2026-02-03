@@ -1,71 +1,79 @@
-<form (ngSubmit)="onSubmit()" [formGroup]="equipmentForm" novalidate>
-  <label for="name">Nom de l'équipement:</label>
-  <input id="name" formControlName="name" />
-  @if (name.invalid && (name.dirty || name.touched)) {
-  @if (name.errors?.['required']) {
-  <div class="error"><small>Le nom est requis.</small></div>
-  }
-  @if (name.errors?.['minlength']) {
-  <div class="error"><small>Le nom doit contenir au moins 3 caractères.</small></div>
-  }
-  }
+<form class="form-main" [formGroup]="equipmentForm" (ngSubmit)="onSubmit()">
+  <span class="left">
+    <div class="form-group">
+      <label for="name">Nom de l'équipement :</label>
+      <input class="commun-input" id="name" formControlName="name" placeholder="Ex: Épée longue" />
 
-  <label for="type">Type d'équipement:</label>
-  <select id="type" formControlName="equipmentTypeId">
-    <option value="" disabled>Choisissez un type</option>
-    @for (type of equipmentTypes; track type.id) {
-    <option [value]="type.id">{{ type.name }}</option>
-    }
-  </select>
-  <button type="button" class="add-type-btn" (click)="showTypePopup = true">
-    Ajouter un type d'équipement
-  </button>
-
-  @if (showTypePopup) {
-  <div class="popup-backdrop">
-    <div class="popup">
-      <h3>Nouveau type d'équipement</h3>
-
-      <input type="text" formControlName="newTypeName" placeholder="Nom du type" />
-
-      <div class="popup-actions">
-        <button type="button" (click)="addNewEquipmentType()">Ajouter</button>
-        <button type="button" (click)="cancelPopup()">Annuler</button>
-      </div>
-
-      @if(newTypeError) {
-      <p class="error">{{ newTypeError }}</p>
+      @if ((equipmentForm.get('name')?.touched || equipmentForm.get('name')?.dirty) && equipmentForm.get('name')?.invalid) {
+        @if (equipmentForm.get('name')?.errors?.['required']) {
+          <p class="error">Le nom est requis.</p>
+        }
+        @if (equipmentForm.get('name')?.errors?.['minlength']) {
+          <p class="error">Le nom doit contenir au moins 3 caractères.</p>
+        }
       }
     </div>
-  </div>
-  }
-  @if (equipmentTypeId.invalid && (equipmentTypeId.dirty || equipmentTypeId.touched)) {
-  @if (equipmentTypeId.errors?.['required']) {
-  <div class="error"><small>Le type d'équipement est requis.</small></div>
-  }
-  }
 
-  <app-form-money label="Coût de l'équipement : " [money]="getMoney()"
-    (moneyChange)="setMoney($event)"></app-form-money>
-  @if (cost.invalid && (cost.dirty || cost.touched)) {
-  @if (cost.errors?.['required']) {
-  <div class="error"><small>Le coût est requis.</small></div>
-  }
-  @if (cost.errors?.['min']) {
-  <div class="error"><small>Le coût doit être supérieur ou égal à 0.</small></div>
-  }
-  }
+    <app-form-money label="Coût de l'équipement : " [money]="getMoney()" (moneyChange)="setMoney($event)"></app-form-money>
 
-  <label for="maxDurability">Durabilité maximale:</label>
-  <input id="maxDurability" type="number" formControlName="maxDurability" />
-  @if (maxDurability.invalid && (maxDurability.dirty || maxDurability.touched)) {
-  @if (maxDurability.errors?.['required']) {
-  <div class="error"><small>La durabilité est requise.</small></div>
-  }
-  @if (maxDurability.errors?.['min']) {
-  <div class="error"><small>La durabilité doit être au moins 1.</small></div>
-  }
-  }
+    @if ((equipmentForm.get('cost')?.touched || equipmentForm.get('cost')?.dirty) && equipmentForm.get('cost')?.invalid) {
+      <p class="error">Le coût est requis.</p>
+    }
 
-  <button type="submit" [disabled]="equipmentForm.invalid">Submit</button>
+    <div class="form-group">
+      <label for="maxDurability">Durabilité maximale :</label>
+      <input class="commun-input" id="maxDurability" type="number" formControlName="maxDurability" />
+
+      @if ((equipmentForm.get('maxDurability')?.touched || equipmentForm.get('maxDurability')?.dirty) && equipmentForm.get('maxDurability')?.invalid) {
+        <p class="error">La durabilité est requise (1 caractère min).</p>
+      }
+    </div>
+
+    <button class="submit-btn commun-btn" type="submit" [disabled]="equipmentForm.invalid">
+      {{ initialData ? "Modifier" : "Ajouter" }} l'équipement
+    </button>
+  </span>
+
+  <span class="right">
+    <div class="form-group">
+      <label for="type">Type d'équipement :</label>
+
+      <mat-form-field class="custom-form-field">
+        <mat-select placeholder="Choisir un type" id="type" formControlName="equipmentTypeId" panelClass="select-panel">
+          @for (type of equipmentTypes; track type.id) {
+            <mat-option [value]="type.id">{{ type.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <button type="button" class="add-type-btn commun-btn" (click)="showTypePopup = true">
+        Ajouter un type d'équipement
+      </button>
+
+      @if (showTypePopup) {
+        <div class="popup-backdrop">
+        <div class="popup">
+          <div class="inner-form">
+            <h3>Nouveau type d'équipement</h3>
+
+            <input class="commun-input" type="text" formControlName="newTypeName" placeholder="Nom du type" />
+
+            <div class="popup-actions">
+              <button class="commun-btn" type="button" (click)="addNewEquipmentType()">Ajouter</button>
+              <button class="commun-btn annuler" type="button" (click)="cancelPopup()">Annuler</button>
+            </div>
+
+            @if(newTypeError) {
+              <p class="error">{{ newTypeError }}</p>
+            }
+          </div>
+        </div>
+      </div>
+      }
+
+      @if ((equipmentForm.get('equipmentTypeId')?.touched || equipmentForm.get('equipmentTypeId')?.dirty) && equipmentForm.get('equipmentTypeId')?.invalid) {
+        <p class="error">Le type d'équipement est requis.</p>
+      }
+    </div>
+  </span>
 </form>

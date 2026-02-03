@@ -1,9 +1,11 @@
-<a routerLink="/equipment/new" routerLinkActive="active">Nouvel Équipement</a>
-<div class="container">
+<section class="container">
+  <a  class="btn-new-equipment commun-btn" routerLink="/equipment/new" routerLinkActive="active">Nouvel Équipement</a>
+  <div class="container-equipments">
     @for (equipment of equipments; track equipment.id) {
-        <app-item-equipment [equipment]="equipment" (quantityChange)="onQuantityChange(equipment.id, $event)"></app-item-equipment>
+      <app-item-equipment [equipment]="equipment" (quantityChange)="onQuantityChange(equipment.id, $event)"></app-item-equipment>
     } @empty {
-        <p>Aucun élément</p>
+      <p>Aucun élément</p>
     }
-</div>
-<button (click)="onPurchase()">Ajouter au stock</button>
+  </div>
+  <button class="btn-new-equipment-add-stock commun-btn" (click)="onPurchase()">Ajouter au stock</button>
+</section>

@@ -4,10 +4,12 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { EquipmentService } from '../../services/equipment/equipment.service';
 import { forkJoin } from 'rxjs';
 import { FormMoney } from '../form-money/form-money';
+import { MatFormField } from "@angular/material/input";
+import { MatOption, MatSelect } from "@angular/material/select";
 
 @Component({
   selector: 'app-form-equipment',
-  imports: [ReactiveFormsModule, FormMoney],
+  imports: [ReactiveFormsModule, FormMoney, MatFormField, MatSelect, MatOption],
   templateUrl: './form-equipment.html',
   styleUrl: './form-equipment.scss',
 })

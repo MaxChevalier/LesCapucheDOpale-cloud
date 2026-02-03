@@ -4,10 +4,12 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ConsumableService } from '../../services/consumable/consumable.service';
 import { forkJoin } from 'rxjs';
 import { FormMoney } from '../form-money/form-money';
+import {MatFormField} from "@angular/material/input";
+import {MatOption, MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-form-consumable',
-  imports: [ReactiveFormsModule, FormMoney],
+  imports: [ReactiveFormsModule, FormMoney, MatFormField, MatSelect, MatOption],
   templateUrl: './form-consumable.html',
   styleUrl: './form-consumable.scss',
 })

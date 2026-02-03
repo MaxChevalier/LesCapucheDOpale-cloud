@@ -5,13 +5,13 @@ import { StockEquipment } from '../../models/stock-equipment';
 import { RouterLink } from '@angular/router';
 import { Consumable } from '../../models/consumable';
 import { ConsumableService } from '../../services/consumable/consumable.service';
-import { ItemConsumable } from '../../components/item-consumable/item-consumable';
+import { ItemStockConsumable } from "../../components/item-stock-consumable/item-stock-consumable";
 
 @Component({
   selector: 'app-stock',
   imports: [
     ItemStockEquipment,
-    ItemConsumable,
+    ItemStockConsumable,
     RouterLink
   ],
   templateUrl: './stock.html',

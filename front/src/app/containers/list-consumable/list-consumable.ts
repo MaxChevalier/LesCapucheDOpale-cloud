@@ -4,12 +4,14 @@ import { ConsumableService } from '../../services/consumable/consumable.service'
 import { Router, RouterLink } from '@angular/router';
 import { ItemConsumable } from '../../components/item-consumable/item-consumable';
 import { forkJoin } from 'rxjs';
+import {ItemAdventurer} from "../../components/item-adventurer/item-adventurer";
 
 @Component({
   selector: 'app-list-consumable',
   imports: [
     ItemConsumable,
     RouterLink,
+    ItemAdventurer,
   ],
   templateUrl: './list-consumable.html',
   styleUrl: './list-consumable.scss',
