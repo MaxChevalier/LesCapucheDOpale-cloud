@@ -80,7 +80,8 @@ module database 'modules/database.bicep' = {
 }
 
 // Variables pour les connection strings (construites ici pour éviter les secrets dans les outputs)
-var sqlConnectionString = 'Server=tcp:${database.outputs.serverFqdn},1433;Initial Catalog=${database.outputs.databaseName};Persist Security Info=False;User ID=${sqlAdminLogin};Password=${sqlAdminPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+// Format Prisma SQL Server: sqlserver://host:port;database=name;user=user;password=pass;...
+var sqlConnectionString = 'sqlserver://${database.outputs.serverFqdn}:1433;database=${database.outputs.databaseName};user=${sqlAdminLogin};password=${sqlAdminPassword};encrypt=true;trustServerCertificate=false'
 
 // Web App - App Service pour héberger NestJS (Backend) et Angular (Frontend)
 module webApp 'modules/webapp.bicep' = {
