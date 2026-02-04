@@ -102,6 +102,9 @@ module webApp 'modules/webapp.bicep' = {
 // Stocker les secrets dans Key Vault
 module keyVaultSecrets 'modules/keyvault-secrets.bicep' = {
   name: 'deploy-keyvault-secrets'
+  dependsOn: [
+    storage  // Attendre que le storage soit créé avant d'appeler listKeys()
+  ]
   params: {
     keyVaultName: keyVault.outputs.keyVaultName
     secrets: [
