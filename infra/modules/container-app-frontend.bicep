@@ -1,4 +1,4 @@
-// container-app-frontend.bicep - Module Container App pour le Frontend
+// container-app-frontend.bicep - Module Container App pour le Frontend (Docker Hub)
 
 @description('Nom du Container App')
 param name string
@@ -12,16 +12,12 @@ param tags object
 @description('ID de l\'environnement Container Apps')
 param containerAppsEnvironmentId string
 
-@description('URL du registre de conteneurs')
-param containerRegistryUrl string
+@description('Nom d\'utilisateur Docker Hub')
+param dockerHubUsername string
 
-@description('Nom d\'utilisateur du registre')
+@description('Token Docker Hub')
 @secure()
-param containerRegistryUsername string
-
-@description('Mot de passe du registre')
-@secure()
-param containerRegistryPassword string
+param dockerHubPassword string
 
 @description('Tag de l\'image')
 param imageTag string
@@ -49,15 +45,15 @@ resource frontendApp 'Microsoft.App/containerApps@2023-05-01' = {
       }
       secrets: [
         {
-          name: 'registry-password'
-          value: containerRegistryPassword
+          name: 'dockerhub-password'
+          value: dockerHubPassword
         }
       ]
       registries: [
         {
-          server: containerRegistryUrl
-          username: containerRegistryUsername
-          passwordSecretRef: 'registry-password'
+          server: 'docker.io'
+          username: dockerHubUsername
+          passwordSecretRef: 'dockerhub-password'
         }
       ]
     }
@@ -65,7 +61,7 @@ resource frontendApp 'Microsoft.App/containerApps@2023-05-01' = {
       containers: [
         {
           name: 'web'
-          image: '${containerRegistryUrl}/capuchesdopale-web:${imageTag}'
+          image: 'docker.io/${dockerHubUsername}/capuchesdopale-web:${imageTag}'
           resources: {
             cpu: json('0.25')
             memory: '0.5Gi'

@@ -1,4 +1,4 @@
-// container-app-backend.bicep - Module Container App pour le Backend API
+// container-app-backend.bicep - Module Container App pour le Backend API (Docker Hub)
 
 @description('Nom du Container App')
 param name string
@@ -12,16 +12,12 @@ param tags object
 @description('ID de l\'environnement Container Apps')
 param containerAppsEnvironmentId string
 
-@description('URL du registre de conteneurs')
-param containerRegistryUrl string
+@description('Nom d\'utilisateur Docker Hub')
+param dockerHubUsername string
 
-@description('Nom d\'utilisateur du registre')
+@description('Token Docker Hub')
 @secure()
-param containerRegistryUsername string
-
-@description('Mot de passe du registre')
-@secure()
-param containerRegistryPassword string
+param dockerHubPassword string
 
 @description('Tag de l\'image')
 param imageTag string
@@ -73,8 +69,8 @@ resource backendApp 'Microsoft.App/containerApps@2023-05-01' = {
       }
       secrets: [
         {
-          name: 'registry-password'
-          value: containerRegistryPassword
+          name: 'dockerhub-password'
+          value: dockerHubPassword
         }
         {
           name: 'database-url'
@@ -95,9 +91,9 @@ resource backendApp 'Microsoft.App/containerApps@2023-05-01' = {
       ]
       registries: [
         {
-          server: containerRegistryUrl
-          username: containerRegistryUsername
-          passwordSecretRef: 'registry-password'
+          server: 'docker.io'
+          username: dockerHubUsername
+          passwordSecretRef: 'dockerhub-password'
         }
       ]
     }
@@ -105,7 +101,7 @@ resource backendApp 'Microsoft.App/containerApps@2023-05-01' = {
       containers: [
         {
           name: 'api'
-          image: '${containerRegistryUrl}/capuchesdopale-api:${imageTag}'
+          image: 'docker.io/${dockerHubUsername}/capuchesdopale-api:${imageTag}'
           resources: {
             cpu: json('0.5')
             memory: '1Gi'

@@ -20,7 +20,7 @@ on:
 env:
   AZURE_RESOURCE_GROUP: rg-capuchesdopale-${{ github.event.inputs.environment || 'dev' }}
   AZURE_LOCATION: francecentral
-  REGISTRY_URL: ${{ secrets.ACR_LOGIN_SERVER }}
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
@@ -85,12 +85,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Login to Azure Container Registry
-        uses: azure/docker-login@v1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -103,8 +102,8 @@ jobs:
           file: ./back/Dockerfile
           push: true
           tags: |
-            ${{ secrets.ACR_LOGIN_SERVER }}/capuchesdopale-api:${{ env.IMAGE_TAG }}
-            ${{ secrets.ACR_LOGIN_SERVER }}/capuchesdopale-api:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/capuchesdopale-api:${{ env.IMAGE_TAG }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/capuchesdopale-api:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -116,8 +115,8 @@ jobs:
           file: ./front/Dockerfile
           push: true
           tags: |
-            ${{ secrets.ACR_LOGIN_SERVER }}/capuchesdopale-web:${{ env.IMAGE_TAG }}
-            ${{ secrets.ACR_LOGIN_SERVER }}/capuchesdopale-web:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/capuchesdopale-web:${{ env.IMAGE_TAG }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/capuchesdopale-web:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -167,9 +166,8 @@ jobs:
             sqlAdminPassword=${{ secrets.SQL_ADMIN_PASSWORD }}
             jwtSecret=${{ secrets.JWT_SECRET }}
             jwtSecretAdmin=${{ secrets.JWT_SECRET_ADMIN }}
-            containerRegistryUrl=${{ secrets.ACR_LOGIN_SERVER }}
-            containerRegistryUsername=${{ secrets.ACR_USERNAME }}
-            containerRegistryPassword=${{ secrets.ACR_PASSWORD }}
+            dockerHubUsername=${{ secrets.DOCKERHUB_USERNAME }}
+            dockerHubPassword=${{ secrets.DOCKERHUB_TOKEN }}
             backendImageTag=${{ env.IMAGE_TAG }}
             frontendImageTag=${{ env.IMAGE_TAG }}
           failOnStdErr: false

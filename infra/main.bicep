@@ -39,16 +39,12 @@ param backendImageTag string = 'latest'
 @description('Tag de l\'image Docker pour le frontend')
 param frontendImageTag string = 'latest'
 
-@description('URL du registre de conteneurs')
-param containerRegistryUrl string
+@description('Nom d\'utilisateur Docker Hub')
+param dockerHubUsername string
 
-@description('Nom d\'utilisateur du registre de conteneurs')
+@description('Token Docker Hub')
 @secure()
-param containerRegistryUsername string
-
-@description('Mot de passe du registre de conteneurs')
-@secure()
-param containerRegistryPassword string
+param dockerHubPassword string
 
 // ============================================================================
 // VARIABLES
@@ -143,9 +139,8 @@ module backendApp 'modules/container-app-backend.bicep' = {
     location: location
     tags: tags
     containerAppsEnvironmentId: containerAppsEnv.outputs.environmentId
-    containerRegistryUrl: containerRegistryUrl
-    containerRegistryUsername: containerRegistryUsername
-    containerRegistryPassword: containerRegistryPassword
+    dockerHubUsername: dockerHubUsername
+    dockerHubPassword: dockerHubPassword
     imageTag: backendImageTag
     databaseConnectionString: sqlDatabase.outputs.connectionString
     jwtSecret: jwtSecret
@@ -163,9 +158,8 @@ module frontendApp 'modules/container-app-frontend.bicep' = {
     location: location
     tags: tags
     containerAppsEnvironmentId: containerAppsEnv.outputs.environmentId
-    containerRegistryUrl: containerRegistryUrl
-    containerRegistryUsername: containerRegistryUsername
-    containerRegistryPassword: containerRegistryPassword
+    dockerHubUsername: dockerHubUsername
+    dockerHubPassword: dockerHubPassword
     imageTag: frontendImageTag
     backendUrl: backendApp.outputs.fqdn
   }

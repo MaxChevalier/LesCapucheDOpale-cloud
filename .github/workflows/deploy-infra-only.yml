@@ -55,9 +55,8 @@ jobs:
                 sqlAdminPassword=${{ secrets.SQL_ADMIN_PASSWORD }} \
                 jwtSecret=${{ secrets.JWT_SECRET }} \
                 jwtSecretAdmin=${{ secrets.JWT_SECRET_ADMIN }} \
-                containerRegistryUrl=${{ secrets.ACR_LOGIN_SERVER }} \
-                containerRegistryUsername=${{ secrets.ACR_USERNAME }} \
-                containerRegistryPassword=${{ secrets.ACR_PASSWORD }}
+                dockerHubUsername=${{ secrets.DOCKERHUB_USERNAME }} \
+                dockerHubPassword=${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Create Resource Group
         uses: azure/cli@v1
@@ -81,9 +80,8 @@ jobs:
             sqlAdminPassword=${{ secrets.SQL_ADMIN_PASSWORD }}
             jwtSecret=${{ secrets.JWT_SECRET }}
             jwtSecretAdmin=${{ secrets.JWT_SECRET_ADMIN }}
-            containerRegistryUrl=${{ secrets.ACR_LOGIN_SERVER }}
-            containerRegistryUsername=${{ secrets.ACR_USERNAME }}
-            containerRegistryPassword=${{ secrets.ACR_PASSWORD }}
+            dockerHubUsername=${{ secrets.DOCKERHUB_USERNAME }}
+            dockerHubPassword=${{ secrets.DOCKERHUB_TOKEN }}
             backendImageTag=latest
             frontendImageTag=latest
           failOnStdErr: false
