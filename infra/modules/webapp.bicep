@@ -1,10 +1,10 @@
 // ============================================================================
 // Azure App Service Module - Web Apps pour Backend et Frontend
 // Optimisé pour Azure for Students
-// IMPORTANT: F1 (Free) ne supporte qu'UN site par plan, donc 2 plans séparés
+// Note: B1 (Basic) permet plusieurs sites par plan (~13€/mois, couvert par crédits Student)
 // ============================================================================
 
-@description('Nom du App Service Plan Backend')
+@description('Nom du App Service Plan')
 param appServicePlanName string
 
 @description('Nom de l\'application backend (NestJS)')
@@ -37,34 +37,17 @@ param jwtSecret string
 param keyVaultUri string
 
 // ============================================================================
-// App Service Plan Backend (Linux) - F1 gratuit pour Azure Student
+// App Service Plan (Linux) - B1 Basic pour Azure Student
+// B1 permet plusieurs sites et always-on (~13€/mois)
 // ============================================================================
-resource appServicePlanBackend 'Microsoft.Web/serverfarms@2023-01-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: appServicePlanName
   location: location
   tags: tags
   kind: 'linux'
   sku: {
-    name: 'F1'      // Gratuit pour Azure Student
-    tier: 'Free'
-  }
-  properties: {
-    reserved: true  // Required for Linux
-  }
-}
-
-// ============================================================================
-// App Service Plan Frontend (Linux) - F1 gratuit pour Azure Student
-// Note: F1 ne supporte qu'UN site par plan, donc plan séparé
-// ============================================================================
-resource appServicePlanFrontend 'Microsoft.Web/serverfarms@2023-01-01' = {
-  name: '${appServicePlanName}-front'
-  location: location
-  tags: tags
-  kind: 'linux'
-  sku: {
-    name: 'F1'      // Gratuit pour Azure Student
-    tier: 'Free'
+    name: 'B1'      // Basic - permet plusieurs sites
+    tier: 'Basic'
   }
   properties: {
     reserved: true  // Required for Linux
@@ -83,7 +66,7 @@ resource backendApp 'Microsoft.Web/sites@2023-01-01' = {
     type: 'SystemAssigned'
   }
   properties: {
-    serverFarmId: appServicePlanBackend.id
+    serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
       linuxFxVersion: 'NODE|20-lts'
@@ -146,7 +129,7 @@ resource frontendApp 'Microsoft.Web/sites@2023-01-01' = {
   tags: tags
   kind: 'app,linux'
   properties: {
-    serverFarmId: appServicePlanFrontend.id
+    serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
       linuxFxVersion: 'NODE|20-lts'
