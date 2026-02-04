@@ -17,10 +17,13 @@ import { AuthModule } from './modules/auth.module';
 import { RolesModule } from './modules/roles.module';
 import { FinancesModule } from './modules/finances.module';
 import { AdventurerAvailabilityModule } from './modules/adventurer-availability.module';
+import { UploadModule } from './modules/upload.module';
+import { AzureKeyVaultModule } from './modules/azure-keyvault.module';
 
 @Module({
   imports: [
     PrismaModule,
+    AzureKeyVaultModule,
     AuthModule,
     UsersModule,
     QuestsModule,
@@ -36,6 +39,7 @@ import { AdventurerAvailabilityModule } from './modules/adventurer-availability.
     RolesModule,
     FinancesModule,
     AdventurerAvailabilityModule,
+    UploadModule,
     AuthModule,
   ],
   controllers: [AppController],

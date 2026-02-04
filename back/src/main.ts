@@ -1,12 +1,57 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { dump as yamlDump } from 'js-yaml';
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { DefaultAzureCredential } from '@azure/identity';
+import { SecretClient } from '@azure/keyvault-secrets';
+
+async function loadKeyVaultSecrets(): Promise<void> {
+  const logger = new Logger('KeyVault');
+  const vaultUrl = process.env.AZURE_KEYVAULT_URL;
+
+  if (!vaultUrl) {
+    logger.warn('AZURE_KEYVAULT_URL not set - skipping Key Vault initialization');
+    return;
+  }
+
+  try {
+    logger.log(`Connecting to Key Vault: ${vaultUrl}`);
+    const credential = new DefaultAzureCredential();
+    const client = new SecretClient(vaultUrl, credential);
+
+    const secretMappings: Record<string, string> = {
+      'DATABASE-URL': 'DATABASE_URL',
+      'JWT-SECRET': 'JWT_SECRET',
+      'AZURE-STORAGE-CONNECTION-STRING': 'AZURE_STORAGE_CONNECTION_STRING',
+      'AZURE-STORAGE-ACCOUNT-NAME': 'AZURE_STORAGE_ACCOUNT_NAME',
+    };
+
+    for (const [secretName, envVarName] of Object.entries(secretMappings)) {
+      try {
+        if (!process.env[envVarName]) {
+          const secret = await client.getSecret(secretName);
+          if (secret.value) {
+            process.env[envVarName] = secret.value;
+            logger.log(`Loaded secret: ${secretName} -> ${envVarName}`);
+          }
+        }
+      } catch (error) {
+        logger.warn(`Could not load secret ${secretName}: ${error}`);
+      }
+    }
+
+    logger.log('Key Vault secrets loaded successfully');
+  } catch (error) {
+    logger.error('Failed to initialize Key Vault:', error);
+  }
+}
 
 async function bootstrap() {
+  await loadKeyVaultSecrets();
+
   const app = await NestFactory.create(AppModule, { cors: true });
 
   const config = new DocumentBuilder()
