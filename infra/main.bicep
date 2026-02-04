@@ -51,6 +51,7 @@ param dockerHubPassword string
 // ============================================================================
 
 var resourcePrefix = '${projectName}-${environment}'
+var uniqueSuffix = uniqueString(resourceGroup().id)
 var tags = {
   project: projectName
   environment: environment
@@ -91,7 +92,7 @@ module appConfig 'modules/appconfig.bicep' = {
 module storage 'modules/storage.bicep' = {
   name: 'storage-deployment'
   params: {
-    name: 'st${replace(resourcePrefix, '-', '')}'
+    name: 'st${replace(projectName, '-', '')}${uniqueSuffix}'
     location: location
     tags: tags
   }
@@ -131,6 +132,15 @@ module containerAppsEnv 'modules/container-apps-env.bicep' = {
   }
 }
 
+// Reference to storage account for key retrieval
+resource storageAccountRef 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+  name: storage.outputs.storageAccountName
+}
+
+// Construct connection strings (avoid exposing in module outputs)
+var databaseConnectionString = 'sqlserver://${sqlDatabase.outputs.serverFqdn}:1433;database=${sqlDatabase.outputs.databaseName};user=${sqlAdminUsername};password=${sqlAdminPassword};encrypt=true;trustServerCertificate=false'
+var storageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storage.outputs.storageAccountName};AccountKey=${storageAccountRef.listKeys().keys[0].value};EndpointSuffix=${az.environment().suffixes.storage}'
+
 // Module Backend Container App
 module backendApp 'modules/container-app-backend.bicep' = {
   name: 'backendApp-deployment'
@@ -142,10 +152,10 @@ module backendApp 'modules/container-app-backend.bicep' = {
     dockerHubUsername: dockerHubUsername
     dockerHubPassword: dockerHubPassword
     imageTag: backendImageTag
-    databaseConnectionString: sqlDatabase.outputs.connectionString
+    databaseConnectionString: databaseConnectionString
     jwtSecret: jwtSecret
     jwtSecretAdmin: jwtSecretAdmin
-    storageConnectionString: storage.outputs.connectionString
+    storageConnectionString: storageConnectionString
     appConfigEndpoint: appConfig.outputs.endpoint
   }
 }
@@ -173,7 +183,7 @@ module functionApp 'modules/function-app.bicep' = {
     location: location
     tags: tags
     storageAccountName: storage.outputs.storageAccountName
-    storageAccountKey: storage.outputs.storageAccountKey
+    storageAccountKey: storageAccountRef.listKeys().keys[0].value
     logAnalyticsWorkspaceId: logAnalytics.outputs.workspaceId
   }
 }

@@ -99,8 +99,5 @@ output serverFqdn string = sqlServer.properties.fullyQualifiedDomainName
 @description('Nom de la base de données')
 output databaseName string = sqlDatabase.name
 
-@description('Chaîne de connexion ADO.NET')
-output connectionStringAdoNet string = 'Server=tcp:${sqlServer.properties.fullyQualifiedDomainName},1433;Initial Catalog=${databaseName};Persist Security Info=False;User ID=${adminUsername};Password=${adminPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-
-@description('Chaîne de connexion Prisma SQL Server')
-output connectionString string = 'sqlserver://${sqlServer.properties.fullyQualifiedDomainName}:1433;database=${databaseName};user=${adminUsername};password=${adminPassword};encrypt=true;trustServerCertificate=false'
+// Note: Connection strings are constructed in main.bicep to avoid exposing
+// secrets in module outputs. The FQDN is provided above for this purpose.

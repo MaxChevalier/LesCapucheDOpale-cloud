@@ -161,8 +161,5 @@ output blobEndpoint string = storageAccount.properties.primaryEndpoints.blob
 @description('Endpoint du Table Storage')
 output tableEndpoint string = storageAccount.properties.primaryEndpoints.table
 
-@description('Chaîne de connexion du Storage Account')
-output connectionString string = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
-
-@description('Clé du Storage Account')
-output storageAccountKey string = storageAccount.listKeys().keys[0].value
+// Note: Connection string and key are accessed directly in consuming modules
+// to avoid exposing secrets in outputs. Use listKeys() at deployment time.

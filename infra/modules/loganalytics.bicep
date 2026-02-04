@@ -45,6 +45,3 @@ output workspaceName string = logAnalyticsWorkspace.name
 
 @description('ID du client Log Analytics')
 output customerId string = logAnalyticsWorkspace.properties.customerId
-
-@description('Clé primaire du workspace')
-output primarySharedKey string = logAnalyticsWorkspace.listKeys().primarySharedKey
