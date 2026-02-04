@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.39.26.7824",
-      "templateHash": "12072452177085125499"
+      "templateHash": "3514306540518392301"
     }
   },
   "parameters": {
@@ -98,7 +98,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.39.26.7824",
-              "templateHash": "2914510214909283161"
+              "templateHash": "6155291124634880513"
             }
           },
           "parameters": {
@@ -137,7 +137,6 @@
                 "enableRbacAuthorization": true,
                 "enableSoftDelete": true,
                 "softDeleteRetentionInDays": 7,
-                "enablePurgeProtection": false,
                 "publicNetworkAccess": "Enabled",
                 "networkAcls": {
                   "defaultAction": "Allow",
@@ -529,7 +528,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.39.26.7824",
-              "templateHash": "4688542476073707989"
+              "templateHash": "687086679133788479"
             }
           },
           "parameters": {
@@ -603,8 +602,8 @@
               "tags": "[parameters('tags')]",
               "kind": "linux",
               "sku": {
-                "name": "F1",
-                "tier": "Free"
+                "name": "B1",
+                "tier": "Basic"
               },
               "properties": {
                 "reserved": true
@@ -767,6 +766,10 @@
               {
                 "name": "JwtSecret",
                 "value": "[parameters('jwtSecret')]"
+              },
+              {
+                "name": "StorageConnectionString",
+                "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', reference(resourceId('Microsoft.Resources/deployments', 'deploy-storage'), '2025-04-01').outputs.storageAccountName.value, environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', format('st{0}', variables('resourcePrefixClean'))), '2023-01-01').keys[0].value)]"
               }
             ]
           }
@@ -814,7 +817,8 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'deploy-database')]",
-        "[resourceId('Microsoft.Resources/deployments', 'deploy-keyvault')]"
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-keyvault')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-storage')]"
       ]
     }
   ],
