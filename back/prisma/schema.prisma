@@ -130,10 +130,10 @@ model Transaction {
 model QuestStockEquipment {
   id               Int            @id @default(autoincrement())
   questId          Int
-  quest            Quest          @relation(fields: [questId], references: [id])
+  quest            Quest          @relation(fields: [questId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   equipmentStockId Int
-  equipmentStock   EquipmentStock @relation(fields: [equipmentStockId], references: [id])
-  Equipment        Equipment?     @relation(fields: [equipmentId], references: [id])
+  equipmentStock   EquipmentStock @relation(fields: [equipmentStockId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Equipment        Equipment?     @relation(fields: [equipmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   equipmentId      Int?
 
   @@unique([questId, equipmentStockId])

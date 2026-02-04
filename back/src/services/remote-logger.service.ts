@@ -27,7 +27,9 @@ export class RemoteLoggerService implements LoggerService {
       this.localLogger.log(`Remote logging enabled: ${this.functionUrl}`);
       this.startFlushTimer();
     } else {
-      this.localLogger.warn('LOG_FUNCTION_URL not set - remote logging disabled');
+      this.localLogger.warn(
+        'LOG_FUNCTION_URL not set - remote logging disabled',
+      );
     }
   }
 
@@ -75,7 +77,9 @@ export class RemoteLoggerService implements LoggerService {
     this.addToBuffer('debug', message, context);
   }
 
-  setLogLevels(_levels: LogLevel[]): void {}
+  setLogLevels(levels: LogLevel[]): void {
+    void levels;
+  }
 
   private addToBuffer(
     level: LogEntry['level'],
@@ -162,4 +166,3 @@ export class RemoteLoggerService implements LoggerService {
     }
   }
 }
-

@@ -91,4 +91,3 @@ export class AzureKeyVaultService implements OnModuleInit {
     return this.secretClient !== null;
   }
 }
-

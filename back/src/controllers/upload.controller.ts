@@ -19,14 +19,15 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { AzureStorageService, UploadResult } from '../services/azure-storage.service';
-
+import {
+  AzureStorageService,
+  UploadResult,
+} from '../services/azure-storage.service';
 
 @ApiTags('Upload')
 @Controller('upload')
 export class UploadController {
   constructor(private readonly azureStorageService: AzureStorageService) {}
-
 
   @Post()
   @ApiOperation({ summary: 'Upload a file to Azure Blob Storage' })
@@ -60,7 +61,10 @@ export class UploadController {
       },
     },
   })
-  @ApiResponse({ status: 400, description: 'Bad request - No file provided or upload failed' })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - No file provided or upload failed',
+  })
   @ApiBearerAuth()
   @UseInterceptors(
     FileInterceptor('file', {
@@ -144,7 +148,12 @@ export class UploadController {
         fileSize: 5 * 1024 * 1024, // 5MB max for images
       },
       fileFilter: (_req, file, callback) => {
-        const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        const allowedMimes = [
+          'image/jpeg',
+          'image/png',
+          'image/gif',
+          'image/webp',
+        ];
 
         if (allowedMimes.includes(file.mimetype)) {
           callback(null, true);
@@ -203,7 +212,6 @@ export class UploadController {
     };
   }
 
-
   @Get('list')
   @ApiOperation({ summary: 'List files in a container' })
   @ApiResponse({
@@ -221,14 +229,13 @@ export class UploadController {
     return this.azureStorageService.listBlobs(containerName);
   }
 
-
   @Get('status')
   @ApiOperation({ summary: 'Check Azure Storage connection status' })
   @ApiResponse({
     status: 200,
     description: 'Storage status',
   })
-  async getStatus(): Promise<{ available: boolean; message: string }> {
+  getStatus(): { available: boolean; message: string } {
     const available = this.azureStorageService.isAvailable();
     return {
       available,

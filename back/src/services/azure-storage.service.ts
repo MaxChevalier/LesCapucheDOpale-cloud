@@ -149,7 +149,8 @@ export class AzureStorageService {
       const containerName = options.containerName || this.defaultContainerName;
       const containerClient = await this.getContainerClient(containerName);
 
-      const blobName = options.customBlobName || this.generateBlobName(fileName);
+      const blobName =
+        options.customBlobName || this.generateBlobName(fileName);
       const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
       await blockBlobClient.uploadData(buffer, {
@@ -177,17 +178,15 @@ export class AzureStorageService {
     }
   }
 
-  async deleteBlob(
-    blobName: string,
-    containerName?: string,
-  ): Promise<boolean> {
+  async deleteBlob(blobName: string, containerName?: string): Promise<boolean> {
     if (!this.blobServiceClient) {
       return false;
     }
 
     try {
       const container = containerName || this.defaultContainerName;
-      const containerClient = this.blobServiceClient.getContainerClient(container);
+      const containerClient =
+        this.blobServiceClient.getContainerClient(container);
       const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
       await blockBlobClient.deleteIfExists();
@@ -206,7 +205,8 @@ export class AzureStorageService {
 
     try {
       const container = containerName || this.defaultContainerName;
-      const containerClient = this.blobServiceClient.getContainerClient(container);
+      const containerClient =
+        this.blobServiceClient.getContainerClient(container);
       const blobs: string[] = [];
 
       for await (const blob of containerClient.listBlobsFlat()) {
@@ -220,4 +220,3 @@ export class AzureStorageService {
     }
   }
 }
-
