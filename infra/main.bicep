@@ -113,6 +113,10 @@ module keyVaultSecrets 'modules/keyvault-secrets.bicep' = {
         name: 'JwtSecret'
         value: jwtSecret
       }
+      {
+        name: 'StorageConnectionString'
+        value: 'DefaultEndpointsProtocol=https;AccountName=${storage.outputs.storageAccountName};EndpointSuffix=${az.environment().suffixes.storage};AccountKey=${listKeys(storage.outputs.storageAccountId, '2023-01-01').keys[0].value}'
+      }
     ]
   }
 }

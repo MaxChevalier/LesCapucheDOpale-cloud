@@ -10,10 +10,10 @@ import { SecretClient } from '@azure/keyvault-secrets';
 
 async function loadKeyVaultSecrets(): Promise<void> {
   const logger = new Logger('KeyVault');
-  const vaultUrl = process.env.AZURE_KEYVAULT_URL;
+  const vaultUrl = process.env.AZURE_KEYVAULT_URI;
 
   if (!vaultUrl) {
-    logger.warn('AZURE_KEYVAULT_URL not set - skipping Key Vault initialization');
+    logger.warn('AZURE_KEYVAULT_URI not set - skipping Key Vault initialization');
     return;
   }
 
@@ -23,10 +23,9 @@ async function loadKeyVaultSecrets(): Promise<void> {
     const client = new SecretClient(vaultUrl, credential);
 
     const secretMappings: Record<string, string> = {
-      'DATABASE-URL': 'DATABASE_URL',
-      'JWT-SECRET': 'JWT_SECRET',
-      'AZURE-STORAGE-CONNECTION-STRING': 'AZURE_STORAGE_CONNECTION_STRING',
-      'AZURE-STORAGE-ACCOUNT-NAME': 'AZURE_STORAGE_ACCOUNT_NAME',
+      'SqlConnectionString': 'DATABASE_URL',
+      'JwtSecret': 'JWT_SECRET',
+      'StorageConnectionString': 'AZURE_STORAGE_CONNECTION_STRING',
     };
 
     for (const [secretName, envVarName] of Object.entries(secretMappings)) {

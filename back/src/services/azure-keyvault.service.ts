@@ -13,11 +13,11 @@ export class AzureKeyVaultService implements OnModuleInit {
   }
 
   private async initialize(): Promise<void> {
-    const vaultUrl = process.env.AZURE_KEYVAULT_URL;
+    const vaultUrl = process.env.AZURE_KEYVAULT_URI;
 
     if (!vaultUrl) {
       this.logger.warn(
-        'AZURE_KEYVAULT_URL not set. Key Vault integration disabled.',
+        'AZURE_KEYVAULT_URI not set. Key Vault integration disabled.',
       );
       return;
     }
@@ -36,9 +36,9 @@ export class AzureKeyVaultService implements OnModuleInit {
 
   private async preloadSecrets(): Promise<void> {
     const secretNames = [
-      'DATABASE-URL',
-      'JWT-SECRET',
-      'AZURE-STORAGE-CONNECTION-STRING',
+      'SqlConnectionString',
+      'JwtSecret',
+      'StorageConnectionString',
     ];
 
     for (const name of secretNames) {
