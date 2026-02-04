@@ -1,22 +1,36 @@
-// ============================================================================
-// Azure Key Vault Module
-// Stockage sécurisé des secrets
-// ============================================================================
+// keyvault.bicep - Module Azure Key Vault pour la gestion sécurisée des secrets
 
 @description('Nom du Key Vault')
-param keyVaultName string
+param name string
 
-@description('Région Azure')
+@description('Localisation')
 param location string
 
 @description('Tags des ressources')
 param tags object
 
+@description('Nom d\'utilisateur administrateur SQL')
+@secure()
+param sqlAdminUsername string
+
+@description('Mot de passe administrateur SQL')
+@secure()
+param sqlAdminPassword string
+
+@description('Secret JWT')
+@secure()
+param jwtSecret string
+
+@description('Secret JWT Admin')
+@secure()
+param jwtSecretAdmin string
+
 // ============================================================================
-// Key Vault
+// KEY VAULT
 // ============================================================================
+
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: keyVaultName
+  name: name
   location: location
   tags: tags
   properties: {
@@ -25,10 +39,12 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
       name: 'standard'
     }
     tenantId: subscription().tenantId
-    enableRbacAuthorization: true       // Utiliser RBAC au lieu des access policies
+    enabledForDeployment: true
+    enabledForDiskEncryption: true
+    enabledForTemplateDeployment: true
+    enableRbacAuthorization: true
     enableSoftDelete: true
-    softDeleteRetentionInDays: 7        // Minimum pour réduire les coûts
-    // Note: enablePurgeProtection omis intentionnellement (false par défaut pour dev)
+    softDeleteRetentionInDays: 7
     publicNetworkAccess: 'Enabled'
     networkAcls: {
       defaultAction: 'Allow'
@@ -38,8 +54,66 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
 }
 
 // ============================================================================
-// Outputs
+// SECRETS
 // ============================================================================
-output keyVaultId string = keyVault.id
-output keyVaultUri string = keyVault.properties.vaultUri
+
+resource sqlAdminUsernameSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: keyVault
+  name: 'sql-admin-username'
+  properties: {
+    value: sqlAdminUsername
+    contentType: 'text/plain'
+    attributes: {
+      enabled: true
+    }
+  }
+}
+
+resource sqlAdminPasswordSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: keyVault
+  name: 'sql-admin-password'
+  properties: {
+    value: sqlAdminPassword
+    contentType: 'text/plain'
+    attributes: {
+      enabled: true
+    }
+  }
+}
+
+resource jwtSecretResource 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: keyVault
+  name: 'jwt-secret'
+  properties: {
+    value: jwtSecret
+    contentType: 'text/plain'
+    attributes: {
+      enabled: true
+    }
+  }
+}
+
+resource jwtSecretAdminResource 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: keyVault
+  name: 'jwt-secret-admin'
+  properties: {
+    value: jwtSecretAdmin
+    contentType: 'text/plain'
+    attributes: {
+      enabled: true
+    }
+  }
+}
+
+// ============================================================================
+// OUTPUTS
+// ============================================================================
+
+@description('Nom du Key Vault')
 output keyVaultName string = keyVault.name
+
+@description('URI du Key Vault')
+output keyVaultUri string = keyVault.properties.vaultUri
+
+@description('ID de la ressource Key Vault')
+output keyVaultId string = keyVault.id

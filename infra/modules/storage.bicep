@@ -1,34 +1,53 @@
-// ============================================================================
-// Azure Storage Account Module - Blob Storage
-// Optimisé pour Azure for Students
-// ============================================================================
+// storage.bicep - Module Azure Storage Account pour le Blob Storage
 
-@description('Nom du compte de stockage (3-24 caractères, minuscules et chiffres uniquement)')
-param storageAccountName string
+@description('Nom du Storage Account (doit être unique globalement)')
+param name string
 
-@description('Région Azure')
+@description('Localisation')
 param location string
 
 @description('Tags des ressources')
 param tags object
 
 // ============================================================================
-// Storage Account
+// STORAGE ACCOUNT
 // ============================================================================
+
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: storageAccountName
+  name: name
   location: location
   tags: tags
   kind: 'StorageV2'
   sku: {
-    name: 'Standard_LRS'    // Le moins cher - stockage local uniquement
+    name: 'Standard_LRS'
   }
   properties: {
     accessTier: 'Hot'
-    supportsHttpsTrafficOnly: true
-    minimumTlsVersion: 'TLS1_2'
-    allowBlobPublicAccess: false
+    allowBlobPublicAccess: true
     allowSharedKeyAccess: true
+    minimumTlsVersion: 'TLS1_2'
+    supportsHttpsTrafficOnly: true
+    encryption: {
+      services: {
+        blob: {
+          enabled: true
+          keyType: 'Account'
+        }
+        file: {
+          enabled: true
+          keyType: 'Account'
+        }
+        table: {
+          enabled: true
+          keyType: 'Account'
+        }
+        queue: {
+          enabled: true
+          keyType: 'Account'
+        }
+      }
+      keySource: 'Microsoft.Storage'
+    }
     networkAcls: {
       defaultAction: 'Allow'
       bypass: 'AzureServices'
@@ -37,8 +56,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 }
 
 // ============================================================================
-// Blob Service
+// BLOB SERVICES
 // ============================================================================
+
 resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01' = {
   parent: storageAccount
   name: 'default'
@@ -46,9 +66,9 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01'
     cors: {
       corsRules: [
         {
-          allowedOrigins: ['*']
-          allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
           allowedHeaders: ['*']
+          allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS']
+          allowedOrigins: ['*']
           exposedHeaders: ['*']
           maxAgeInSeconds: 3600
         }
@@ -62,41 +82,87 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01'
 }
 
 // ============================================================================
-// Blob Containers
+// CONTAINERS
 // ============================================================================
 
-// Container pour les uploads généraux
 resource uploadsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
   parent: blobService
   name: 'uploads'
   properties: {
-    publicAccess: 'None'
+    publicAccess: 'Blob'
+    metadata: {
+      description: 'Container for user uploads'
+    }
   }
 }
 
-// Container pour les documents de quêtes
-resource questsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
+resource avatarsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
   parent: blobService
-  name: 'quest-documents'
+  name: 'avatars'
   properties: {
-    publicAccess: 'None'
+    publicAccess: 'Blob'
+    metadata: {
+      description: 'Container for adventurer avatars'
+    }
   }
 }
 
-// Container pour les profils d'aventuriers
-resource adventurersContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
+resource documentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
   parent: blobService
-  name: 'adventurer-profiles'
+  name: 'documents'
   properties: {
     publicAccess: 'None'
+    metadata: {
+      description: 'Container for private documents'
+    }
+  }
+}
+
+resource questFilesContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
+  parent: blobService
+  name: 'quest-files'
+  properties: {
+    publicAccess: 'None'
+    metadata: {
+      description: 'Container for quest-related files'
+    }
   }
 }
 
 // ============================================================================
-// Outputs
+// TABLE SERVICES (pour les logs Azure Function)
 // ============================================================================
-output storageAccountId string = storageAccount.id
+
+resource tableService 'Microsoft.Storage/storageAccounts/tableServices@2023-01-01' = {
+  parent: storageAccount
+  name: 'default'
+  properties: {}
+}
+
+resource logsTable 'Microsoft.Storage/storageAccounts/tableServices/tables@2023-01-01' = {
+  parent: tableService
+  name: 'ApplicationLogs'
+  properties: {}
+}
+
+// ============================================================================
+// OUTPUTS
+// ============================================================================
+
+@description('Nom du Storage Account')
 output storageAccountName string = storageAccount.name
+
+@description('ID du Storage Account')
+output storageAccountId string = storageAccount.id
+
+@description('Endpoint du Blob Storage')
 output blobEndpoint string = storageAccount.properties.primaryEndpoints.blob
 
-// Note: La connection string est construite dans le module webapp via listKeys()
+@description('Endpoint du Table Storage')
+output tableEndpoint string = storageAccount.properties.primaryEndpoints.table
+
+@description('Chaîne de connexion du Storage Account')
+output connectionString string = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
+
+@description('Clé du Storage Account')
+output storageAccountKey string = storageAccount.listKeys().keys[0].value

@@ -1,135 +1,210 @@
+// main.bicep - Infrastructure principale Azure pour Les Capuches d'Opale
+// Architecture 3-tiers : Frontend (Container App) + Backend (Container App) + Database (Azure SQL)
+
+targetScope = 'resourceGroup'
+
 // ============================================================================
-// Main Bicep Template - Les Capuches d'Opale
-// Architecture 3-tiers : Frontend Angular + Backend NestJS + Database + Storage
-// Optimisé pour Azure for Students (France Central)
+// PARAMETERS
 // ============================================================================
 
-@description('Nom du projet (utilisé comme préfixe pour les ressources)')
-param projectName string = 'capucheopale'
+@description('Nom du projet')
+param projectName string = 'capuchesdopale'
 
 @description('Environnement de déploiement')
-@allowed(['dev', 'prod'])
+@allowed(['dev', 'staging', 'prod'])
 param environment string = 'dev'
 
-@description('Région Azure - France Central pour Azure Student')
+@description('Localisation des ressources')
 param location string = 'francecentral'
 
-@description('Login administrateur SQL Server')
+@description('Nom d\'utilisateur administrateur SQL')
 @secure()
-param sqlAdminLogin string
+param sqlAdminUsername string
 
-@description('Mot de passe administrateur SQL Server')
+@description('Mot de passe administrateur SQL')
 @secure()
 param sqlAdminPassword string
 
-@description('Secret JWT pour l\'authentification')
+@description('Secret JWT')
 @secure()
 param jwtSecret string
 
-@description('Date de déploiement (générée automatiquement)')
-param deploymentDate string = utcNow('yyyy-MM-dd')
+@description('Secret JWT Admin')
+@secure()
+param jwtSecretAdmin string
+
+@description('Tag de l\'image Docker pour le backend')
+param backendImageTag string = 'latest'
+
+@description('Tag de l\'image Docker pour le frontend')
+param frontendImageTag string = 'latest'
+
+@description('URL du registre de conteneurs')
+param containerRegistryUrl string
+
+@description('Nom d\'utilisateur du registre de conteneurs')
+@secure()
+param containerRegistryUsername string
+
+@description('Mot de passe du registre de conteneurs')
+@secure()
+param containerRegistryPassword string
 
 // ============================================================================
-// Variables
+// VARIABLES
 // ============================================================================
+
 var resourcePrefix = '${projectName}-${environment}'
-var resourcePrefixClean = replace(resourcePrefix, '-', '') // Pour Storage Account (pas de tirets)
-
 var tags = {
-  Project: 'LesCapuchesDOpale'
-  Environment: environment
-  ManagedBy: 'Bicep'
-  DeployedAt: deploymentDate
+  project: projectName
+  environment: environment
+  managedBy: 'bicep'
 }
 
 // ============================================================================
-// Modules
+// MODULES
 // ============================================================================
 
-// Key Vault - Stockage sécurisé des secrets
+// Module Key Vault pour la gestion des secrets
 module keyVault 'modules/keyvault.bicep' = {
-  name: 'deploy-keyvault'
+  name: 'keyVault-deployment'
   params: {
-    keyVaultName: 'kv-${resourcePrefix}'
+    name: 'kv-${replace(resourcePrefix, '-', '')}'
     location: location
     tags: tags
+    sqlAdminUsername: sqlAdminUsername
+    sqlAdminPassword: sqlAdminPassword
+    jwtSecret: jwtSecret
+    jwtSecretAdmin: jwtSecretAdmin
   }
 }
 
-// Storage Account - Blob Storage pour les fichiers
+// Module App Configuration pour la centralisation des paramètres
+module appConfig 'modules/appconfig.bicep' = {
+  name: 'appConfig-deployment'
+  params: {
+    name: 'appconfig-${resourcePrefix}'
+    location: location
+    tags: tags
+    environment: environment
+    keyVaultName: keyVault.outputs.keyVaultName
+  }
+}
+
+// Module Storage Account pour le Blob Storage
 module storage 'modules/storage.bicep' = {
-  name: 'deploy-storage'
+  name: 'storage-deployment'
   params: {
-    storageAccountName: 'st${resourcePrefixClean}'
+    name: 'st${replace(resourcePrefix, '-', '')}'
     location: location
     tags: tags
   }
 }
 
-// SQL Database - Base de données Azure SQL
-module database 'modules/database.bicep' = {
-  name: 'deploy-database'
+// Module Azure SQL Database
+module sqlDatabase 'modules/sqldatabase.bicep' = {
+  name: 'sqlDatabase-deployment'
   params: {
     serverName: 'sql-${resourcePrefix}'
-    databaseName: 'guilddb'
+    databaseName: 'guild-db'
     location: location
     tags: tags
-    administratorLogin: sqlAdminLogin
-    administratorPassword: sqlAdminPassword
+    adminUsername: sqlAdminUsername
+    adminPassword: sqlAdminPassword
   }
 }
 
-// Variables pour les connection strings (construites ici pour éviter les secrets dans les outputs)
-// Format Prisma SQL Server: sqlserver://host:port;database=name;user=user;password=pass;...
-var sqlConnectionString = 'sqlserver://${database.outputs.serverFqdn}:1433;database=${database.outputs.databaseName};user=${sqlAdminLogin};password=${sqlAdminPassword};encrypt=true;trustServerCertificate=false'
-
-// Web App - App Service pour héberger NestJS (Backend) et Angular (Frontend)
-module webApp 'modules/webapp.bicep' = {
-  name: 'deploy-webapp'
+// Module Log Analytics pour la surveillance
+module logAnalytics 'modules/loganalytics.bicep' = {
+  name: 'logAnalytics-deployment'
   params: {
-    appServicePlanName: 'plan-${resourcePrefix}'
-    backendAppName: 'api-${resourcePrefix}'
-    frontendAppName: 'web-${resourcePrefix}'
+    name: 'log-${resourcePrefix}'
     location: location
     tags: tags
-    databaseConnectionString: sqlConnectionString
-    storageAccountName: storage.outputs.storageAccountName
-    storageBlobEndpoint: storage.outputs.blobEndpoint
+  }
+}
+
+// Module Container Apps Environment
+module containerAppsEnv 'modules/container-apps-env.bicep' = {
+  name: 'containerAppsEnv-deployment'
+  params: {
+    name: 'cae-${resourcePrefix}'
+    location: location
+    tags: tags
+    logAnalyticsWorkspaceId: logAnalytics.outputs.workspaceId
+  }
+}
+
+// Module Backend Container App
+module backendApp 'modules/container-app-backend.bicep' = {
+  name: 'backendApp-deployment'
+  params: {
+    name: 'ca-${resourcePrefix}-api'
+    location: location
+    tags: tags
+    containerAppsEnvironmentId: containerAppsEnv.outputs.environmentId
+    containerRegistryUrl: containerRegistryUrl
+    containerRegistryUsername: containerRegistryUsername
+    containerRegistryPassword: containerRegistryPassword
+    imageTag: backendImageTag
+    databaseConnectionString: sqlDatabase.outputs.connectionString
     jwtSecret: jwtSecret
-    keyVaultUri: keyVault.outputs.keyVaultUri
+    jwtSecretAdmin: jwtSecretAdmin
+    storageConnectionString: storage.outputs.connectionString
+    appConfigEndpoint: appConfig.outputs.endpoint
   }
 }
 
-// Stocker les secrets dans Key Vault
-module keyVaultSecrets 'modules/keyvault-secrets.bicep' = {
-  name: 'deploy-keyvault-secrets'
-  dependsOn: [
-    storage  // Attendre que le storage soit créé avant d'appeler listKeys()
-  ]
+// Module Frontend Container App
+module frontendApp 'modules/container-app-frontend.bicep' = {
+  name: 'frontendApp-deployment'
   params: {
-    keyVaultName: keyVault.outputs.keyVaultName
-    secrets: [
-      {
-        name: 'SqlConnectionString'
-        value: sqlConnectionString
-      }
-      {
-        name: 'JwtSecret'
-        value: jwtSecret
-      }
-      {
-        name: 'StorageConnectionString'
-        value: 'DefaultEndpointsProtocol=https;AccountName=${storage.outputs.storageAccountName};EndpointSuffix=${az.environment().suffixes.storage};AccountKey=${listKeys(resourceId('Microsoft.Storage/storageAccounts', 'st${resourcePrefixClean}'), '2023-01-01').keys[0].value}'
-      }
-    ]
+    name: 'ca-${resourcePrefix}-web'
+    location: location
+    tags: tags
+    containerAppsEnvironmentId: containerAppsEnv.outputs.environmentId
+    containerRegistryUrl: containerRegistryUrl
+    containerRegistryUsername: containerRegistryUsername
+    containerRegistryPassword: containerRegistryPassword
+    imageTag: frontendImageTag
+    backendUrl: backendApp.outputs.fqdn
+  }
+}
+
+// Module Azure Function App pour le logging
+module functionApp 'modules/function-app.bicep' = {
+  name: 'functionApp-deployment'
+  params: {
+    name: 'func-${resourcePrefix}'
+    location: location
+    tags: tags
+    storageAccountName: storage.outputs.storageAccountName
+    storageAccountKey: storage.outputs.storageAccountKey
+    logAnalyticsWorkspaceId: logAnalytics.outputs.workspaceId
   }
 }
 
 // ============================================================================
-// Outputs - URLs et informations de déploiement
+// OUTPUTS
 // ============================================================================
-output frontendUrl string = webApp.outputs.frontendUrl
-output backendUrl string = webApp.outputs.backendUrl
-output sqlServerFqdn string = database.outputs.serverFqdn
+
+@description('URL du frontend')
+output frontendUrl string = 'https://${frontendApp.outputs.fqdn}'
+
+@description('URL du backend API')
+output backendUrl string = 'https://${backendApp.outputs.fqdn}'
+
+@description('URL de la Function App')
+output functionAppUrl string = functionApp.outputs.functionAppUrl
+
+@description('Endpoint App Configuration')
+output appConfigEndpoint string = appConfig.outputs.endpoint
+
+@description('Nom du Key Vault')
+output keyVaultName string = keyVault.outputs.keyVaultName
+
+@description('Nom du Storage Account')
 output storageAccountName string = storage.outputs.storageAccountName
-output keyVaultUri string = keyVault.outputs.keyVaultUri
+
+@description('Nom du serveur SQL')
+output sqlServerName string = sqlDatabase.outputs.serverName

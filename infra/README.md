@@ -1,108 +1,157 @@
 # Infrastructure Azure - Les Capuches d'Opale
 
-## 📁 Structure des fichiers Bicep
+Ce dossier contient les templates **Bicep** pour le déploiement automatisé de l'infrastructure Azure.
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        Azure Resource Group                              │
+│  rg-capuchesdopale-{env}                                                │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                 Container Apps Environment                        │   │
+│  │  cae-capuchesdopale-{env}                                        │   │
+│  │  ┌─────────────────────┐    ┌─────────────────────┐            │   │
+│  │  │   Frontend (Web)    │    │   Backend (API)     │            │   │
+│  │  │   Angular + Nginx   │───▶│   NestJS + Prisma   │            │   │
+│  │  │   Port: 80          │    │   Port: 3000        │            │   │
+│  │  └─────────────────────┘    └──────────┬──────────┘            │   │
+│  └─────────────────────────────────────────┼────────────────────────┘   │
+│                                            │                             │
+│  ┌─────────────────┐   ┌─────────────────┐│   ┌─────────────────────┐  │
+│  │   Key Vault     │   │  App Config     ││   │   Azure SQL         │  │
+│  │   kv-...        │   │  appconfig-...  ││   │   sql-...-{env}     │  │
+│  │   • JWT Secrets │   │  • Feature Flags│◀──│   • guild-db        │  │
+│  │   • DB Password │   │  • App Settings ││   └─────────────────────┘  │
+│  └─────────────────┘   └─────────────────┘│                             │
+│                                            │                             │
+│  ┌─────────────────┐   ┌─────────────────┐│   ┌─────────────────────┐  │
+│  │  Storage Acct   │   │  Function App   │◀──│   Log Analytics      │  │
+│  │  st...          │   │  func-...       │    │   log-...           │  │
+│  │  • Blob: uploads│   │  • Log Receiver │    │   • Monitoring      │  │
+│  │  • Table: logs  │   │  • HTTP Trigger │    │   • Alerts          │  │
+│  └─────────────────┘   └─────────────────┘    └─────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+## 📁 Structure des fichiers
 
 ```
 infra/
-├── main.bicep                    # Template principal (orchestrateur)
-└── modules/
-    ├── webapp.bicep              # App Service Plan + Backend + Frontend
-    ├── database.bicep            # Azure SQL Database
-    ├── storage.bicep             # Blob Storage
-    ├── keyvault.bicep            # Key Vault
-    └── keyvault-secrets.bicep    # Secrets dans Key Vault
+├── main.bicep                      # Template principal (orchestrateur)
+├── modules/
+│   ├── keyvault.bicep             # Azure Key Vault (secrets)
+│   ├── appconfig.bicep            # Azure App Configuration
+│   ├── storage.bicep              # Storage Account (Blob + Table)
+│   ├── sqldatabase.bicep          # Azure SQL Database
+│   ├── loganalytics.bicep         # Log Analytics Workspace
+│   ├── container-apps-env.bicep   # Container Apps Environment
+│   ├── container-app-backend.bicep # Backend Container App
+│   ├── container-app-frontend.bicep# Frontend Container App
+│   └── function-app.bicep         # Azure Function App
+└── parameters/
+    ├── parameters.dev.bicepparam  # Paramètres environnement DEV
+    └── parameters.prod.bicepparam # Paramètres environnement PROD
 ```
 
-## 🏗️ Architecture déployée
+## 🚀 Déploiement
 
+### Prérequis
+
+1. **Azure CLI** installé et connecté (`az login`)
+2. **Bicep CLI** installé (`az bicep install`)
+3. Un **Azure Container Registry** avec les images Docker
+
+### Déploiement manuel
+
+```bash
+# 1. Créer le groupe de ressources
+az group create --name rg-capuchesdopale-dev --location westeurope
+
+# 2. Déployer l'infrastructure
+az deployment group create \
+  --resource-group rg-capuchesdopale-dev \
+  --template-file infra/main.bicep \
+  --parameters \
+    projectName=capuchesdopale \
+    environment=dev \
+    sqlAdminUsername=<USERNAME> \
+    sqlAdminPassword=<PASSWORD> \
+    jwtSecret=<JWT_SECRET> \
+    jwtSecretAdmin=<JWT_ADMIN_SECRET> \
+    containerRegistryUrl=<ACR_URL> \
+    containerRegistryUsername=<ACR_USER> \
+    containerRegistryPassword=<ACR_PASSWORD>
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                Resource Group (France Central)                   │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │              App Service Plan (F1 - Gratuit)             │   │
-│  │  ┌──────────────────┐    ┌──────────────────┐           │   │
-│  │  │  web-capucheopale │    │  api-capucheopale │           │   │
-│  │  │    (Angular)      │    │    (NestJS)       │           │   │
-│  │  └──────────────────┘    └──────────────────┘           │   │
-│  └─────────────────────────────────────────────────────────┘   │
-│                                │                                 │
-│                                ▼                                 │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
-│  │  Key Vault   │    │  SQL Database │    │ Blob Storage │      │
-│  │  (Secrets)   │    │   (Basic)     │    │ (Standard)   │      │
-│  └──────────────┘    └──────────────┘    └──────────────┘      │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
 
-## 🔧 Configuration requise
+### Déploiement via CI/CD (recommandé)
 
-### Secrets GitHub à configurer
+Le déploiement est automatisé via GitHub Actions. Voir `.github/workflows/azure-deploy.yml`.
 
-Dans **Settings > Secrets and variables > Actions** :
+## 🔐 Secrets GitHub requis
 
-| Secret | Description | Exemple |
-|--------|-------------|---------|
-| `AZURE_CREDENTIALS` | JSON du Service Principal | `{"clientId":"..."}` |
-| `SQL_ADMIN_LOGIN` | Login admin SQL Server | `sqladmin` |
-| `SQL_ADMIN_PASSWORD` | Mot de passe SQL (fort!) | `P@ssw0rd123!` |
-| `JWT_SECRET` | Clé secrète JWT | `my-super-secret-key` |
+Configurez ces secrets dans les paramètres de votre repository GitHub :
+
+| Secret | Description |
+|--------|-------------|
+| `AZURE_CREDENTIALS` | Service Principal JSON pour Azure |
+| `ACR_LOGIN_SERVER` | URL du Container Registry (ex: `myacr.azurecr.io`) |
+| `ACR_USERNAME` | Username du Container Registry |
+| `ACR_PASSWORD` | Password du Container Registry |
+| `SQL_ADMIN_USERNAME` | Username administrateur SQL |
+| `SQL_ADMIN_PASSWORD` | Password administrateur SQL |
+| `JWT_SECRET` | Secret pour les tokens JWT |
+| `JWT_SECRET_ADMIN` | Secret pour les tokens JWT admin |
 
 ### Créer le Service Principal Azure
 
 ```bash
-# 1. Connexion à Azure
-az login
-
-# 2. Créer le Service Principal
 az ad sp create-for-rbac \
-  --name "sp-capucheopale-github" \
+  --name "sp-capuchesdopale-github" \
   --role contributor \
   --scopes /subscriptions/<SUBSCRIPTION_ID> \
   --sdk-auth
-
-# 3. Copier le JSON généré dans AZURE_CREDENTIALS
 ```
 
-## 🚀 Déploiement manuel (si besoin)
+Copiez la sortie JSON dans le secret `AZURE_CREDENTIALS`.
 
-```bash
-# 1. Connexion Azure
-az login
+## 📊 Services Azure déployés
 
-# 2. Créer le Resource Group
-az group create \
-  --name rg-capucheopale-dev \
-  --location francecentral
+| Service | SKU | Description | Coût estimé/mois |
+|---------|-----|-------------|------------------|
+| Container Apps | Consumption | Frontend + Backend | ~15-30€ |
+| Azure SQL | Basic (5 DTU) | Base de données | ~5€ |
+| Storage Account | Standard LRS | Blob + Table | ~1-5€ |
+| Function App | Consumption | Log receiver | ~0-5€ |
+| Key Vault | Standard | Secrets | ~0.03€/10k ops |
+| App Configuration | Free | Config centralisée | Gratuit |
+| Log Analytics | Pay-per-GB | Monitoring | ~2-5€ |
 
-# 3. Déployer l'infrastructure
-az deployment group create \
-  --resource-group rg-capucheopale-dev \
-  --template-file infra/main.bicep \
-  --parameters \
-    projectName=capucheopale \
-    environment=dev \
-    sqlAdminLogin=sqladmin \
-    sqlAdminPassword='VotreMotDePasse123!' \
-    jwtSecret='votre-secret-jwt'
-```
+**Coût total estimé : 25-50€/mois** (environnement dev)
 
-## 💰 Estimation des coûts (Azure Student)
+## 🔧 Personnalisation
 
-| Service | SKU | Coût/mois |
-|---------|-----|-----------|
-| App Service Plan | F1 (Gratuit) | **0€** |
-| SQL Database | Basic | ~5€ |
-| Storage Account | Standard LRS | ~0.50€ |
-| Key Vault | Standard | ~0.03€ |
-| **Total** | | **~6€/mois** |
+### Modifier les Feature Flags
 
-> ✅ Compatible avec le crédit Azure Student (~100$/an)
+Les feature flags sont définis dans `modules/appconfig.bicep` :
 
-## 🌐 URLs après déploiement
+- `LoggingEnabled` : Active/désactive le logging Azure Function
+- `MaintenanceMode` : Mode maintenance
+- `NewQuestSystem` : Nouvelle fonctionnalité (dev only)
 
-- **Frontend**: `https://web-capucheopale-dev.azurewebsites.net`
-- **Backend API**: `https://api-capucheopale-dev.azurewebsites.net`
-- **Swagger**: `https://api-capucheopale-dev.azurewebsites.net/docs`
+### Ajouter un nouveau secret
+
+1. Ajouter le paramètre dans `main.bicep`
+2. Ajouter le secret dans `modules/keyvault.bicep`
+3. Mettre à jour le pipeline CI/CD
+
+## 📝 Outputs
+
+Après déploiement, les URLs suivantes sont disponibles :
+
+- **Frontend** : `https://ca-capuchesdopale-{env}-web.{region}.azurecontainerapps.io`
+- **Backend API** : `https://ca-capuchesdopale-{env}-api.{region}.azurecontainerapps.io`
+- **Swagger** : `https://ca-capuchesdopale-{env}-api.{region}.azurecontainerapps.io/api`
+- **Function App** : `https://func-capuchesdopale-{env}.azurewebsites.net`

@@ -43,7 +43,7 @@ RUN echo '#!/bin/sh' > /app/docker-entrypoint.sh && \
     echo 'echo "🌱 Seeding database..."' >> /app/docker-entrypoint.sh && \
     echo 'npm run prisma:seed || echo "⚠️  Seed already applied or failed"' >> /app/docker-entrypoint.sh && \
     echo 'echo "🚀 Starting application..."' >> /app/docker-entrypoint.sh && \
-    echo 'exec node dist/src/main.js' >> /app/docker-entrypoint.sh && \
+    echo 'exec node dist/main.js' >> /app/docker-entrypoint.sh && \
     chmod +x /app/docker-entrypoint.sh && \
     chown nestjs:nodejs /app/docker-entrypoint.sh
 

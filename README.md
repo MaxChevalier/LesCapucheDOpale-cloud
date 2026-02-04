@@ -289,6 +289,42 @@ LesCapucheDOpale/
 
 Ce projet est sous licence privée - voir les détails avec les propriétaires.
 
+## ☁️ Déploiement Azure
+
+Ce projet est configuré pour un déploiement automatisé sur Microsoft Azure.
+
+### Architecture Azure
+
+- **Frontend** : Azure Container Apps (Angular + Nginx)
+- **Backend** : Azure Container Apps (NestJS)
+- **Base de données** : Azure SQL Database
+- **Stockage** : Azure Blob Storage
+- **Secrets** : Azure Key Vault
+- **Configuration** : Azure App Configuration
+- **Logging** : Azure Functions + Table Storage
+- **Monitoring** : Log Analytics Workspace
+
+### Infrastructure as Code
+
+L'infrastructure est définie avec **Bicep** dans le dossier `infra/`.
+
+```bash
+# Déployer l'infrastructure
+az deployment group create \
+  --resource-group rg-capuchesdopale-dev \
+  --template-file infra/main.bicep \
+  --parameters @infra/parameters/parameters.dev.bicepparam
+```
+
+### CI/CD
+
+Le déploiement est automatisé via **GitHub Actions** :
+- Push sur `main` → Déploiement automatique
+- Workflow manuel pour choisir l'environnement (dev/prod)
+
+📚 [Documentation Infrastructure](./infra/README.md)  
+📄 [Rapport Technique](./docs/RAPPORT_TECHNIQUE.md)
+
 ## 👥 Équipe
 
 Projet développé dans le cadre de la formation YNOV.

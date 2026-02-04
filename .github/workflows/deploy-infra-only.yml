@@ -1,0 +1,101 @@
+# Infrastructure-only Deployment
+# Ce workflow déploie uniquement l'infrastructure Bicep sans rebuilder les images
+
+name: Deploy Infrastructure Only
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+
+env:
+  AZURE_RESOURCE_GROUP: rg-capuchesdopale-${{ github.event.inputs.environment }}
+  AZURE_LOCATION: francecentral
+
+jobs:
+  deploy-bicep:
+    name: Deploy Bicep Infrastructure
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Validate Bicep template
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az bicep build --file ./infra/main.bicep
+
+      - name: What-If deployment
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az deployment group what-if \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --template-file ./infra/main.bicep \
+              --parameters \
+                projectName=capuchesdopale \
+                environment=${{ github.event.inputs.environment }} \
+                location=${{ env.AZURE_LOCATION }} \
+                sqlAdminUsername=${{ secrets.SQL_ADMIN_USERNAME }} \
+                sqlAdminPassword=${{ secrets.SQL_ADMIN_PASSWORD }} \
+                jwtSecret=${{ secrets.JWT_SECRET }} \
+                jwtSecretAdmin=${{ secrets.JWT_SECRET_ADMIN }} \
+                containerRegistryUrl=${{ secrets.ACR_LOGIN_SERVER }} \
+                containerRegistryUsername=${{ secrets.ACR_USERNAME }} \
+                containerRegistryPassword=${{ secrets.ACR_PASSWORD }}
+
+      - name: Create Resource Group
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az group create \
+              --name ${{ env.AZURE_RESOURCE_GROUP }} \
+              --location ${{ env.AZURE_LOCATION }}
+
+      - name: Deploy Bicep Infrastructure
+        id: deploy
+        uses: azure/arm-deploy@v1
+        with:
+          resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
+          template: ./infra/main.bicep
+          parameters: >
+            projectName=capuchesdopale
+            environment=${{ github.event.inputs.environment }}
+            location=${{ env.AZURE_LOCATION }}
+            sqlAdminUsername=${{ secrets.SQL_ADMIN_USERNAME }}
+            sqlAdminPassword=${{ secrets.SQL_ADMIN_PASSWORD }}
+            jwtSecret=${{ secrets.JWT_SECRET }}
+            jwtSecretAdmin=${{ secrets.JWT_SECRET_ADMIN }}
+            containerRegistryUrl=${{ secrets.ACR_LOGIN_SERVER }}
+            containerRegistryUsername=${{ secrets.ACR_USERNAME }}
+            containerRegistryPassword=${{ secrets.ACR_PASSWORD }}
+            backendImageTag=latest
+            frontendImageTag=latest
+          failOnStdErr: false
+
+      - name: Output deployment results
+        run: |
+          echo "## 🏗️ Infrastructure Deployment Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Output | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend URL | ${{ steps.deploy.outputs.frontendUrl }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend URL | ${{ steps.deploy.outputs.backendUrl }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Function App | ${{ steps.deploy.outputs.functionAppUrl }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Key Vault | ${{ steps.deploy.outputs.keyVaultName }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Storage Account | ${{ steps.deploy.outputs.storageAccountName }} |" >> $GITHUB_STEP_SUMMARY
