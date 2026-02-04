@@ -28,7 +28,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enableRbacAuthorization: true       // Utiliser RBAC au lieu des access policies
     enableSoftDelete: true
     softDeleteRetentionInDays: 7        // Minimum pour réduire les coûts
-    enablePurgeProtection: false        // Désactivé pour dev (permet de supprimer rapidement)
+    // Note: enablePurgeProtection omis intentionnellement (false par défaut pour dev)
     publicNetworkAccess: 'Enabled'
     networkAcls: {
       defaultAction: 'Allow'
