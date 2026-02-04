@@ -115,7 +115,7 @@ module keyVaultSecrets 'modules/keyvault-secrets.bicep' = {
       }
       {
         name: 'StorageConnectionString'
-        value: 'DefaultEndpointsProtocol=https;AccountName=${storage.outputs.storageAccountName};EndpointSuffix=${az.environment().suffixes.storage};AccountKey=${listKeys(storage.outputs.storageAccountId, '2023-01-01').keys[0].value}'
+        value: 'DefaultEndpointsProtocol=https;AccountName=${storage.outputs.storageAccountName};EndpointSuffix=${az.environment().suffixes.storage};AccountKey=${listKeys(resourceId('Microsoft.Storage/storageAccounts', 'st${resourcePrefixClean}'), '2023-01-01').keys[0].value}'
       }
     ]
   }
